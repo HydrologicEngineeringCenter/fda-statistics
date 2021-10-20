@@ -9,6 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StatisticsTests", "Statisti
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8E5BB5A4-295D-4741-A985-35473B6ACE40}"
 	ProjectSection(SolutionItems) = preProject
+		.github\workflows\CI-CD.yml = .github\workflows\CI-CD.yml
 		nuget.config = nuget.config
 	EndProjectSection
 EndProject
