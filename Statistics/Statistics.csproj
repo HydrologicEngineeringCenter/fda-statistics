@@ -15,10 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Utilities\Utilities.csproj" />
+	<PackageReference Include="USACE.HEC.FDA.Utilities" Version="1.0.0-Alpha" />
   </ItemGroup>
 
 </Project>
