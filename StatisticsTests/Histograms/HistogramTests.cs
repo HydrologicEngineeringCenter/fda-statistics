@@ -199,5 +199,17 @@ namespace StatisticsTests.Histograms
 
         }
 
+        [Theory]
+        [InlineData(.1,1)]
+        public void IsHistogramConstructableWithNullData(double binWidth, double expected)
+        {
+            Histogram histogram = new Histogram(null, binWidth);
+            double[] obsToAdd = new double[1] { .05 };
+            IData data = new Data(obsToAdd);
+            histogram.AddObservationToHistogram(data);
+            double actual = histogram.BinCounts[0];
+            Assert.Equal(expected, actual);
+        }
+
     }
 }

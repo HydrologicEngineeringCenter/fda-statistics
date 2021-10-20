@@ -56,15 +56,25 @@ namespace Statistics.Histograms
 
         #region Constructor
         public Histogram(IData data, double binWidth)
-        {
+        {//need to be able to handle null
             BinWidth = binWidth;
-            Min = Math.Floor(data.Range.Min); //this need not be a integer - it just needs to be the nearest bin start - a function of bin width.
-            Int64 numberOfBins = Convert.ToInt64(Math.Ceiling((data.Range.Max - Min) / binWidth)); 
-            Max = Min + (numberOfBins * binWidth);
-            BinCounts = new double[numberOfBins];
-            AddObservationsToHistogram(data);
-            Range = GetRange(Min, Max);
+            if (data == null)
+            {
+                Min = 0;
+                Max = Min + BinWidth;
+                Int64 numberOfBins = 1;
+                BinCounts = new double[numberOfBins];
+            }
+            else
+            {
+                Min = Math.Floor(data.Range.Min); //this need not be a integer - it just needs to be the nearest bin start - a function of bin width.
+                Int64 numberOfBins = Convert.ToInt64(Math.Ceiling((data.Range.Max - Min) / binWidth));
+                Max = Min + (numberOfBins * binWidth);
+                BinCounts = new double[numberOfBins];
+                AddObservationsToHistogram(data);
 
+            }
+            Range = GetRange(Min, Max);
         }
         #endregion
 
