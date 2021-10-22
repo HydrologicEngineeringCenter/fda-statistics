@@ -1,7 +1,7 @@
-name: CI-CD
+name: CI
 
 on:
-  push:
+  pull_request:
     branches: [ main ]
 
 jobs:
@@ -50,13 +50,6 @@ jobs:
     - name: Test
       run: dotnet test --no-build
       
-    # pack the NuGet
-    - name: Pack 
-      run: dotnet pack --configuration Release
-      
-    #Publish
-    - name: Publish
-      run: dotnet nuget push "D:\a\fda-statistics\fda-statistics\Build\FDA2.0\*.nupkg"  --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
 
 
   
