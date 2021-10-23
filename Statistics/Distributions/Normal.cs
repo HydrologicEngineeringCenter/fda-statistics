@@ -111,7 +111,14 @@ namespace Statistics.Distributions
             ordinateElem.SetAttributeValue(SerializationConstants.SAMPLE_SIZE, SampleSize);
 
             return ordinateElem;
-        }     
+        }
+        public IDistribution ReadFromXML(XElement ele)
+        {
+            double mean = Convert.ToDouble(ele.Attribute(SerializationConstants.MEAN).Value);
+            double stdev = Convert.ToDouble(ele.Attribute(SerializationConstants.ST_DEV).Value);
+            int samplesize = Convert.ToInt32(ele.Attribute(SerializationConstants.SAMPLE_SIZE).Value);
+            return IDistributionFactory.FactoryNormal(mean, stdev, samplesize);
+        }
         #endregion
     }
 }
