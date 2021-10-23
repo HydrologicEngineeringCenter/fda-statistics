@@ -11,7 +11,7 @@ namespace Statistics.Distributions
     /// A specific truncated distribution that places density from outside the truncation value(s) at the truncation value(s) without altering the statistics of the underlying distribution.
     /// </summary>
     /// <remarks> Measures of central tendency and dispersion are based on the underlying distribution NOT the truncated copy. </remarks>
-    internal class TruncatedDistribution : IDistribution, IValidate<TruncatedDistribution>
+    public class TruncatedDistribution : IDistribution, IValidate<TruncatedDistribution>
     {
         // TODO: Validation lower bound below mean, median, mode and upper bound above mean, median mode - valid range of lower and upper bounds 
 
@@ -119,7 +119,7 @@ namespace Statistics.Distributions
         internal static string RequirementNotes() => $"If the minimum value is set to {double.NegativeInfinity} the left hand tail of the IDistribution will not be truncated. Similarly, if the maximum is set to {double.PositiveInfinity} the right hand tail of the IDistribution will not be truncated.";
         #endregion
 
-        XElement WriteToXML()
+        public XElement WriteToXML()
         {
             throw new NotImplementedException();
         }

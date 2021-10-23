@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Statistics.Distributions
 {
-    internal class Uniform: IDistribution, IValidate<Uniform>
+    public class Uniform: IDistribution, IValidate<Uniform>
     {
         //TODO: Validation
         #region Fields and Properties

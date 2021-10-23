@@ -8,7 +8,7 @@ using Utilities.Serialization;
 
 namespace Statistics.Distributions
 {
-    internal class LogPearson3: IDistribution, IValidate<LogPearson3> 
+    public class LogPearson3: IDistribution, IValidate<LogPearson3> 
     {
         internal readonly PearsonIII _Distribution;
         internal readonly IRange<double> _ProbabilityRange; 
@@ -144,7 +144,7 @@ namespace Statistics.Distributions
             return new LogPearson3(stats.Mean, stats.StandardDeviation, stats.Skewness, sampleSize == -404 ? stats.SampleSize : sampleSize);
         }
 
-        XElement WriteToXML()
+        public XElement WriteToXML()
         {
             throw new NotImplementedException();
         }

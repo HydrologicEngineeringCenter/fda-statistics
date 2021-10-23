@@ -8,7 +8,7 @@ using Utilities;
 
 namespace Statistics.Distributions
 {
-    internal class Normal : IDistribution, Utilities.IValidate<Normal> //IOrdinate<IDistribution>
+    public class Normal : IDistribution, Utilities.IValidate<Normal> //IOrdinate<IDistribution>
     {
         //TODO: Sample
         #region Fields and Properties

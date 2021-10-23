@@ -8,7 +8,7 @@ using Utilities.Serialization;
 
 namespace Statistics.Distributions
 {
-    internal class Beta4Parameters: IDistribution, IValidate<Beta4Parameters> // IOrdinate<IDistribution>
+    public class Beta4Parameters: IDistribution, IValidate<Beta4Parameters> // IOrdinate<IDistribution>
     {
         private readonly MathNet.Numerics.Distributions.BetaScaled _Distribution;
         
@@ -155,7 +155,7 @@ namespace Statistics.Distributions
             return new Beta4Parameters(alpha, beta, min, (max - min));
         }
 
-        XElement WriteToXML()
+        public XElement WriteToXML()
         {
             throw new NotImplementedException();
         }
