@@ -129,11 +129,12 @@ namespace Statistics.Distributions
                 //return null;
             }
             IDistribution ret = IDistributionFactory.CreateDefaultDistributionOfType(type);
-            ret.Range = Utilities.IRangeFactory.Factory(min, max);
-            XElement child = ele.Elements().FirstOrDefault();
-            IDistribution dist = ret._Distribution.ReadFromXML(child);
-            ret._Distribution = dist;
-            return ret;
+            //ret.Range = Utilities.IRangeFactory.Factory(min, max);
+            //XElement child = ele.Elements().FirstOrDefault();
+            //IDistribution dist = ret._Distribution.ReadFromXML(child);
+            //ret._Distribution = dist;
+            throw new NotImplementedException("under construction");
+            //return ret;
         }
     }
 }
