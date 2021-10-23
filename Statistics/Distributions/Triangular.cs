@@ -30,6 +30,10 @@ namespace Statistics.Distributions
         #endregion
 
         #region Constructor
+        public Triangular()
+        {
+            //for reflection
+        }
         public Triangular(double min, double mode, double max, int sampleSize = int.MaxValue)
         {
             IRange<double> range = IRangeFactory.Factory(min, max,true, true, true, false);

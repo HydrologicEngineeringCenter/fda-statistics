@@ -15,12 +15,16 @@ namespace Statistics.Distributions
         
         #region Properties
         public IDistributionEnum Type => IDistributionEnum.LogPearsonIII;
+        [Stored(Name = "Mean", type = typeof(double))]
         public double Mean { get; }
         public double Median { get; }
         public double Variance { get; }
+        [Stored(Name = "St_Dev", type = typeof(double))]
         public double StandardDeviation { get; }
+        [Stored(Name = "Skew", type = typeof(double))]
         public double Skewness { get; }
         public Utilities.IRange<double> Range { get; }
+        [Stored(Name = "SampleSize", type = typeof(Int32))]
         public int SampleSize { get; }
         public IMessageLevels State { get; }
         public IEnumerable<Utilities.IMessage> Messages { get; }
@@ -29,6 +33,10 @@ namespace Statistics.Distributions
         #endregion
 
         #region Constructor
+        public LogPearson3()
+        {
+            //for reflection;
+        }
         public LogPearson3(double mean, double standardDeviation, double skew, int sampleSize = int.MaxValue)
         {
             if (!Validation.LogPearson3Validator.IsConstructable(mean, standardDeviation, skew, sampleSize, out string error)) throw new Utilities.InvalidConstructorArgumentsException(error);

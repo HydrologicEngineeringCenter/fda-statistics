@@ -30,6 +30,10 @@ namespace Statistics.Distributions
         #endregion
 
         #region Constructor
+        public Uniform()
+        {
+            //for reflection
+        }
         public Uniform(double min, double max, int sampleSize = int.MaxValue)
         {
             _Distribution = new MathNet.Numerics.Distributions.ContinuousUniform(lower: min, upper: max);

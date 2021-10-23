@@ -120,19 +120,8 @@ namespace Statistics.Distributions
         }
         public IDistribution ReadFromXML(XElement ele)
         {
-            double min = Convert.ToDouble(ele.Attribute(SerializationConstants.MIN).Value);
-            double max = Convert.ToDouble(ele.Attribute(SerializationConstants.MAX).Value);
-            IDistributionEnum type = IDistributionEnum.NotSupported;
-            if (!IDistributionEnum.TryParse(ele.Attribute("Type").Value,out type))
-            {
-                throw new ArgumentException("Could not parse type " + ele.Attribute("Type").Value);
-                //return null;
-            }
-            IDistribution ret = IDistributionFactory.CreateDefaultDistributionOfType(type);
-            //ret.Range = Utilities.IRangeFactory.Factory(min, max);
-            //XElement child = ele.Elements().FirstOrDefault();
-            //IDistribution dist = ret._Distribution.ReadFromXML(child);
-            //ret._Distribution = dist;
+
+
             throw new NotImplementedException("under construction");
             //return ret;
         }

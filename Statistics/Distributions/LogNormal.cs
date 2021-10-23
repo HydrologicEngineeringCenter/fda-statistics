@@ -14,6 +14,7 @@ namespace Statistics.Distributions
 
         #region Properties
         public IDistributionEnum Type => IDistributionEnum.LogNormal;
+        [Stored(Name = "Mean", type = typeof(double))]
         public double Mean => _Distribution.Mean;
 
         public double Median => _Distribution.Median;
@@ -21,13 +22,13 @@ namespace Statistics.Distributions
         public double Mode => _Distribution.Mode;
 
         public double Variance => _Distribution.Variance;
-
+        [Stored(Name = "St_Dev", type = typeof(double))]
         public double StandardDeviation => _Distribution.StdDev;
 
         public double Skewness => _Distribution.Skewness;
 
         public IRange<double> Range { get; }
-
+        [Stored(Name = "SampleSize", type = typeof(Int32))]
         public int SampleSize { get; }
 
         public IMessageLevels State { get; }
@@ -35,6 +36,10 @@ namespace Statistics.Distributions
         #endregion
 
         #region Constructor
+        public LogNormal()
+        {
+            //for reflection
+        }
         internal LogNormal(double mean, double standardDeviation, int sampleSize = int.MaxValue)
         {
             if (!Validation.LogNormalValidator.IsConstructable(mean, standardDeviation, sampleSize, out string msg)) throw new InvalidConstructorArgumentsException(msg);

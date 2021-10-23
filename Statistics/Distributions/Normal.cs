@@ -16,13 +16,16 @@ namespace Statistics.Distributions
         private readonly MathNet.Numerics.Distributions.Normal _Distribution;
         #region IDistribution Properties
         public IDistributionEnum Type => IDistributionEnum.Normal;
+        [Stored(Name = "Mean", type = typeof(double))]
         public double Mean => _Distribution.Mean;
         public double Median => _Distribution.Median;
         public double Mode => _Distribution.Mode;
         public double Variance => _Distribution.Variance;
+        [Stored(Name = "St_Dev", type = typeof(double))]
         public double StandardDeviation => _Distribution.StdDev;
         public double Skewness => _Distribution.Skewness;
         public Utilities.IRange<double> Range { get; }
+        [Stored(Name = "SampleSize", type = typeof(Int32))]
         public int SampleSize { get; }
         #endregion
         #region IMessagePublisher Properties
@@ -33,6 +36,10 @@ namespace Statistics.Distributions
         #endregion
 
         #region Constructor
+        public Normal()
+        {
+            //for reflection;
+        }
         public Normal(double mean, double sd, int sampleSize = int.MaxValue)
         {
             if (!Validation.NormalValidator.IsConstructable(mean, sd, sampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
@@ -72,16 +79,7 @@ namespace Statistics.Distributions
             return _Distribution.InverseCumulativeDistribution(p);
         }
 
-        //public double Sample(Random r = null) => InverseCDF(r == null ? new Random().NextDouble() : r.NextDouble());
-        ////public double[] Sample(Random numberGenerator = null) => Sample(SampleSize, numberGenerator);
-        //public double[] Sample(int sampleSize, Random numberGenerator = null)
-        //{
-        //    if (numberGenerator == null) numberGenerator = new Random();
-        //    double[] sample = new double[sampleSize];
-        //    for (int i = 0; i < sample.Length; i++) sample[i] = InverseCDF(numberGenerator.NextDouble());
-        //    return sample;
-        //}
-        //public IDistribution SampleDistribution(Random numberGenerator = null) => Fit(Sample(SampleSize, numberGenerator));
+
         public string Print(bool round = false) => round ? Print(Mean, StandardDeviation, SampleSize): $"Normal(mean: {Mean}, sd: {StandardDeviation}, sample size: {SampleSize})";
         public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
         public bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print()) == 0 ? true : false;
