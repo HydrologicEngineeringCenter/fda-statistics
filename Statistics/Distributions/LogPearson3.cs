@@ -144,11 +144,7 @@ namespace Statistics.Distributions
             return new LogPearson3(stats.Mean, stats.StandardDeviation, stats.Skewness, sampleSize == -404 ? stats.SampleSize : sampleSize);
         }
 
-        public string WriteToXML()
-        {
-            return $"{Mean}, {StandardDeviation}, {Skewness}, {SampleSize}";
-        }
-        XElement ISerializeToXML<IDistribution>.WriteToXML()
+        XElement WriteToXML()
         {
             throw new NotImplementedException();
         }

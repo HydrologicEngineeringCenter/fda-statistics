@@ -119,7 +119,7 @@ namespace Statistics.Distributions
         internal static string RequirementNotes() => $"If the minimum value is set to {double.NegativeInfinity} the left hand tail of the IDistribution will not be truncated. Similarly, if the maximum is set to {double.PositiveInfinity} the right hand tail of the IDistribution will not be truncated.";
         #endregion
 
-        XElement ISerializeToXML<IDistribution>.WriteToXML()
+        XElement WriteToXML()
         {
             throw new NotImplementedException();
         }

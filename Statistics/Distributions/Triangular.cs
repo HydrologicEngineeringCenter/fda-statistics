@@ -65,30 +65,12 @@ namespace Statistics.Distributions
         public double CDF(double x) =>  _Distribution.CumulativeDistribution(x);
         public double InverseCDF(double p) => p.IsOnRange(0,1) ? _Distribution.InverseCumulativeDistribution(p): throw new ArgumentOutOfRangeException($"The specified probability parameter, p: {p} is invalid because it it not on the valid range [0, 1].");
 
-        //public double Sample(Random r = null) => InverseCDF(r == null ? new Random().NextDouble() : r.NextDouble());
-        ////public double[] Sample(Random numberGenerator = null) => Sample(SampleSize, numberGenerator);
-        //public double[] Sample(int sampleSize, Random numberGenerator = null)
-        //{
-        //    if (numberGenerator == null) numberGenerator = new Random();
-        //    double[] sample = new double[SampleSize];
-        //    for (int i = 0; i < sample.Length; i++) sample[i] = InverseCDF(numberGenerator.NextDouble());
-        //    return sample;
-        //}
-        //public IDistribution SampleDistribution(Random numberGenerator = null) => Fit(Sample(SampleSize, numberGenerator));
         public string Print(bool round = false) => round ? Print(_Distribution.Mode, Range) : $"Triangular(mode: {_Distribution.Mode}, range: {Range.Print()}, sample size: {SampleSize})";
         public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
         public bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print()) == 0 ? true : false;
         #endregion
 
-        //internal static string Print(double mode, IRange<double> range) => $"Triangular(mode: {mode.Print()}, range: [{range.Min.Print()}, {range.Max.Print()}])";
-        //internal static string RequiredParameterization(bool printNotes)
-        //{
-        //    string s = $"The Triangular distribution requires the following parameterization: {Parameterization()}.";
-        //    if (printNotes) s += RequirementNotes();
-        //    return s;
-        //}
-       // internal static string Parameterization() => $"Triangular(mode: range minimum \u2264 mode \u2264 range maximum, {Validation.Resources.DoubleRangeRequirements()}, sample size: > 0)";
-       // internal static string RequirementNotes() => "The mode parameter is also sometimes referred to as the mostly likely value.";
+
 
         public static Triangular Fit(IEnumerable<double> sample)
         {

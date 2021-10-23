@@ -95,24 +95,5 @@ namespace Statistics
         bool Equals(IDistribution distribution);
         #endregion
 
-        ///// <summary>
-        ///// Draws a single random value from the distribution.
-        ///// </summary>
-        ///// <param name="numberGenerator"> A <see cref="Random"/> Number Generator. If left <see langword="null""/> a random number generator is constructed by the function.</param>
-        ///// <returns> A single double value drawn from the distribution. </returns>
-        //double Sample(Random numberGenerator);
-        ///// <summary>
-        ///// Draws a random sample from the distribution, with the specified length (<paramref name="sampleSize"/>).
-        ///// </summary>
-        ///// <param name="numberGenerator"> A <see cref="Random"/> Number Generator. If left <see langword="null""/> a random number generator is constructed by the function. </param>
-        ///// <param name="sampleSize"> The desired sample size. </param>
-        ///// <returns> An array of double values drawn from the distribution.</returns>
-        //double[] Sample(int sampleSize, Random numberGenerator = null);
-        ///// <summary>
-        ///// Uses parametric bootstrapping technique to draw a new distribution.
-        ///// </summary>
-        ///// <param name="numberGenerator"> A <see cref="Random"/> Number Generator. If left <see langword="null"/> a random number generator is constructed by the function.  </param>
-        ///// <returns> A new distribution based on the a sample of <see cref="SampleSize"/> values drawn from the distribution. </returns>
-        //IDistribution SampleDistribution(Random numberGenerator = null);
     }
 }
