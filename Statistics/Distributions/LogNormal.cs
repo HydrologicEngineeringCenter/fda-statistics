@@ -7,7 +7,7 @@ using Utilities;
 
 namespace Statistics.Distributions
 {
-    internal class LogNormal : IDistribution, Utilities.IValidate<LogNormal>
+    public class LogNormal : IDistribution, Utilities.IValidate<LogNormal>
     {      
         internal IRange<double> _ProbabilityRange;
         private readonly MathNet.Numerics.Distributions.LogNormal _Distribution;
