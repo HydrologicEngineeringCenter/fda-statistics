@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using Utilities;
@@ -85,20 +86,6 @@ namespace Statistics.Distributions
             else return _Distribution.InverseCDF(p);
         }
 
-        //public double Sample(Random r = null) => InverseCDF(r == null ? new Random().NextDouble() : r.NextDouble());
-        ////public double[] Sample(Random numberGenerator = null) => Sample(SampleSize, numberGenerator);
-        //public double[] Sample(int sampleSize, Random numberGenerator = null)
-        //{
-        //    if (numberGenerator == null) numberGenerator = new Random();
-        //    double[] sample = new double[sampleSize];
-        //    for (int i = 0; i < sample.Length; i++) sample[i] = InverseCDF(numberGenerator.NextDouble());
-        //    return sample;
-        //}
-        //public IDistribution SampleDistribution(Random numberGenerator = null)
-        //{
-        //    IDistribution distribution = IDistributionFactory.Fit(Sample(SampleSize, numberGenerator), _Distribution.Type);
-        //    return new TruncatedDistribution(distribution, Range.Min, Range.Max);
-        //}
         public string Print(bool round = false) => round ? Print(_Distribution, Range) : $"TruncatedDistribution(distribution: {_Distribution.Print()}, truncated range: {Range.Print()})";
         public string Requirements(bool printNotes)
         {
@@ -121,7 +108,32 @@ namespace Statistics.Distributions
 
         public XElement WriteToXML()
         {
-            throw new NotImplementedException();
+            XElement ordinateElem = new XElement("Truncated");
+            //min
+            ordinateElem.SetAttributeValue(SerializationConstants.MIN, Range.Min);
+            //max
+            ordinateElem.SetAttributeValue(SerializationConstants.MAX, Range.Max);
+            ordinateElem.SetAttributeValue("Type", Type);
+            XElement dist = _Distribution.WriteToXML();
+            ordinateElem.Add(dist);
+            return ordinateElem;
+        }
+        public IDistribution ReadFromXML(XElement ele)
+        {
+            double min = Convert.ToDouble(ele.Attribute(SerializationConstants.MIN).Value);
+            double max = Convert.ToDouble(ele.Attribute(SerializationConstants.MAX).Value);
+            IDistributionEnum type = IDistributionEnum.NotSupported;
+            if (!IDistributionEnum.TryParse(ele.Attribute("Type").Value,out type))
+            {
+                throw new ArgumentException("Could not parse type " + ele.Attribute("Type").Value);
+                //return null;
+            }
+            IDistribution ret = IDistributionFactory.CreateDefaultDistributionOfType(type);
+            ret.Range = Utilities.IRangeFactory.Factory(min, max);
+            XElement child = ele.Elements().FirstOrDefault();
+            IDistribution dist = ret._Distribution.ReadFromXML(child);
+            ret._Distribution = dist;
+            return ret;
         }
     }
 }

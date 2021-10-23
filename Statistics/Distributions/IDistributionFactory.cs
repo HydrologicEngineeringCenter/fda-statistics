@@ -49,7 +49,37 @@ namespace Statistics
                     throw new NotImplementedException();
             }
         }
-
+        public static IDistribution CreateDefaultDistributionOfType(IDistributionEnum type)
+        {
+            switch (type)
+            {
+                case IDistributionEnum.Histogram:
+                    return new Histograms.Histogram(null,0);
+                case IDistributionEnum.Beta4Parameters:
+                    return new Distributions.Beta4Parameters(0,0,0,0,0);
+                case IDistributionEnum.LogPearsonIII:
+                    return new Distributions.LogPearson3(0,0,0,0);
+                case IDistributionEnum.Normal:
+                    return new Distributions.Normal(0,0,0);
+                case IDistributionEnum.Triangular:
+                    return new Distributions.Triangular(0,0,0,0);
+                case IDistributionEnum.Uniform:
+                    return new Distributions.Uniform(0,0,0);
+                case IDistributionEnum.TruncatedBeta4Parameter:
+                    return new Distributions.TruncatedDistribution(IDistributionFactory.CreateDefaultDistributionOfType(IDistributionEnum.Beta4Parameters), 0, 0);
+                case IDistributionEnum.TruncatedHistogram:
+                    return new Distributions.TruncatedDistribution(IDistributionFactory.CreateDefaultDistributionOfType(IDistributionEnum.Histogram), 0, 0);
+                case IDistributionEnum.TruncatedNormal:
+                    return new Distributions.TruncatedDistribution(IDistributionFactory.CreateDefaultDistributionOfType(IDistributionEnum.Normal), 0, 0);
+                case IDistributionEnum.TruncatedTriangular:
+                    return new Distributions.TruncatedDistribution(IDistributionFactory.CreateDefaultDistributionOfType(IDistributionEnum.Triangular), 0, 0);
+                case IDistributionEnum.TruncatedUniform:
+                    return new Distributions.TruncatedDistribution(IDistributionFactory.CreateDefaultDistributionOfType(IDistributionEnum.Uniform), 0, 0);
+                case IDistributionEnum.NotSupported:
+                default:
+                    throw new NotImplementedException();
+            }
+        }
         #region Sample Stuff To Remove
         /// <summary>
         /// Generates a parametric bootstrap sample, yielding a new <see cref="IDistribution"/> based on the specified <paramref name="distribution"/>.
