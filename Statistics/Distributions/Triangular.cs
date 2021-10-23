@@ -94,6 +94,14 @@ namespace Statistics.Distributions
 
             return ordinateElem;
         }
+        public IDistribution ReadFromXML(XElement ele)
+        {
+            double min = Convert.ToDouble(ele.Attribute(SerializationConstants.MIN).Value);
+            double mostlikely = Convert.ToDouble(ele.Attribute(SerializationConstants.MODE).Value);
+            double max = Convert.ToDouble(ele.Attribute(SerializationConstants.MAX).Value);
+            int samplesize = Convert.ToInt32(ele.Attribute(SerializationConstants.SAMPLE_SIZE).Value);
+            return IDistributionFactory.FactoryTriangular(min, mostlikely, max, samplesize);
+        }
         #endregion
     }
 }
