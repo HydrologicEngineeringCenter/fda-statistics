@@ -10,22 +10,51 @@ namespace Statistics.Distributions
 {
     public class LogPearson3: IDistribution, IValidate<LogPearson3> 
     {
-        internal readonly PearsonIII _Distribution;
+        internal PearsonIII _Distribution;
         internal readonly IRange<double> _ProbabilityRange; 
         
         #region Properties
         public IDistributionEnum Type => IDistributionEnum.LogPearsonIII;
         [Stored(Name = "Mean", type = typeof(double))]
-        public double Mean { get; }
+        public double Mean
+        {
+            get { return _Distribution.Mean; }
+            set
+            {
+                _Distribution = new PearsonIII(value, _Distribution.StandardDeviation, _Distribution.Skewness, _Distribution.SampleSize);
+            }
+        }
         public double Median { get; }
         public double Variance { get; }
         [Stored(Name = "St_Dev", type = typeof(double))]
-        public double StandardDeviation { get; }
+        public double StandardDeviation
+        {
+            get { return _Distribution.StandardDeviation; }
+            set
+            {
+                _Distribution = new PearsonIII(_Distribution.Mean, value, _Distribution.Skewness, _Distribution.SampleSize);
+                Variance = Math.Pow(value, 2);
+            }
+        }
         [Stored(Name = "Skew", type = typeof(double))]
-        public double Skewness { get; }
+        public double Skewness
+        {
+            get { return _Distribution.Skewness; }
+            set
+            {
+                _Distribution = new PearsonIII(_Distribution.Mean, _Distribution.StandardDeviation, value, _Distribution.SampleSize);
+            }
+        }
         public Utilities.IRange<double> Range { get; }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
-        public int SampleSize { get; }
+        public int SampleSize
+        {
+            get { return _Distribution.SampleSize; }
+            set
+            {
+                _Distribution = new PearsonIII(_Distribution.Mean, _Distribution.StandardDeviation, _Distribution.Skewness, value);
+            }
+        }
         public IMessageLevels State { get; }
         public IEnumerable<Utilities.IMessage> Messages { get; }
 

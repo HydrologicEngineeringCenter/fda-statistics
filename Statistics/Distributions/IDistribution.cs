@@ -36,6 +36,8 @@ namespace Statistics
         /// The expected absolute value for the deviation of the distribution values from the distribution <see cref="IDistribution.Mean"/>. It is the square root of the <see cref="IDistribution.Variance"/>.
         /// </summary>
         double StandardDeviation { get; }
+        double Min { get; }
+        double Max { get; }
         /// <summary>
         /// Measures the asymmetry of the distribution.
         /// Zero skew values represent a symmetrical distribution.
@@ -48,6 +50,7 @@ namespace Statistics
         /// The maximum and minimum value for the distribution.
         /// For continuous distributions which span the real number line from negative to positive infinity, this is approximated a value very close to <see cref="double.NegativeInfinity"/> or <see cref="double.PositiveInfinity"/>.
         /// </summary>
+        [Obsolete("IDistribution.Range is Obsolete, Please use Min and Max instead.")]
         Utilities.IRange<double> Range { get; }    
         /// <summary>
         /// The sample size used to fit the distribution.

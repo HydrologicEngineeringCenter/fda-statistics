@@ -12,7 +12,7 @@ namespace Statistics.Distributions
     {
         //TODO: Sample
         #region Fields and Properties
-        private readonly MathNet.Numerics.Distributions.Triangular _Distribution;
+        private MathNet.Numerics.Distributions.Triangular _Distribution;
 
         #region IDistribution Properties
         public IDistributionEnum Type => IDistributionEnum.Triangular;
@@ -22,10 +22,38 @@ namespace Statistics.Distributions
         public double StandardDeviation => _Distribution.StdDev;
         public double Skewness => _Distribution.Skewness;
         public IRange<double> Range { get; }
+        [Stored(Name = "Min", type = typeof(double))]
+        public double Min
+        {
+            get { return Range.Min(); }
+            set
+            {
+                _Distribution = new MathNet.Numerics.Distributions.Triangular(value, _Distribution.Maximum, _Distribution.Mode);
+                Range = Utilities.IRangeFactory.Factory(_Distribution.Minimum, _Distribution.Maximum);
+            }
+        }
+        [Stored(Name = "Max", type = typeof(double))]
+        public double Max
+        {
+            get { return Range.Max(); }
+            set
+            {
+                _Distribution = new MathNet.Numerics.Distributions.Triangular(_Distribution.Minimum, value, _Distribution.Mode);
+                Range = Utilities.IRangeFactory.Factory(_Distribution.Minimum, _Distribution.Maximum);
+            }
+        }
+        [Stored(Name = "SampleSize", type = typeof(Int32))]
         public int SampleSize { get; }
         public IMessageLevels State { get; }
         public IEnumerable<IMessage> Messages { get; }
-        public double Mode => _Distribution.Mode;
+        public double Mode
+        {
+            get { return _Distribution.Mode; }
+            set
+            {
+                _Distribution = new MathNet.Numerics.Distributions.Triangular(_Distribution.Minimum, _Distribution.Maximum, value);
+            }
+        }
         #endregion
         #endregion
 
@@ -97,14 +125,6 @@ namespace Statistics.Distributions
             ordinateElem.SetAttributeValue(SerializationConstants.SAMPLE_SIZE, SampleSize);
 
             return ordinateElem;
-        }
-        public IDistribution ReadFromXML(XElement ele)
-        {
-            double min = Convert.ToDouble(ele.Attribute(SerializationConstants.MIN).Value);
-            double mostlikely = Convert.ToDouble(ele.Attribute(SerializationConstants.MODE).Value);
-            double max = Convert.ToDouble(ele.Attribute(SerializationConstants.MAX).Value);
-            int samplesize = Convert.ToInt32(ele.Attribute(SerializationConstants.SAMPLE_SIZE).Value);
-            return IDistributionFactory.FactoryTriangular(min, mostlikely, max, samplesize);
         }
         #endregion
     }

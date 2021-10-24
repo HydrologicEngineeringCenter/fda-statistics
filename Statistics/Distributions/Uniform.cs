@@ -12,7 +12,7 @@ namespace Statistics.Distributions
     {
         //TODO: Validation
         #region Fields and Properties
-        private readonly MathNet.Numerics.Distributions.ContinuousUniform _Distribution;
+        private MathNet.Numerics.Distributions.ContinuousUniform _Distribution;
 
         #region IDistribution Properties
         public IDistributionEnum Type => IDistributionEnum.Uniform;
@@ -22,8 +22,29 @@ namespace Statistics.Distributions
         public double StandardDeviation => _Distribution.StdDev;
         public double Skewness => _Distribution.Skewness;
         public Utilities.IRange<double> Range { get; }
+        [Stored(Name = "Min", type =typeof(double))]
+        public double Min
+        {
+            get { return Range.Min(); }
+            set
+            {
+                _Distribution = new MathNet.Numerics.Distributions.ContinuousUniform(value, _Distribution.Maximum);
+                Range = Utilities.IRangeFactory.Factory(_Distribution.Minimum, _Distribution.Maximum);
+            }
+        }
+        [Stored(Name = "Max", type = typeof(double))]
+        public double Max
+        {
+            get { return Range.Max(); }
+            set
+            {
+                _Distribution = new MathNet.Numerics.Distributions.ContinuousUniform(_Distribution.Minimum, value);
+                Range = Utilities.IRangeFactory.Factory(_Distribution.Minimum, _Distribution.Maximum);
+            }
+        }
         public double Mode => _Distribution.Mode;
-        public int SampleSize { get; }
+        [Stored(Name = "SampleSize", type = typeof(Int32))]
+        public int SampleSize { get; set; }
         #endregion
         public IMessageLevels State { get; }
         public IEnumerable<IMessage> Messages { get; }
@@ -93,13 +114,6 @@ namespace Statistics.Distributions
             ordinateElem.SetAttributeValue(SerializationConstants.SAMPLE_SIZE, SampleSize);
 
             return ordinateElem;
-        }
-        public IDistribution ReadFromXML(XElement ele)
-        {
-            double min = Convert.ToDouble(ele.Attribute(SerializationConstants.MIN).Value);
-            double max = Convert.ToDouble(ele.Attribute(SerializationConstants.MAX).Value);
-            int samplesize = Convert.ToInt32(ele.Attribute(SerializationConstants.SAMPLE_SIZE).Value);
-            return IDistributionFactory.FactoryUniform(min, max, samplesize);
         }
         #endregion
     }

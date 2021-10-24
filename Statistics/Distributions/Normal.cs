@@ -13,20 +13,41 @@ namespace Statistics.Distributions
         //TODO: Sample
         #region Fields and Properties
         internal IRange<double> _ProbabilityRange;
-        private readonly MathNet.Numerics.Distributions.Normal _Distribution;
+        private MathNet.Numerics.Distributions.Normal _Distribution;
         #region IDistribution Properties
         public IDistributionEnum Type => IDistributionEnum.Normal;
         [Stored(Name = "Mean", type = typeof(double))]
-        public double Mean => _Distribution.Mean;
+        public double Mean
+        {
+            get { return _Distribution.Mean; }
+            set {
+                _Distribution = new MathNet.Numerics.Distributions.Normal(value,_Distribution.StdDev);
+            }
+        }
         public double Median => _Distribution.Median;
         public double Mode => _Distribution.Mode;
         public double Variance => _Distribution.Variance;
         [Stored(Name = "St_Dev", type = typeof(double))]
-        public double StandardDeviation => _Distribution.StdDev;
+        public double StandardDeviation
+        {
+            get { return _Distribution.StdDev; }
+            set
+            {
+                _Distribution = new MathNet.Numerics.Distributions.Normal(_Distribution.Mean, value);
+            }
+        }
         public double Skewness => _Distribution.Skewness;
         public Utilities.IRange<double> Range { get; }
+        public double Min
+        {
+            get { return Range.Min(); }
+        }
+        public double Max
+        {
+            get { return Range.Max(); }
+        }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
-        public int SampleSize { get; }
+        public int SampleSize { get; set; }
         #endregion
         #region IMessagePublisher Properties
         public IMessageLevels State { get; }
@@ -110,13 +131,7 @@ namespace Statistics.Distributions
 
             return ordinateElem;
         }
-        public IDistribution ReadFromXML(XElement ele)
-        {
-            double mean = Convert.ToDouble(ele.Attribute(SerializationConstants.MEAN).Value);
-            double stdev = Convert.ToDouble(ele.Attribute(SerializationConstants.ST_DEV).Value);
-            int samplesize = Convert.ToInt32(ele.Attribute(SerializationConstants.SAMPLE_SIZE).Value);
-            return IDistributionFactory.FactoryNormal(mean, stdev, samplesize);
-        }
+
         #endregion
     }
 }
