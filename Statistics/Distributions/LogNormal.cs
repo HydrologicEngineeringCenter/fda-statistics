@@ -10,12 +10,19 @@ namespace Statistics.Distributions
     public class LogNormal : IDistribution, Utilities.IValidate<LogNormal>
     {      
         internal IRange<double> _ProbabilityRange;
-        private readonly MathNet.Numerics.Distributions.LogNormal _Distribution;
+        private MathNet.Numerics.Distributions.LogNormal _Distribution;
 
         #region Properties
         public IDistributionEnum Type => IDistributionEnum.LogNormal;
         [Stored(Name = "Mean", type = typeof(double))]
-        public double Mean => _Distribution.Mean;
+        public double Mean
+        {
+            get { return _Distribution.Mean; }
+            set
+            {
+                _Distribution = new MathNet.Numerics.Distributions.LogNormal(value, _Distribution.StdDev);
+            }
+        }
 
         public double Median => _Distribution.Median;
 
@@ -23,13 +30,28 @@ namespace Statistics.Distributions
 
         public double Variance => _Distribution.Variance;
         [Stored(Name = "St_Dev", type = typeof(double))]
-        public double StandardDeviation => _Distribution.StdDev;
+        public double StandardDeviation
+        {
+            get { return _Distribution.StdDev; }
+            set
+            {
+                _Distribution = new MathNet.Numerics.Distributions.LogNormal(_Distribution.Mean, value);
+            }
+        }
 
         public double Skewness => _Distribution.Skewness;
 
         public IRange<double> Range { get; }
+        public double Min
+        {
+            get { return Range.Min(); }
+        }
+        public double Max
+        {
+            get { return Range.Max(); }
+        }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
-        public int SampleSize { get; }
+        public int SampleSize { get; set; }
 
         public IMessageLevels State { get; }
         public IEnumerable<IMessage> Messages { get; }

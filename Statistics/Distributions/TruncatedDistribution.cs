@@ -26,6 +26,14 @@ namespace Statistics.Distributions
         public double StandardDeviation => _Distribution.StandardDeviation;
         public double Skewness => _Distribution.Skewness;
         public Utilities.IRange<double> Range { get; }
+        public double Min
+        {
+            get { return Range.Min(); }
+        }
+        public double Max
+        {
+            get { return Range.Max(); }
+        }
         public int SampleSize => _Distribution.SampleSize;
         public IMessageLevels State { get; }
         public IEnumerable<IMessage> Messages { get; }
