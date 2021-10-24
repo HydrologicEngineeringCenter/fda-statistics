@@ -78,7 +78,7 @@ namespace Statistics
             string n = ele.Name.ToString();
             string ns = "Statistics";//this libraries name and the appropriate namespace.
             ObjectHandle oh = System.Activator.CreateInstance(ns, ns + ".Distributions." + n);//requires empty constructor
-            IDistribution dist = oh as IDistribution;
+            IDistribution dist = oh.Unwrap() as IDistribution;
             PropertyInfo[] pilist = dist.GetType().GetProperties();
             foreach (PropertyInfo pi in pilist)
             {
