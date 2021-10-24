@@ -27,7 +27,7 @@ namespace Statistics.Distributions
         [Stored(Name = "Max", type = typeof(double))]
         public double Max { get; set; }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
-        public int SampleSize { get; }
+        public int SampleSize { get; set; }
         public IMessageLevels State { get; private set; }
         public IEnumerable<IMessage> Messages { get; private set; }
         public double Mode { get; set; }
