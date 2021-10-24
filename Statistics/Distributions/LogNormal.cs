@@ -59,7 +59,7 @@ namespace Statistics.Distributions
             State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
         }
-        public void BuildFromParameters()
+        public void BuildFromProperties()
         {
             if (!Validation.LogNormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new InvalidConstructorArgumentsException(msg);
             _Distribution = new MathNet.Numerics.Distributions.LogNormal(Mean, StandardDeviation);

@@ -76,6 +76,10 @@ namespace Statistics.Histograms
             }
             Range = GetRange(Min, Max);
         }
+        public void BuildFromParameters()
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
         internal int GetBinQuantity()

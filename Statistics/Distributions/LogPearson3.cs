@@ -64,7 +64,7 @@ namespace Statistics.Distributions
                 Messages = msgs;
             }
         }
-        public void BuildFromParameters()
+        public void BuildFromProperties()
         {
             if (!Validation.LogPearson3Validator.IsConstructable(Mean, StandardDeviation, Skewness, SampleSize, out string error)) throw new Utilities.InvalidConstructorArgumentsException(error);
             else

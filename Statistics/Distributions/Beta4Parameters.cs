@@ -53,6 +53,10 @@ namespace Statistics.Distributions
                 Messages = msgs;
             }   
         }
+        public void BuildFromProperties()
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
         #region Functions
