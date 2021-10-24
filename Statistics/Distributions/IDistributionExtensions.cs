@@ -90,6 +90,10 @@ namespace Statistics
                             double vald =  Convert.ToDouble(ele.Element(sa.Name).Value);
                             pi.SetValue(dist,vald);
                             break;
+                        case "Double":
+                            double valD = Convert.ToDouble(ele.Element(sa.Name).Value);
+                            pi.SetValue(dist, valD);
+                            break;
                         case "Int32":
                             int vali = Convert.ToInt32(ele.Element(sa.Name).Value);
                             pi.SetValue(dist, vali);
