@@ -40,11 +40,11 @@ namespace Statistics.Distributions
         public Utilities.IRange<double> Range { get; }
         public double Min
         {
-            get { return Range.Min(); }
+            get { return Range.Min; }
         }
         public double Max
         {
-            get { return Range.Max(); }
+            get { return Range.Max; }
         }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
         public int SampleSize { get; set; }

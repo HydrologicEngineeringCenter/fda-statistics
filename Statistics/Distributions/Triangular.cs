@@ -25,7 +25,7 @@ namespace Statistics.Distributions
         [Stored(Name = "Min", type = typeof(double))]
         public double Min
         {
-            get { return Range.Min(); }
+            get { return Range.Min; }
             set
             {
                 _Distribution = new MathNet.Numerics.Distributions.Triangular(value, _Distribution.Maximum, _Distribution.Mode);
@@ -35,7 +35,7 @@ namespace Statistics.Distributions
         [Stored(Name = "Max", type = typeof(double))]
         public double Max
         {
-            get { return Range.Max(); }
+            get { return Range.Max; }
             set
             {
                 _Distribution = new MathNet.Numerics.Distributions.Triangular(_Distribution.Minimum, value, _Distribution.Mode);

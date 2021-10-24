@@ -28,11 +28,11 @@ namespace Statistics.Distributions
         public Utilities.IRange<double> Range { get; }
         public double Min
         {
-            get { return Range.Min(); }
+            get { return Range.Min; }
         }
         public double Max
         {
-            get { return Range.Max(); }
+            get { return Range.Max; }
         }
         public int SampleSize => _Distribution.SampleSize;
         public IMessageLevels State { get; }
