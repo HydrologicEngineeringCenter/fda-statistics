@@ -25,7 +25,7 @@ namespace Statistics.Distributions
             }
         }
         public double Median { get; }
-        public double Variance { get; }
+        public double Variance { get; set; }
         [Stored(Name = "St_Dev", type = typeof(double))]
         public double StandardDeviation
         {
@@ -45,7 +45,7 @@ namespace Statistics.Distributions
                 _Distribution = new PearsonIII(_Distribution.Mean, _Distribution.StandardDeviation, value, _Distribution.SampleSize);
             }
         }
-        public Utilities.IRange<double> Range { get; }
+        public Utilities.IRange<double> Range { get; set; }
         public double Min
         {
             get { return Range.Min; }

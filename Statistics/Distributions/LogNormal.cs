@@ -41,7 +41,7 @@ namespace Statistics.Distributions
 
         public double Skewness => _Distribution.Skewness;
 
-        public IRange<double> Range { get; }
+        public IRange<double> Range { get; set; }
         public double Min
         {
             get { return Range.Min; }

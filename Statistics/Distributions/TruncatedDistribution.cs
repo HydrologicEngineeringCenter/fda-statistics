@@ -25,7 +25,7 @@ namespace Statistics.Distributions
         public double Variance => _Distribution.Variance;
         public double StandardDeviation => _Distribution.StandardDeviation;
         public double Skewness => _Distribution.Skewness;
-        public Utilities.IRange<double> Range { get; }
+        public Utilities.IRange<double> Range { get; set; }
         public double Min
         {
             get { return Range.Min; }
