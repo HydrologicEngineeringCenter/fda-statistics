@@ -19,7 +19,9 @@ namespace StatisticsTests.Distributions
             IDistribution d = new Normal(mean, sd, n);
             XElement ele = d.ToXML();
             IDistribution d2 = IDistributionExtensions.FromXML(ele);
-            Assert.Equal(d, d2);
+            Assert.Equal(d.Mean, d2.Mean);
+            Assert.Equal(d.StandardDeviation, d2.StandardDeviation);
+            Assert.Equal(d.SampleSize, d2.SampleSize);
         }
     }
 }
