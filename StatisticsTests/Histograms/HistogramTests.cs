@@ -146,12 +146,12 @@ namespace StatisticsTests.Histograms
         }
 
         [Theory]
-        [InlineData(1000000, .001, -1.96, .025)]
-        [InlineData(1000000, .001, 1.96, .975)]
+        [InlineData(10000000, .001, -1.96, .025)]
+        [InlineData(10000000, .001, 1.96, .975)]
         public void NormallyDistributed_Histogram_CDF(int n, double binWidth, double value, double expected)
         {
             IDistribution stdNormal = new Statistics.Distributions.Normal(0, 1);
-            var rand = new Random();
+            var rand = new Random(1234);
             double[] initialObs = new double[1] { stdNormal.InverseCDF(rand.NextDouble()) };
             IData initialData = new Data(initialObs);
             Histogram histogram = new Histogram(initialData, binWidth);
