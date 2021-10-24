@@ -11,7 +11,7 @@ namespace Statistics.Distributions
     public class LogPearson3: IDistribution, IValidate<LogPearson3> 
     {
         internal PearsonIII _Distribution;
-        internal readonly IRange<double> _ProbabilityRange; 
+        internal IRange<double> _ProbabilityRange; 
         
         #region Properties
         public IDistributionEnum Type => IDistributionEnum.LogPearsonIII;
