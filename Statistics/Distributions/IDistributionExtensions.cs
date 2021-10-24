@@ -87,15 +87,15 @@ namespace Statistics
                 {
                     switch (sa.type.Name){
                         case "double":
-                            double vald =  Convert.ToDouble(ele.Element(sa.Name).Value);
+                            double vald =  Convert.ToDouble(ele.Attribute(sa.Name).Value);
                             pi.SetValue(dist,vald);
                             break;
                         case "Double":
-                            double valD = Convert.ToDouble(ele.Element(sa.Name).Value);
+                            double valD = Convert.ToDouble(ele.Attribute(sa.Name).Value);
                             pi.SetValue(dist, valD);
                             break;
                         case "Int32":
-                            int vali = Convert.ToInt32(ele.Element(sa.Name).Value);
+                            int vali = Convert.ToInt32(ele.Attribute(sa.Name).Value);
                             pi.SetValue(dist, vali);
                             break;
                         default:
