@@ -58,7 +58,9 @@ namespace Statistics
         /// <remarks> If the distribution was not fit from a sample use the desired length of samples or <see cref="int.MaxValue"/> if the distribution is assumed to be a population distribution. </remarks>
         int SampleSize { get; }
         #endregion
-
+        #region Voids
+        void BuildFromProperties();
+        #endregion
         #region Functions
         /// <summary>
         /// Computes the density of the distribution at the point x.

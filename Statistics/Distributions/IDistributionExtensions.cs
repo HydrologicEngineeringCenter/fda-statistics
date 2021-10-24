@@ -104,6 +104,7 @@ namespace Statistics
                     
                 }
             }
+            dist.BuildFromProperties();
             return dist;
         }
     }

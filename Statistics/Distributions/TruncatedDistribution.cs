@@ -17,7 +17,7 @@ namespace Statistics.Distributions
         // TODO: Validation lower bound below mean, median, mode and upper bound above mean, median mode - valid range of lower and upper bounds 
 
         #region Fields and Properties
-        private readonly IDistribution _Distribution;
+        private IDistribution _Distribution;
 
         public IDistributionEnum Type => (IDistributionEnum)((int)_Distribution.Type * 10);
         public double Mean => _Distribution.Mean;
@@ -35,17 +35,30 @@ namespace Statistics.Distributions
             get { return Range.Max; }
         }
         public int SampleSize => _Distribution.SampleSize;
-        public IMessageLevels State { get; }
-        public IEnumerable<IMessage> Messages { get; }
+        public IMessageLevels State { get; private set; }
+        public IEnumerable<IMessage> Messages { get; private set; }
 
         public double Mode => _Distribution.Mode;
         #endregion
 
         #region Constructor
+        public TruncatedDistribution()
+        {
+            //for reflection;
+        }
         public TruncatedDistribution(IDistribution distribution, double lowerBound = double.NegativeInfinity, double upperBound = double.PositiveInfinity)
         {
             if (distribution.IsNull()) throw new ArgumentNullException(nameof(distribution), "The specified distribution parameter is invalid because it is null.");
             _Distribution = distribution;
+            IMessageBoard msgBoard = IMessageBoardFactory.Factory(_Distribution);
+            Range = Utilities.IRangeFactory.Factory(lowerBound == double.NegativeInfinity ? _Distribution.Range.Min : lowerBound, upperBound == double.PositiveInfinity ? _Distribution.Range.Max : upperBound);
+            State = Validate(new Validation.TruncatedDistributionValidator(), out IEnumerable<IMessage> msgs);
+            msgBoard.PostMessages(msgs);
+            Messages = msgBoard.ReadMessages();
+        }
+        public void BuildFromProperties()
+        {
+            if (_Distribution.IsNull()) throw new ArgumentNullException(nameof(_Distribution), "The specified distribution parameter is invalid because it is null.");
             IMessageBoard msgBoard = IMessageBoardFactory.Factory(_Distribution);
             Range = Utilities.IRangeFactory.Factory(lowerBound == double.NegativeInfinity ? _Distribution.Range.Min : lowerBound, upperBound == double.PositiveInfinity ? _Distribution.Range.Max : upperBound);
             State = Validate(new Validation.TruncatedDistributionValidator(), out IEnumerable<IMessage> msgs);

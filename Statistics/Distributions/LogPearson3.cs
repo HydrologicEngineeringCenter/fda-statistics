@@ -16,35 +16,13 @@ namespace Statistics.Distributions
         #region Properties
         public IDistributionEnum Type => IDistributionEnum.LogPearsonIII;
         [Stored(Name = "Mean", type = typeof(double))]
-        public double Mean
-        {
-            get { return _Distribution.Mean; }
-            set
-            {
-                _Distribution = new PearsonIII(value, _Distribution.StandardDeviation, _Distribution.Skewness, _Distribution.SampleSize);
-            }
-        }
-        public double Median { get; }
+        public double Mean { get; set; }
+        public double Median { get; private set; }
         public double Variance { get; set; }
         [Stored(Name = "St_Dev", type = typeof(double))]
-        public double StandardDeviation
-        {
-            get { return _Distribution.StandardDeviation; }
-            set
-            {
-                _Distribution = new PearsonIII(_Distribution.Mean, value, _Distribution.Skewness, _Distribution.SampleSize);
-                Variance = Math.Pow(value, 2);
-            }
-        }
+        public double StandardDeviation { get; set; }
         [Stored(Name = "Skew", type = typeof(double))]
-        public double Skewness
-        {
-            get { return _Distribution.Skewness; }
-            set
-            {
-                _Distribution = new PearsonIII(_Distribution.Mean, _Distribution.StandardDeviation, value, _Distribution.SampleSize);
-            }
-        }
+        public double Skewness { get; set; }
         public Utilities.IRange<double> Range { get; set; }
         public double Min
         {
@@ -55,16 +33,9 @@ namespace Statistics.Distributions
             get { return Range.Max; }
         }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
-        public int SampleSize
-        {
-            get { return _Distribution.SampleSize; }
-            set
-            {
-                _Distribution = new PearsonIII(_Distribution.Mean, _Distribution.StandardDeviation, _Distribution.Skewness, value);
-            }
-        }
-        public IMessageLevels State { get; }
-        public IEnumerable<Utilities.IMessage> Messages { get; }
+        public int SampleSize { get; set; }
+        public IMessageLevels State { get; private set; }
+        public IEnumerable<Utilities.IMessage> Messages { get; private set; }
 
         public double Mode => throw new NotImplementedException();
         #endregion
@@ -89,6 +60,20 @@ namespace Statistics.Distributions
                 Median = InverseCDF(0.50);
                 _ProbabilityRange = FiniteRange(); 
                 Range = IRangeFactory.Factory(InverseCDF(_ProbabilityRange.Min), InverseCDF(_ProbabilityRange.Max)); 
+                State = Validate(new Validation.LogPearson3Validator(), out IEnumerable<Utilities.IMessage> msgs);
+                Messages = msgs;
+            }
+        }
+        public void BuildFromParameters()
+        {
+            if (!Validation.LogPearson3Validator.IsConstructable(Mean, StandardDeviation, Skewness, SampleSize, out string error)) throw new Utilities.InvalidConstructorArgumentsException(error);
+            else
+            {
+                _Distribution = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
+                Variance = Math.Pow(StandardDeviation, 2);
+                Median = InverseCDF(0.50);
+                _ProbabilityRange = FiniteRange();
+                Range = IRangeFactory.Factory(InverseCDF(_ProbabilityRange.Min), InverseCDF(_ProbabilityRange.Max));
                 State = Validate(new Validation.LogPearson3Validator(), out IEnumerable<Utilities.IMessage> msgs);
                 Messages = msgs;
             }

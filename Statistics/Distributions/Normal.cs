@@ -17,25 +17,12 @@ namespace Statistics.Distributions
         #region IDistribution Properties
         public IDistributionEnum Type => IDistributionEnum.Normal;
         [Stored(Name = "Mean", type = typeof(double))]
-        public double Mean
-        {
-            get { return _Distribution.Mean; }
-            set {
-                _Distribution = new MathNet.Numerics.Distributions.Normal(value,_Distribution.StdDev);
-            }
-        }
+        public double Mean { get; set; }
         public double Median => _Distribution.Median;
         public double Mode => _Distribution.Mode;
         public double Variance => _Distribution.Variance;
         [Stored(Name = "St_Dev", type = typeof(double))]
-        public double StandardDeviation
-        {
-            get { return _Distribution.StdDev; }
-            set
-            {
-                _Distribution = new MathNet.Numerics.Distributions.Normal(_Distribution.Mean, value);
-            }
-        }
+        public double StandardDeviation { get; set; }
         public double Skewness => _Distribution.Skewness;
         public Utilities.IRange<double> Range { get; set; }
         public double Min
@@ -50,8 +37,8 @@ namespace Statistics.Distributions
         public int SampleSize { get; set; }
         #endregion
         #region IMessagePublisher Properties
-        public IMessageLevels State { get; }
-        public IEnumerable<Utilities.IMessage> Messages { get; }
+        public IMessageLevels State { get; private set; }
+        public IEnumerable<Utilities.IMessage> Messages { get; private set; }
         #endregion
 
         #endregion
@@ -69,6 +56,15 @@ namespace Statistics.Distributions
             _ProbabilityRange = FiniteRange();
             Range = IRangeFactory.Factory(_Distribution.InverseCumulativeDistribution(_ProbabilityRange.Min), _Distribution.InverseCumulativeDistribution(_ProbabilityRange.Max));           
             SampleSize = sampleSize;
+            State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
+        }
+        public void BuildFromParameters()
+        {
+            if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            _Distribution = new MathNet.Numerics.Distributions.Normal(Mean, StandardDeviation);
+            _ProbabilityRange = FiniteRange();
+            Range = IRangeFactory.Factory(_Distribution.InverseCumulativeDistribution(_ProbabilityRange.Min), _Distribution.InverseCumulativeDistribution(_ProbabilityRange.Max));
             State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
         }
