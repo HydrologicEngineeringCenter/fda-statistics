@@ -61,6 +61,7 @@ namespace Statistics.Distributions
         public LogNormal()
         {
             //for reflection
+            _Distribution = new MathNet.Numerics.Distributions.LogNormal(0, 1);
         }
         internal LogNormal(double mean, double standardDeviation, int sampleSize = int.MaxValue)
         {

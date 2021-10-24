@@ -61,6 +61,7 @@ namespace Statistics.Distributions
         public Triangular()
         {
             //for reflection
+            _Distribution = new MathNet.Numerics.Distributions.Triangular(0, 1, 0.5);
         }
         public Triangular(double min, double mode, double max, int sampleSize = int.MaxValue)
         {

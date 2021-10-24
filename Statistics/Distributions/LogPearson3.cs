@@ -73,6 +73,7 @@ namespace Statistics.Distributions
         public LogPearson3()
         {
             //for reflection;
+            _Distribution = new PearsonIII(0, 0.01, 0.01, 1);
         }
         public LogPearson3(double mean, double standardDeviation, double skew, int sampleSize = int.MaxValue)
         {

@@ -60,6 +60,7 @@ namespace Statistics.Distributions
         public Normal()
         {
             //for reflection;
+            _Distribution = new MathNet.Numerics.Distributions.Normal(0, 1);
         }
         public Normal(double mean, double sd, int sampleSize = int.MaxValue)
         {

@@ -54,6 +54,7 @@ namespace Statistics.Distributions
         public Uniform()
         {
             //for reflection
+            _Distribution = new MathNet.Numerics.Distributions.ContinuousUniform(0, 1);
         }
         public Uniform(double min, double max, int sampleSize = int.MaxValue)
         {
