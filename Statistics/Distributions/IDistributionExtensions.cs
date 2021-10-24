@@ -95,7 +95,7 @@ namespace Statistics
                             pi.SetValue(dist, vali);
                             break;
                         default:
-                            throw new ArgumentException("unrecognized type in serialization");
+                            throw new ArgumentException("unrecognized type in serialization " +  sa.type.Name);
                     }
                     
                 }
