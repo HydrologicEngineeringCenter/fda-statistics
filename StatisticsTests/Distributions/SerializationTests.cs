@@ -10,7 +10,7 @@ using System.Xml.Linq;
 namespace StatisticsTests.Distributions
 {
     [ExcludeFromCodeCoverage]
-    class SerializationTests
+    public class SerializationTests
     {
         [Theory]
         [InlineData(2.33, 1d, 1)]
