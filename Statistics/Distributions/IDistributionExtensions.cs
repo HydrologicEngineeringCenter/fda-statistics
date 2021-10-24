@@ -76,7 +76,7 @@ namespace Statistics
         public static IDistribution FromXML(XElement ele)
         {
             string n = ele.Name.ToString();
-            string ns = "Statistics.Distributions";//this libraries name and the appropriate namespace.
+            string ns = "Statistics";//this libraries name and the appropriate namespace.
             ObjectHandle oh = System.Activator.CreateInstance(ns, ns + "." + n);//requires empty constructor
             IDistribution dist = oh as IDistribution;
             PropertyInfo[] pilist = dist.GetType().GetProperties();
