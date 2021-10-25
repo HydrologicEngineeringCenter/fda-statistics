@@ -30,6 +30,7 @@ namespace Statistics.Distributions
         public int SampleSize { get; set; }
         public IMessageLevels State { get; private set; }
         public IEnumerable<IMessage> Messages { get; private set; }
+        [Stored(Name = "MostLikely", type = typeof(double))]
         public double Mode { get; set; }
         #endregion
         #endregion
@@ -46,6 +47,9 @@ namespace Statistics.Distributions
             if (!Validation.TriangularValidator.IsConstructable(mode, range, out string error)) throw new InvalidConstructorArgumentsException(error);
             else
             {
+                Min = min;
+                Max = max;
+                Mode = mode;
                 _Distribution = new MathNet.Numerics.Distributions.Triangular(lower: min, upper: max, mode: mode);
                 Range = range;
                 SampleSize = sampleSize;
