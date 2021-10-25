@@ -9,7 +9,7 @@ using Utilities.Serialization;
 
 namespace Statistics.Distributions
 {
-    internal class Deterministic : IDistribution
+    public class Deterministic : IDistribution
     {
         #region IDistribution Properties
         public IDistributionEnum Type => IDistributionEnum.Deterministic;
@@ -20,6 +20,8 @@ namespace Statistics.Distributions
 
         public double Mode { get; }
 
+        public double Min { get; }
+        public double Max { get;  }
         public double Variance { get; }
 
         public double StandardDeviation { get; }
@@ -42,6 +44,8 @@ namespace Statistics.Distributions
             Mean = x;
             Median = x;
             Mode = x;
+            Min = x;
+            Max = x;
             Variance = 0;
             StandardDeviation = 0;
             Skewness = 0;
@@ -113,6 +117,11 @@ namespace Statistics.Distributions
             XElement ordinateElem = new XElement(SerializationConstants.DETERMINISTIC);
             ordinateElem.SetAttributeValue(SerializationConstants.CONSTANT_VALUE, Value);
             return ordinateElem;
+        }
+
+        public void BuildFromProperties()
+        {
+            throw new NotImplementedException();
         }
         #endregion
     }
