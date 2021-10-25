@@ -8,7 +8,7 @@
 
 	<PropertyGroup>
 		<PackageId>USACE.HEC.FDA.Statistics</PackageId>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<Description>A library for computing statistics within HEC-FDA</Description>
 		<Authors>Hydrologic Engineering Center</Authors>
 		<RepositoryUrl>https://github.com/HydrologicEngineeringCenter/fda-statistics</RepositoryUrl>
