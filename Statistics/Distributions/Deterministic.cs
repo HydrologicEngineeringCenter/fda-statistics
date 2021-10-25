@@ -14,28 +14,29 @@ namespace Statistics.Distributions
         #region IDistribution Properties
         public IDistributionEnum Type => IDistributionEnum.Deterministic;
 
-        public double Mean { get; }
+        public double Mean { get; set;  }
 
-        public double Median { get; }
+        public double Median { get; set; }
 
-        public double Mode { get; }
+        public double Mode { get; set; }
 
-        public double Min { get; }
-        public double Max { get;  }
-        public double Variance { get; }
+        public double Min { get; set; }
+        public double Max { get; set; }
+        public double Variance { get; set; }
 
-        public double StandardDeviation { get; }
+        public double StandardDeviation { get; set; }
 
-        public double Skewness { get; }
+        public double Skewness { get; set; }
 
-        public IRange<double> Range { get; }
+        public IRange<double> Range { get; set; }
 
-        public int SampleSize { get; }
+        public int SampleSize { get; set; }
 
         public IMessageLevels State => throw new NotImplementedException();
 
         public IEnumerable<IMessage> Messages => throw new NotImplementedException();
         #endregion
+        [Stored(Name = "Value", type = typeof(double))]
         public double Value { get; }
         #region constructor
         public Deterministic(double x)
@@ -51,6 +52,21 @@ namespace Statistics.Distributions
             Skewness = 0;
             SampleSize = 1;
             Range = IRangeFactory.Factory(x, x);
+        }
+        public void BuildFromProperties()
+        {
+
+                Mean = Value;
+                Median = Value;
+                Mode = Value;
+                Min = Value;
+                Max = Value;
+                Variance = 0;
+                StandardDeviation = 0;
+                Skewness = 0;
+                SampleSize = 1;
+                Range = IRangeFactory.Factory(Value, Value);
+
         }
         #endregion
 
@@ -114,15 +130,12 @@ namespace Statistics.Distributions
 
         XElement ISerializeToXML<IDistribution>.WriteToXML()
         {
-            XElement ordinateElem = new XElement(SerializationConstants.DETERMINISTIC);
-            ordinateElem.SetAttributeValue(SerializationConstants.CONSTANT_VALUE, Value);
+            XElement ordinateElem = new XElement("DeterministicDistribution");
+            ordinateElem.SetAttributeValue("Constant Value", Value);
             return ordinateElem;
         }
 
-        public void BuildFromProperties()
-        {
-            throw new NotImplementedException();
-        }
+
         #endregion
     }
 }

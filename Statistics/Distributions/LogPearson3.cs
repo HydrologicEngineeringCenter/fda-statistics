@@ -183,7 +183,7 @@ namespace Statistics.Distributions
             //st dev
             ordinateElem.SetAttributeValue(SerializationConstants.ST_DEV, StandardDeviation);
             //skew
-            ordinateElem.SetAttributeValue(SerializationConstants.SKEW, Skewness);
+            ordinateElem.SetAttributeValue("Skew", Skewness);
             //sample size
             ordinateElem.SetAttributeValue(SerializationConstants.SAMPLE_SIZE, SampleSize);
             return ordinateElem;
