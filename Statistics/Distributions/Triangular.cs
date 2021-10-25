@@ -12,7 +12,7 @@ namespace Statistics.Distributions
     {
         //TODO: Sample
         #region Fields and Properties
-        private readonly MathNet.Numerics.Distributions.Triangular _Distribution;
+        private MathNet.Numerics.Distributions.Triangular _Distribution;
 
         #region IDistribution Properties
         public IDistributionEnum Type => IDistributionEnum.Triangular;
@@ -21,15 +21,25 @@ namespace Statistics.Distributions
         public double Variance => _Distribution.Variance;
         public double StandardDeviation => _Distribution.StdDev;
         public double Skewness => _Distribution.Skewness;
-        public IRange<double> Range { get; }
-        public int SampleSize { get; }
-        public IMessageLevels State { get; }
-        public IEnumerable<IMessage> Messages { get; }
-        public double Mode => _Distribution.Mode;
+        public IRange<double> Range { get; set; }
+        [Stored(Name = "Min", type = typeof(double))]
+        public double Min { get; set; }
+        [Stored(Name = "Max", type = typeof(double))]
+        public double Max { get; set; }
+        [Stored(Name = "SampleSize", type = typeof(Int32))]
+        public int SampleSize { get; set; }
+        public IMessageLevels State { get; private set; }
+        public IEnumerable<IMessage> Messages { get; private set; }
+        public double Mode { get; set; }
         #endregion
         #endregion
 
         #region Constructor
+        public Triangular()
+        {
+            //for reflection
+            _Distribution = new MathNet.Numerics.Distributions.Triangular(0, 1, 0.5);
+        }
         public Triangular(double min, double mode, double max, int sampleSize = int.MaxValue)
         {
             IRange<double> range = IRangeFactory.Factory(min, max,true, true, true, false);
@@ -39,6 +49,18 @@ namespace Statistics.Distributions
                 _Distribution = new MathNet.Numerics.Distributions.Triangular(lower: min, upper: max, mode: mode);
                 Range = range;
                 SampleSize = sampleSize;
+                State = Validate(new Validation.TriangularValidator(), out IEnumerable<IMessage> msgs);
+                Messages = msgs;
+            }
+        }
+        public void BuildFromProperties()
+        {
+            IRange<double> range = IRangeFactory.Factory(Min, Max, true, true, true, false);
+            if (!Validation.TriangularValidator.IsConstructable(Mode, range, out string error)) throw new InvalidConstructorArgumentsException(error);
+            else
+            {
+                _Distribution = new MathNet.Numerics.Distributions.Triangular(Min, Max, Mode);
+                Range = range;
                 State = Validate(new Validation.TriangularValidator(), out IEnumerable<IMessage> msgs);
                 Messages = msgs;
             }

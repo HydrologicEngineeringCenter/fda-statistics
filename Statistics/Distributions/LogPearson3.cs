@@ -10,25 +10,42 @@ namespace Statistics.Distributions
 {
     public class LogPearson3: IDistribution, IValidate<LogPearson3> 
     {
-        internal readonly PearsonIII _Distribution;
-        internal readonly IRange<double> _ProbabilityRange; 
+        internal PearsonIII _Distribution;
+        internal IRange<double> _ProbabilityRange; 
         
         #region Properties
         public IDistributionEnum Type => IDistributionEnum.LogPearsonIII;
-        public double Mean { get; }
-        public double Median { get; }
-        public double Variance { get; }
-        public double StandardDeviation { get; }
-        public double Skewness { get; }
-        public Utilities.IRange<double> Range { get; }
-        public int SampleSize { get; }
-        public IMessageLevels State { get; }
-        public IEnumerable<Utilities.IMessage> Messages { get; }
+        [Stored(Name = "Mean", type = typeof(double))]
+        public double Mean { get; set; }
+        public double Median { get; private set; }
+        public double Variance { get; set; }
+        [Stored(Name = "St_Dev", type = typeof(double))]
+        public double StandardDeviation { get; set; }
+        [Stored(Name = "Skew", type = typeof(double))]
+        public double Skewness { get; set; }
+        public Utilities.IRange<double> Range { get; set; }
+        public double Min
+        {
+            get { return Range.Min; }
+        }
+        public double Max
+        {
+            get { return Range.Max; }
+        }
+        [Stored(Name = "SampleSize", type = typeof(Int32))]
+        public int SampleSize { get; set; }
+        public IMessageLevels State { get; private set; }
+        public IEnumerable<Utilities.IMessage> Messages { get; private set; }
 
         public double Mode => throw new NotImplementedException();
         #endregion
 
         #region Constructor
+        public LogPearson3()
+        {
+            //for reflection;
+            _Distribution = new PearsonIII(0, 0.01, 0.01, 1);
+        }
         public LogPearson3(double mean, double standardDeviation, double skew, int sampleSize = int.MaxValue)
         {
             if (!Validation.LogPearson3Validator.IsConstructable(mean, standardDeviation, skew, sampleSize, out string error)) throw new Utilities.InvalidConstructorArgumentsException(error);
@@ -43,6 +60,20 @@ namespace Statistics.Distributions
                 Median = InverseCDF(0.50);
                 _ProbabilityRange = FiniteRange(); 
                 Range = IRangeFactory.Factory(InverseCDF(_ProbabilityRange.Min), InverseCDF(_ProbabilityRange.Max)); 
+                State = Validate(new Validation.LogPearson3Validator(), out IEnumerable<Utilities.IMessage> msgs);
+                Messages = msgs;
+            }
+        }
+        public void BuildFromProperties()
+        {
+            if (!Validation.LogPearson3Validator.IsConstructable(Mean, StandardDeviation, Skewness, SampleSize, out string error)) throw new Utilities.InvalidConstructorArgumentsException(error);
+            else
+            {
+                _Distribution = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
+                Variance = Math.Pow(StandardDeviation, 2);
+                Median = InverseCDF(0.50);
+                _ProbabilityRange = FiniteRange();
+                Range = IRangeFactory.Factory(InverseCDF(_ProbabilityRange.Min), InverseCDF(_ProbabilityRange.Max));
                 State = Validate(new Validation.LogPearson3Validator(), out IEnumerable<Utilities.IMessage> msgs);
                 Messages = msgs;
             }

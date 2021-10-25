@@ -21,6 +21,14 @@ namespace Statistics.Distributions
         public double Skewness { get; }
         public IDistributionEnum Type => IDistributionEnum.Beta4Parameters;
         public IRange<double> Range { get; }
+        public double Min
+        {
+            get { return Range.Min; }
+        }
+        public double Max
+        {
+            get { return Range.Max; }
+        }
         public int SampleSize { get; }
         public IMessageLevels State { get; }
         public IEnumerable<IMessage> Messages { get; }
@@ -44,6 +52,10 @@ namespace Statistics.Distributions
                 State = Validate(new Validation.Beta4ParameterValidator(), out IEnumerable<IMessage> msgs);
                 Messages = msgs;
             }   
+        }
+        public void BuildFromProperties()
+        {
+            throw new NotImplementedException();
         }
         #endregion
 

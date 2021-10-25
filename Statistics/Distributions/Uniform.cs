@@ -12,7 +12,7 @@ namespace Statistics.Distributions
     {
         //TODO: Validation
         #region Fields and Properties
-        private readonly MathNet.Numerics.Distributions.ContinuousUniform _Distribution;
+        private MathNet.Numerics.Distributions.ContinuousUniform _Distribution;
 
         #region IDistribution Properties
         public IDistributionEnum Type => IDistributionEnum.Uniform;
@@ -21,20 +21,37 @@ namespace Statistics.Distributions
         public double Variance => _Distribution.Variance;
         public double StandardDeviation => _Distribution.StdDev;
         public double Skewness => _Distribution.Skewness;
-        public Utilities.IRange<double> Range { get; }
+        public Utilities.IRange<double> Range { get; set; }
+        [Stored(Name = "Min", type =typeof(double))]
+        public double Min { get; set; }
+        [Stored(Name = "Max", type = typeof(double))]
+        public double Max { get; set; }
         public double Mode => _Distribution.Mode;
-        public int SampleSize { get; }
+        [Stored(Name = "SampleSize", type = typeof(Int32))]
+        public int SampleSize { get; set; }
         #endregion
-        public IMessageLevels State { get; }
-        public IEnumerable<IMessage> Messages { get; }
+        public IMessageLevels State { get; private set; }
+        public IEnumerable<IMessage> Messages { get; private set; }
         #endregion
 
         #region Constructor
+        public Uniform()
+        {
+            //for reflection
+            _Distribution = new MathNet.Numerics.Distributions.ContinuousUniform(0, 1);
+        }
         public Uniform(double min, double max, int sampleSize = int.MaxValue)
         {
             _Distribution = new MathNet.Numerics.Distributions.ContinuousUniform(lower: min, upper: max);
             Range = Utilities.IRangeFactory.Factory(_Distribution.Minimum, _Distribution.Maximum);
             SampleSize = sampleSize;
+            State = Validate(new Validation.UniformValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
+        }
+        public void BuildFromProperties()
+        {
+            _Distribution = new MathNet.Numerics.Distributions.ContinuousUniform(Min, Max);
+            Range = Utilities.IRangeFactory.Factory(_Distribution.Minimum, _Distribution.Maximum);
             State = Validate(new Validation.UniformValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
         }

@@ -13,26 +13,42 @@ namespace Statistics.Distributions
         //TODO: Sample
         #region Fields and Properties
         internal IRange<double> _ProbabilityRange;
-        private readonly MathNet.Numerics.Distributions.Normal _Distribution;
+        private MathNet.Numerics.Distributions.Normal _Distribution;
         #region IDistribution Properties
         public IDistributionEnum Type => IDistributionEnum.Normal;
-        public double Mean => _Distribution.Mean;
+        [Stored(Name = "Mean", type = typeof(double))]
+        public double Mean { get; set; }
         public double Median => _Distribution.Median;
         public double Mode => _Distribution.Mode;
         public double Variance => _Distribution.Variance;
-        public double StandardDeviation => _Distribution.StdDev;
+        [Stored(Name = "St_Dev", type = typeof(double))]
+        public double StandardDeviation { get; set; }
         public double Skewness => _Distribution.Skewness;
-        public Utilities.IRange<double> Range { get; }
-        public int SampleSize { get; }
+        public Utilities.IRange<double> Range { get; set; }
+        public double Min
+        {
+            get { return Range.Min; }
+        }
+        public double Max
+        {
+            get { return Range.Max; }
+        }
+        [Stored(Name = "SampleSize", type = typeof(Int32))]
+        public int SampleSize { get; set; }
         #endregion
         #region IMessagePublisher Properties
-        public IMessageLevels State { get; }
-        public IEnumerable<Utilities.IMessage> Messages { get; }
+        public IMessageLevels State { get; private set; }
+        public IEnumerable<Utilities.IMessage> Messages { get; private set; }
         #endregion
 
         #endregion
 
         #region Constructor
+        public Normal()
+        {
+            //for reflection;
+            _Distribution = new MathNet.Numerics.Distributions.Normal(0, 1);
+        }
         public Normal(double mean, double sd, int sampleSize = int.MaxValue)
         {
             if (!Validation.NormalValidator.IsConstructable(mean, sd, sampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
@@ -40,6 +56,15 @@ namespace Statistics.Distributions
             _ProbabilityRange = FiniteRange();
             Range = IRangeFactory.Factory(_Distribution.InverseCumulativeDistribution(_ProbabilityRange.Min), _Distribution.InverseCumulativeDistribution(_ProbabilityRange.Max));           
             SampleSize = sampleSize;
+            State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
+        }
+        public void BuildFromProperties()
+        {
+            if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            _Distribution = new MathNet.Numerics.Distributions.Normal(Mean, StandardDeviation);
+            _ProbabilityRange = FiniteRange();
+            Range = IRangeFactory.Factory(_Distribution.InverseCumulativeDistribution(_ProbabilityRange.Min), _Distribution.InverseCumulativeDistribution(_ProbabilityRange.Max));
             State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
         }
@@ -72,16 +97,7 @@ namespace Statistics.Distributions
             return _Distribution.InverseCumulativeDistribution(p);
         }
 
-        //public double Sample(Random r = null) => InverseCDF(r == null ? new Random().NextDouble() : r.NextDouble());
-        ////public double[] Sample(Random numberGenerator = null) => Sample(SampleSize, numberGenerator);
-        //public double[] Sample(int sampleSize, Random numberGenerator = null)
-        //{
-        //    if (numberGenerator == null) numberGenerator = new Random();
-        //    double[] sample = new double[sampleSize];
-        //    for (int i = 0; i < sample.Length; i++) sample[i] = InverseCDF(numberGenerator.NextDouble());
-        //    return sample;
-        //}
-        //public IDistribution SampleDistribution(Random numberGenerator = null) => Fit(Sample(SampleSize, numberGenerator));
+
         public string Print(bool round = false) => round ? Print(Mean, StandardDeviation, SampleSize): $"Normal(mean: {Mean}, sd: {StandardDeviation}, sample size: {SampleSize})";
         public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
         public bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print()) == 0 ? true : false;
@@ -111,7 +127,8 @@ namespace Statistics.Distributions
             ordinateElem.SetAttributeValue(SerializationConstants.SAMPLE_SIZE, SampleSize);
 
             return ordinateElem;
-        }     
+        }
+
         #endregion
     }
 }

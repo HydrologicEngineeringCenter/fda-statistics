@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.Remoting;
 using System.Text;
+using System.Xml.Linq;
 using Utilities;
 
 namespace Statistics
@@ -55,6 +58,54 @@ namespace Statistics
             if (before.IsNull()) throw new ArgumentNullException(nameof(before));
             if (criteria.IsNull()) throw new ArgumentNullException(nameof(criteria));
             return criteria.Test(before.InverseCDF(criteria.Quantile), after.InverseCDF(criteria.Quantile), after.SampleSize - before.SampleSize, after.SampleSize);
+        }
+        public static XElement ToXML(this IDistribution dist)
+        {
+            XElement ele = new XElement(dist.GetType().Name);
+            PropertyInfo[] pilist = dist.GetType().GetProperties();
+            foreach(PropertyInfo pi in pilist)
+            {
+                Distributions.StoredAttribute sa = (Distributions.StoredAttribute)pi.GetCustomAttribute(typeof(Distributions.StoredAttribute));
+                if (sa != null)
+                {
+                    ele.SetAttributeValue(sa.Name, pi.GetValue(dist));
+                }
+            }
+            return ele;
+        }
+        public static IDistribution FromXML(XElement ele)
+        {
+            string n = ele.Name.ToString();
+            string ns = "Statistics";//this libraries name and the appropriate namespace.
+            ObjectHandle oh = System.Activator.CreateInstance(ns, ns + ".Distributions." + n);//requires empty constructor
+            IDistribution dist = oh.Unwrap() as IDistribution;
+            PropertyInfo[] pilist = dist.GetType().GetProperties();
+            foreach (PropertyInfo pi in pilist)
+            {
+                Distributions.StoredAttribute sa = (Distributions.StoredAttribute)pi.GetCustomAttribute(typeof(Distributions.StoredAttribute));
+                if (sa != null)
+                {
+                    switch (sa.type.Name){
+                        case "double":
+                            double vald =  Convert.ToDouble(ele.Attribute(sa.Name).Value);
+                            pi.SetValue(dist,vald);
+                            break;
+                        case "Double":
+                            double valD = Convert.ToDouble(ele.Attribute(sa.Name).Value);
+                            pi.SetValue(dist, valD);
+                            break;
+                        case "Int32":
+                            int vali = Convert.ToInt32(ele.Attribute(sa.Name).Value);
+                            pi.SetValue(dist, vali);
+                            break;
+                        default:
+                            throw new ArgumentException("unrecognized type in serialization " +  sa.type.Name);
+                    }
+                    
+                }
+            }
+            dist.BuildFromProperties();
+            return dist;
         }
     }
 }

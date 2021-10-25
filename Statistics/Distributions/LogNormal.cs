@@ -10,31 +10,45 @@ namespace Statistics.Distributions
     public class LogNormal : IDistribution, Utilities.IValidate<LogNormal>
     {      
         internal IRange<double> _ProbabilityRange;
-        private readonly MathNet.Numerics.Distributions.LogNormal _Distribution;
+        private MathNet.Numerics.Distributions.LogNormal _Distribution;
 
         #region Properties
         public IDistributionEnum Type => IDistributionEnum.LogNormal;
-        public double Mean => _Distribution.Mean;
+        [Stored(Name = "Mean", type = typeof(double))]
+        public double Mean { get; set; }
 
         public double Median => _Distribution.Median;
 
         public double Mode => _Distribution.Mode;
 
         public double Variance => _Distribution.Variance;
-
-        public double StandardDeviation => _Distribution.StdDev;
+        [Stored(Name = "St_Dev", type = typeof(double))]
+        public double StandardDeviation{ get; set; }
 
         public double Skewness => _Distribution.Skewness;
 
-        public IRange<double> Range { get; }
+        public IRange<double> Range { get; set; }
+        public double Min
+        {
+            get { return Range.Min; }
+        }
+        public double Max
+        {
+            get { return Range.Max; }
+        }
+        [Stored(Name = "SampleSize", type = typeof(Int32))]
+        public int SampleSize { get; set; }
 
-        public int SampleSize { get; }
-
-        public IMessageLevels State { get; }
-        public IEnumerable<IMessage> Messages { get; }
+        public IMessageLevels State { get; private set; }
+        public IEnumerable<IMessage> Messages { get; private set; }
         #endregion
 
         #region Constructor
+        public LogNormal()
+        {
+            //for reflection
+            _Distribution = new MathNet.Numerics.Distributions.LogNormal(1, 1);
+        }
         internal LogNormal(double mean, double standardDeviation, int sampleSize = int.MaxValue)
         {
             if (!Validation.LogNormalValidator.IsConstructable(mean, standardDeviation, sampleSize, out string msg)) throw new InvalidConstructorArgumentsException(msg);
@@ -42,6 +56,15 @@ namespace Statistics.Distributions
             _ProbabilityRange = FiniteRange();
             Range = IRangeFactory.Factory(_Distribution.InverseCumulativeDistribution(_ProbabilityRange.Min), _Distribution.InverseCumulativeDistribution(_ProbabilityRange.Max));
             SampleSize = sampleSize;
+            State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
+        }
+        public void BuildFromProperties()
+        {
+            if (!Validation.LogNormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new InvalidConstructorArgumentsException(msg);
+            _Distribution = new MathNet.Numerics.Distributions.LogNormal(Mean, StandardDeviation);
+            _ProbabilityRange = FiniteRange();
+            Range = IRangeFactory.Factory(_Distribution.InverseCumulativeDistribution(_ProbabilityRange.Min), _Distribution.InverseCumulativeDistribution(_ProbabilityRange.Max));
             State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using Utilities;
@@ -16,7 +17,7 @@ namespace Statistics.Distributions
         // TODO: Validation lower bound below mean, median, mode and upper bound above mean, median mode - valid range of lower and upper bounds 
 
         #region Fields and Properties
-        private readonly IDistribution _Distribution;
+        private IDistribution _Distribution;
 
         public IDistributionEnum Type => (IDistributionEnum)((int)_Distribution.Type * 10);
         public double Mean => _Distribution.Mean;
@@ -24,21 +25,42 @@ namespace Statistics.Distributions
         public double Variance => _Distribution.Variance;
         public double StandardDeviation => _Distribution.StandardDeviation;
         public double Skewness => _Distribution.Skewness;
-        public Utilities.IRange<double> Range { get; }
+        public Utilities.IRange<double> Range { get; set; }
+        public double Min
+        {
+            get { return Range.Min; }
+        }
+        public double Max
+        {
+            get { return Range.Max; }
+        }
         public int SampleSize => _Distribution.SampleSize;
-        public IMessageLevels State { get; }
-        public IEnumerable<IMessage> Messages { get; }
+        public IMessageLevels State { get; private set; }
+        public IEnumerable<IMessage> Messages { get; private set; }
 
         public double Mode => _Distribution.Mode;
         #endregion
 
         #region Constructor
+        public TruncatedDistribution()
+        {
+            //for reflection;
+        }
         public TruncatedDistribution(IDistribution distribution, double lowerBound = double.NegativeInfinity, double upperBound = double.PositiveInfinity)
         {
             if (distribution.IsNull()) throw new ArgumentNullException(nameof(distribution), "The specified distribution parameter is invalid because it is null.");
             _Distribution = distribution;
             IMessageBoard msgBoard = IMessageBoardFactory.Factory(_Distribution);
             Range = Utilities.IRangeFactory.Factory(lowerBound == double.NegativeInfinity ? _Distribution.Range.Min : lowerBound, upperBound == double.PositiveInfinity ? _Distribution.Range.Max : upperBound);
+            State = Validate(new Validation.TruncatedDistributionValidator(), out IEnumerable<IMessage> msgs);
+            msgBoard.PostMessages(msgs);
+            Messages = msgBoard.ReadMessages();
+        }
+        public void BuildFromProperties()
+        {
+            if (_Distribution.IsNull()) throw new ArgumentNullException(nameof(_Distribution), "The specified distribution parameter is invalid because it is null.");
+            IMessageBoard msgBoard = IMessageBoardFactory.Factory(_Distribution);
+            Range = Utilities.IRangeFactory.Factory(Min == double.NegativeInfinity ? _Distribution.Range.Min : Min, Max == double.PositiveInfinity ? _Distribution.Range.Max : Max);
             State = Validate(new Validation.TruncatedDistributionValidator(), out IEnumerable<IMessage> msgs);
             msgBoard.PostMessages(msgs);
             Messages = msgBoard.ReadMessages();
@@ -85,20 +107,6 @@ namespace Statistics.Distributions
             else return _Distribution.InverseCDF(p);
         }
 
-        //public double Sample(Random r = null) => InverseCDF(r == null ? new Random().NextDouble() : r.NextDouble());
-        ////public double[] Sample(Random numberGenerator = null) => Sample(SampleSize, numberGenerator);
-        //public double[] Sample(int sampleSize, Random numberGenerator = null)
-        //{
-        //    if (numberGenerator == null) numberGenerator = new Random();
-        //    double[] sample = new double[sampleSize];
-        //    for (int i = 0; i < sample.Length; i++) sample[i] = InverseCDF(numberGenerator.NextDouble());
-        //    return sample;
-        //}
-        //public IDistribution SampleDistribution(Random numberGenerator = null)
-        //{
-        //    IDistribution distribution = IDistributionFactory.Fit(Sample(SampleSize, numberGenerator), _Distribution.Type);
-        //    return new TruncatedDistribution(distribution, Range.Min, Range.Max);
-        //}
         public string Print(bool round = false) => round ? Print(_Distribution, Range) : $"TruncatedDistribution(distribution: {_Distribution.Print()}, truncated range: {Range.Print()})";
         public string Requirements(bool printNotes)
         {
@@ -121,7 +129,22 @@ namespace Statistics.Distributions
 
         public XElement WriteToXML()
         {
-            throw new NotImplementedException();
+            XElement ordinateElem = new XElement("Truncated");
+            //min
+            ordinateElem.SetAttributeValue(SerializationConstants.MIN, Range.Min);
+            //max
+            ordinateElem.SetAttributeValue(SerializationConstants.MAX, Range.Max);
+            ordinateElem.SetAttributeValue("Type", Type);
+            XElement dist = _Distribution.WriteToXML();
+            ordinateElem.Add(dist);
+            return ordinateElem;
+        }
+        public IDistribution ReadFromXML(XElement ele)
+        {
+
+
+            throw new NotImplementedException("under construction");
+            //return ret;
         }
     }
 }
