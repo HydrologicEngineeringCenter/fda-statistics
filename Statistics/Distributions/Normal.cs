@@ -21,7 +21,7 @@ namespace Statistics.Distributions
         public double Median => _Distribution.Median;
         public double Mode => _Distribution.Mode;
         public double Variance => _Distribution.Variance;
-        [Stored(Name = "St_Dev", type = typeof(double))]
+        [Stored(Name = "Standard_Deviation", type = typeof(double))]
         public double StandardDeviation { get; set; }
         public double Skewness => _Distribution.Skewness;
         public Utilities.IRange<double> Range { get; set; }

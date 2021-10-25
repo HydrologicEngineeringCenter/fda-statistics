@@ -65,8 +65,14 @@ namespace StatisticsTests.Distributions
             XElement ele = d.ToXML();
             IDistribution d2 = IDistributionExtensions.FromXML(ele);
             Assert.Equal(d.Min, d2.Min);
+            Assert.Equal(min, d.Min);
+            Assert.Equal(min, d2.Min);
             Assert.Equal(d.Max, d2.Max);
+            Assert.Equal(max, d.Max);
+            Assert.Equal(max, d2.Max);
             Assert.Equal(d.Mode, d2.Mode);
+            Assert.Equal(mostlikely, d.Mode);
+            Assert.Equal(mostlikely, d2.Mode);
             Assert.Equal(d.SampleSize, d2.SampleSize);
         }
     }

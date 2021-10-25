@@ -42,6 +42,8 @@ namespace Statistics.Distributions
         }
         public Uniform(double min, double max, int sampleSize = int.MaxValue)
         {
+            Min = min;
+            Max = max;
             _Distribution = new MathNet.Numerics.Distributions.ContinuousUniform(lower: min, upper: max);
             Range = Utilities.IRangeFactory.Factory(_Distribution.Minimum, _Distribution.Maximum);
             SampleSize = sampleSize;
