@@ -33,7 +33,10 @@ jobs:
       run: dotnet test --no-build
       
     - name: Pack 
-      run: dotnet pack --configuration Release --version-suffix "alpha-" + ${{ github.run_id }}
+      run: |
+            $datetime = get-date -f yyyy.MM.dd.HHmm
+            $versionSuffix = "alpha-" + $datetime
+            dotnet pack --configuration Release --version-suffix $versionSuffix
       shell: powershell
       
     - name: Publish
