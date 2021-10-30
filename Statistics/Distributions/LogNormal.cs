@@ -11,6 +11,7 @@ namespace Statistics.Distributions
     {      
         internal IRange<double> _ProbabilityRange;
         private MathNet.Numerics.Distributions.LogNormal _Distribution;
+        private bool _Constructed;
 
         #region Properties
         public IDistributionEnum Type => IDistributionEnum.LogNormal;
@@ -28,17 +29,20 @@ namespace Statistics.Distributions
         public double Skewness => _Distribution.Skewness;
 
         public IRange<double> Range { get; set; }
+        [Stored(Name = "Min", type = typeof(double))]
         public double Min
         {
-            get { return Range.Min; }
+            get; set;
         }
+        [Stored(Name = "Max", type = typeof(double))]
         public double Max
         {
-            get { return Range.Max; }
+            get; set;
         }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
         public int SampleSize { get; set; }
-
+        [Stored(Name = "Truncated", type = typeof(bool))]
+        public bool Truncated { get; set; }
         public IMessageLevels State { get; private set; }
         public IEnumerable<IMessage> Messages { get; private set; }
         #endregion
@@ -54,6 +58,8 @@ namespace Statistics.Distributions
             Mean = mean;
             StandardDeviation = standardDeviation;
             SampleSize = sampleSize;
+            Min = double.NegativeInfinity;
+            Max = double.PositiveInfinity;
             BuildFromProperties();
         }
         public LogNormal(double mean, double standardDeviation, double min, double max, int sampleSize = int.MaxValue)
@@ -61,16 +67,24 @@ namespace Statistics.Distributions
             Mean = mean;
             StandardDeviation = standardDeviation;
             SampleSize = sampleSize;
-            BuildFromProperties(min, max);
+            Min = min;
+            Max = max;
+            Truncated = true;
+            BuildFromProperties();
+            
         }
-        public void BuildFromProperties(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
+        public void BuildFromProperties()
         {
+
             if (!Validation.LogNormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new InvalidConstructorArgumentsException(msg);
             _Distribution = new MathNet.Numerics.Distributions.LogNormal(Mean, StandardDeviation);
-            _ProbabilityRange = FiniteRange(min, max);
+            _ProbabilityRange = FiniteRange(Min, Max);
             Range = IRangeFactory.Factory(_Distribution.InverseCumulativeDistribution(_ProbabilityRange.Min), _Distribution.InverseCumulativeDistribution(_ProbabilityRange.Max));
+            Min = Range.Min;
+            Max = Range.Max;
             State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
+            _Constructed = true;
         }
         #endregion
 
@@ -103,6 +117,10 @@ namespace Statistics.Distributions
         public double CDF(double x) => _Distribution.CumulativeDistribution(x);
         public double InverseCDF(double p)
         {
+            if (Truncated && _Constructed)
+            {
+                p = _ProbabilityRange.Min + (p) * (_ProbabilityRange.Max - _ProbabilityRange.Min);
+            }
             if (p <= _ProbabilityRange.Min) return Range.Min;
             if (p >= _ProbabilityRange.Max) return Range.Max;
             return _Distribution.InverseCumulativeDistribution(p);

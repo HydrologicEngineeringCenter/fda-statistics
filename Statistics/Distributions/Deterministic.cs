@@ -31,7 +31,7 @@ namespace Statistics.Distributions
         public IRange<double> Range { get; set; }
 
         public int SampleSize { get; set; }
-
+        public bool Truncated { get; set; }
         public IMessageLevels State => throw new NotImplementedException();
 
         public IEnumerable<IMessage> Messages => throw new NotImplementedException();
@@ -44,7 +44,7 @@ namespace Statistics.Distributions
             Value = x;
             BuildFromProperties();
         }
-        public void BuildFromProperties(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
+        public void BuildFromProperties()
         {
 
                 Mean = Value;

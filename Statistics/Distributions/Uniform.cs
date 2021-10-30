@@ -29,6 +29,7 @@ namespace Statistics.Distributions
         public double Mode => _Distribution.Mode;
         [Stored(Name = "SampleSize", type = typeof(Int32))]
         public int SampleSize { get; set; }
+        public bool Truncated { get; set; }
         #endregion
         public IMessageLevels State { get; private set; }
         public IEnumerable<IMessage> Messages { get; private set; }
@@ -50,7 +51,7 @@ namespace Statistics.Distributions
             SampleSize = sampleSize;
             BuildFromProperties();
         }
-        public void BuildFromProperties(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
+        public void BuildFromProperties()
         {
             _Distribution = new MathNet.Numerics.Distributions.ContinuousUniform(Min, Max);
             Range = Utilities.IRangeFactory.Factory(_Distribution.Minimum, _Distribution.Maximum);

@@ -11,8 +11,9 @@ namespace Statistics.Distributions
     public class LogPearson3: IDistribution, IValidate<LogPearson3> 
     {
         internal PearsonIII _Distribution;
-        internal IRange<double> _ProbabilityRange; 
-        
+        internal IRange<double> _ProbabilityRange;
+        private bool _Constructed;
+
         #region Properties
         public IDistributionEnum Type => IDistributionEnum.LogPearsonIII;
         [Stored(Name = "Mean", type = typeof(double))]
@@ -24,13 +25,20 @@ namespace Statistics.Distributions
         [Stored(Name = "Skew", type = typeof(double))]
         public double Skewness { get; set; }
         public Utilities.IRange<double> Range { get; set; }
+        [Stored(Name = "Min", type = typeof(double))]
         public double Min
         {
-            get { return Range.Min; }
+            get; set;
         }
+        [Stored(Name = "Max", type = typeof(double))]
         public double Max
         {
-            get { return Range.Max; }
+            get; set;
+        }
+        [Stored(Name = "Truncated", type = typeof(bool))]
+        public bool Truncated
+        {
+            get; set;
         }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
         public int SampleSize { get; set; }
@@ -44,7 +52,13 @@ namespace Statistics.Distributions
         public LogPearson3()
         {
             //for reflection;
-            _Distribution = new PearsonIII(0, 0.01, 0.01, 1);
+            Mean = 0.1;
+            StandardDeviation = .01;
+            Skewness = .01;
+            SampleSize = 1;
+            Min = double.NegativeInfinity;
+            Max = double.PositiveInfinity;
+            BuildFromProperties();
         }
         public LogPearson3(double mean, double standardDeviation, double skew, int sampleSize = int.MaxValue)
         {
@@ -52,6 +66,8 @@ namespace Statistics.Distributions
             StandardDeviation = standardDeviation;
             Skewness = skew;
             SampleSize = sampleSize;
+            Min = double.NegativeInfinity;
+            Max = double.PositiveInfinity;
             BuildFromProperties();
         }
         public LogPearson3(double mean, double standardDeviation, double skew, double min, double max, int sampleSize = int.MaxValue)
@@ -60,9 +76,13 @@ namespace Statistics.Distributions
             StandardDeviation = standardDeviation;
             Skewness = skew;
             SampleSize = sampleSize;
-            BuildFromProperties(min, max);
+            Min = min;
+            Max = max;
+            Truncated = true;
+            BuildFromProperties();
+            
         }
-        public void BuildFromProperties(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
+        public void BuildFromProperties()
         {
             if (!Validation.LogPearson3Validator.IsConstructable(Mean, StandardDeviation, Skewness, SampleSize, out string error)) throw new Utilities.InvalidConstructorArgumentsException(error);
             else
@@ -70,11 +90,14 @@ namespace Statistics.Distributions
                 _Distribution = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
                 Variance = Math.Pow(StandardDeviation, 2);
                 Median = InverseCDF(0.50);
-                _ProbabilityRange = FiniteRange(min, max);
+                _ProbabilityRange = FiniteRange(Min, Max);
                 Range = IRangeFactory.Factory(InverseCDF(_ProbabilityRange.Min), InverseCDF(_ProbabilityRange.Max));
+                Min = Range.Min;
+                Max = Range.Max;
                 State = Validate(new Validation.LogPearson3Validator(), out IEnumerable<Utilities.IMessage> msgs);
                 Messages = msgs;
             }
+            _Constructed = true;
         }
         #endregion
 
@@ -136,7 +159,10 @@ namespace Statistics.Distributions
         }
         public double InverseCDF(double p)
         {
-            
+            if (Truncated && _Constructed)
+            {
+                p = _ProbabilityRange.Min + (p) * (_ProbabilityRange.Max - _ProbabilityRange.Min);
+            }
             if (!p.IsFinite()) 
             {
                 throw new ArgumentException($"The value of specified probability parameter: {p} is invalid because it is not on the valid probability range: [0, 1].");

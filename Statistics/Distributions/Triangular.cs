@@ -28,6 +28,7 @@ namespace Statistics.Distributions
         public double Max { get; set; }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
         public int SampleSize { get; set; }
+        public bool Truncated { get; set; }
         public IMessageLevels State { get; private set; }
         public IEnumerable<IMessage> Messages { get; private set; }
         [Stored(Name = "MostLikely", type = typeof(double))]
@@ -53,7 +54,7 @@ namespace Statistics.Distributions
             Mode = mode;IRange<double> range = IRangeFactory.Factory(min, max,true, true, true, false);
             BuildFromProperties();
         }
-        public void BuildFromProperties(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
+        public void BuildFromProperties()
         {
             IRange<double> range = IRangeFactory.Factory(Min, Max, true, true, true, false);
             if (!Validation.TriangularValidator.IsConstructable(Mode, range, out string error)) throw new InvalidConstructorArgumentsException(error);

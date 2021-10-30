@@ -30,6 +30,7 @@ namespace Statistics.Distributions
             get { return Range.Max; }
         }
         public int SampleSize { get; }
+        public bool Truncated { get; set; }
         public IMessageLevels State { get; }
         public IEnumerable<IMessage> Messages { get; }
         #endregion
@@ -53,7 +54,7 @@ namespace Statistics.Distributions
                 Messages = msgs;
             }   
         }
-        public void BuildFromProperties(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
+        public void BuildFromProperties()
         {
             throw new NotImplementedException();
         }

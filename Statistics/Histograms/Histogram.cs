@@ -44,6 +44,7 @@ namespace Statistics.Histograms
                 return GetSampleSize();
             }
         }
+        public bool Truncated { get; set; }
         public double Mode { get; }
         
         public IDistributionEnum Type => IDistributionEnum.Histogram;
@@ -76,7 +77,7 @@ namespace Statistics.Histograms
             }
             Range = GetRange(Min, Max);
         }
-        public void BuildFromProperties(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
+        public void BuildFromProperties()
         {
             throw new NotImplementedException();
         }

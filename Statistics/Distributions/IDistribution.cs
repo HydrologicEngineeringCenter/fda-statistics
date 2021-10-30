@@ -57,9 +57,10 @@ namespace Statistics
         /// </summary>
         /// <remarks> If the distribution was not fit from a sample use the desired length of samples or <see cref="int.MaxValue"/> if the distribution is assumed to be a population distribution. </remarks>
         int SampleSize { get; }
+        bool Truncated { get; }
         #endregion
         #region Voids
-        void BuildFromProperties(double min = double.NegativeInfinity, double max = double.PositiveInfinity);
+        void BuildFromProperties();
         #endregion
         #region Functions
         /// <summary>
