@@ -42,18 +42,9 @@ namespace Statistics.Distributions
         public Deterministic(double x)
         {
             Value = x;
-            Mean = x;
-            Median = x;
-            Mode = x;
-            Min = x;
-            Max = x;
-            Variance = 0;
-            StandardDeviation = 0;
-            Skewness = 0;
-            SampleSize = 1;
-            Range = IRangeFactory.Factory(x, x);
+            BuildFromProperties();
         }
-        public void BuildFromProperties()
+        public void BuildFromProperties(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
         {
 
                 Mean = Value;

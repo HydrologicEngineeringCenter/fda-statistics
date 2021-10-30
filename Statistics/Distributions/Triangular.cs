@@ -39,25 +39,21 @@ namespace Statistics.Distributions
         public Triangular()
         {
             //for reflection
-            _Distribution = new MathNet.Numerics.Distributions.Triangular(0, 1, 0.5);
+            Min = 0;
+            Max = 1;
+            Mode = .5;
+            SampleSize = 0;
+            BuildFromProperties();
         }
         public Triangular(double min, double mode, double max, int sampleSize = int.MaxValue)
         {
-            IRange<double> range = IRangeFactory.Factory(min, max,true, true, true, false);
-            if (!Validation.TriangularValidator.IsConstructable(mode, range, out string error)) throw new InvalidConstructorArgumentsException(error);
-            else
-            {
-                Min = min;
-                Max = max;
-                Mode = mode;
-                _Distribution = new MathNet.Numerics.Distributions.Triangular(lower: min, upper: max, mode: mode);
-                Range = range;
-                SampleSize = sampleSize;
-                State = Validate(new Validation.TriangularValidator(), out IEnumerable<IMessage> msgs);
-                Messages = msgs;
-            }
+            Min = min;
+            Max = max;
+            SampleSize = sampleSize;
+            Mode = mode;IRange<double> range = IRangeFactory.Factory(min, max,true, true, true, false);
+            BuildFromProperties();
         }
-        public void BuildFromProperties()
+        public void BuildFromProperties(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
         {
             IRange<double> range = IRangeFactory.Factory(Min, Max, true, true, true, false);
             if (!Validation.TriangularValidator.IsConstructable(Mode, range, out string error)) throw new InvalidConstructorArgumentsException(error);

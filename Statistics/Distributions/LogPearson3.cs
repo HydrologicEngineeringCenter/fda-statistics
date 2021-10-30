@@ -48,23 +48,21 @@ namespace Statistics.Distributions
         }
         public LogPearson3(double mean, double standardDeviation, double skew, int sampleSize = int.MaxValue)
         {
-            if (!Validation.LogPearson3Validator.IsConstructable(mean, standardDeviation, skew, sampleSize, out string error)) throw new Utilities.InvalidConstructorArgumentsException(error);
-            else
-            {
-                _Distribution = new PearsonIII(mean, standardDeviation, skew, sampleSize);
-                Mean = _Distribution.Mean;
-                Skewness = _Distribution.Skewness;
-                SampleSize = _Distribution.SampleSize;
-                StandardDeviation = _Distribution.StandardDeviation;
-                Variance = Math.Pow(standardDeviation, 2);
-                Median = InverseCDF(0.50);
-                _ProbabilityRange = FiniteRange(); 
-                Range = IRangeFactory.Factory(InverseCDF(_ProbabilityRange.Min), InverseCDF(_ProbabilityRange.Max)); 
-                State = Validate(new Validation.LogPearson3Validator(), out IEnumerable<Utilities.IMessage> msgs);
-                Messages = msgs;
-            }
+            Mean = mean;
+            StandardDeviation = standardDeviation;
+            Skewness = skew;
+            SampleSize = sampleSize;
+            BuildFromProperties();
         }
-        public void BuildFromProperties()
+        public LogPearson3(double mean, double standardDeviation, double skew, double min, double max, int sampleSize = int.MaxValue)
+        {
+            Mean = mean;
+            StandardDeviation = standardDeviation;
+            Skewness = skew;
+            SampleSize = sampleSize;
+            BuildFromProperties(min, max);
+        }
+        public void BuildFromProperties(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
         {
             if (!Validation.LogPearson3Validator.IsConstructable(Mean, StandardDeviation, Skewness, SampleSize, out string error)) throw new Utilities.InvalidConstructorArgumentsException(error);
             else
@@ -72,7 +70,7 @@ namespace Statistics.Distributions
                 _Distribution = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
                 Variance = Math.Pow(StandardDeviation, 2);
                 Median = InverseCDF(0.50);
-                _ProbabilityRange = FiniteRange();
+                _ProbabilityRange = FiniteRange(min, max);
                 Range = IRangeFactory.Factory(InverseCDF(_ProbabilityRange.Min), InverseCDF(_ProbabilityRange.Max));
                 State = Validate(new Validation.LogPearson3Validator(), out IEnumerable<Utilities.IMessage> msgs);
                 Messages = msgs;
@@ -86,18 +84,33 @@ namespace Statistics.Distributions
             return validator.IsValid(this, out msgs);
         }
 
-        private IRange<double> FiniteRange()
+        private IRange<double> FiniteRange(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
         {
-            double min = InverseCDF(0.0000001), max = InverseCDF(0.9999999), p = 0.0000001, epsilon = 1 / 1000000d;
-            while (!min.IsFinite() || !max.IsFinite())
+            double pmin = 0, epsilon = 1 / 1000000000d;
+            double pmax = 1 - pmin;
+            if (min.IsFinite() || max.IsFinite())//not entirely sure how inclusive or works with one sided truncation and the while loop below.
             {
-                p += epsilon;
-                if (!min.IsFinite()) min = InverseCDF(p);
-                if (!max.IsFinite()) max = InverseCDF(1 - p);
-                if (p > 0.25) 
+                pmin = CDF(min);
+                pmax = CDF(max);
+            }
+            else
+            {
+                pmin = .0000001;
+                pmax = 1 - pmin;
+                min = InverseCDF(pmin);
+                max = InverseCDF(pmax);
+            }
+            while (!(min.IsFinite() && max.IsFinite()))
+            {
+                pmin += epsilon;
+                pmax -= epsilon;
+                if (!min.IsFinite()) min = InverseCDF(pmin);
+                if (!max.IsFinite()) max = InverseCDF(pmax);
+                if (pmin > 0.25)
                     throw new InvalidConstructorArgumentsException($"The log Pearson III object is not constructable because 50% or more of its distribution returns {double.NegativeInfinity} and {double.PositiveInfinity}.");
-            } 
-            return IRangeFactory.Factory(p, 1d - p);
+            }
+            return IRangeFactory.Factory(pmin, pmax);
+
         }
         #region IDistribution Functions
         public double PDF(double x)

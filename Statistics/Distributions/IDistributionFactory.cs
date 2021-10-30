@@ -43,7 +43,7 @@ namespace Statistics
                 case IDistributionEnum.TruncatedNormal:
                 case IDistributionEnum.TruncatedTriangular:
                 case IDistributionEnum.TruncatedUniform:
-                    return Distributions.TruncatedDistribution.RequiredParameterization(true);
+                    //return Distributions.TruncatedDistribution.RequiredParameterization(true);
                 case IDistributionEnum.NotSupported:
                 default:
                     throw new NotImplementedException();
@@ -96,8 +96,9 @@ namespace Statistics
             }
             else
             {
-                IDistribution distribution = (IDistribution)Fit(sample, (int)returnType / 10);
-                return new Distributions.TruncatedDistribution(distribution, minimum, maximum);
+                throw new NotImplementedException();
+                //IDistribution distribution = (IDistribution)Fit(sample, (int)returnType / 10);//this is all sorts of broken, return type is a distribution enum, being forced into number of bins.
+                //return new Distributions.TruncatedDistribution(distribution, minimum, maximum);
             }
         }
         
@@ -146,8 +147,8 @@ namespace Statistics
         /// <returns> A new <see cref="IDistribution"/>. </returns>
         public static IDistribution FactoryTruncatedNormal(double mean, double stDev, double min, double max, int sampleSize = int.MaxValue)
         {
-            IDistribution normal = new Distributions.Normal(mean, stDev, sampleSize);
-            return new Distributions.TruncatedDistribution(normal, min, max);
+            IDistribution normal = new Distributions.Normal(mean, stDev, min, max, sampleSize);
+            return normal;
         }
         /// <summary>
         /// Constructs a scaled beta distribution.
@@ -212,7 +213,7 @@ namespace Statistics
         {
             if (lpIII.IsNull()) throw new ArgumentNullException(nameof(lpIII));
             if (lpIII.Type != IDistributionEnum.LogPearsonIII) throw new ArgumentException($"The {nameof(FactoryTruncatedLogPearsonIII)} factory requires a {nameof(IDistributionEnum.LogPearsonIII)} {nameof(lpIII)} parameter, instead a {nameof(lpIII.Type)} was provided.");
-            return new Statistics.Distributions.TruncatedDistribution(lpIII, min, max);
+            return new Statistics.Distributions.LogPearson3(lpIII.Mean,lpIII.StandardDeviation,lpIII.Skewness, min, max, lpIII.SampleSize);
         }
         /// <summary>
         /// Constructs a <see cref="IDistribution"/> bound on the range specified by the <paramref name="min"/> and <paramref name="max"/> values."/>

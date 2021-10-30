@@ -59,7 +59,7 @@ namespace Statistics
         int SampleSize { get; }
         #endregion
         #region Voids
-        void BuildFromProperties();
+        void BuildFromProperties(double min = double.NegativeInfinity, double max = double.PositiveInfinity);
         #endregion
         #region Functions
         /// <summary>

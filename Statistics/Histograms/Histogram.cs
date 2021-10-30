@@ -76,7 +76,7 @@ namespace Statistics.Histograms
             }
             Range = GetRange(Min, Max);
         }
-        public void BuildFromProperties()
+        public void BuildFromProperties(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
         {
             throw new NotImplementedException();
         }
