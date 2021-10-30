@@ -24,6 +24,19 @@ namespace StatisticsTests.Distributions
             Assert.Equal(d.SampleSize, d2.SampleSize);
         }
         [Theory]
+        [InlineData(2.33, 1d, 1d, 4d, 1)]
+        public void SerializationRoundTrip_TruncatedNormal(double mean, double sd, double min, double max, int n)
+        {
+            IDistribution d = new Normal(mean, sd, min, max, n);
+            XElement ele = d.ToXML();
+            IDistribution d2 = IDistributionExtensions.FromXML(ele);
+            Assert.Equal(d.Mean, d2.Mean);
+            Assert.Equal(d.StandardDeviation, d2.StandardDeviation);
+            Assert.Equal(d.Min, d2.Min);
+            Assert.Equal(d.Max, d2.Max);
+            Assert.Equal(d.SampleSize, d2.SampleSize);
+        }
+        [Theory]
         [InlineData(2.33, 1d, 1)]
         public void SerializationRoundTrip_LogNormal(double mean, double sd, int n)
         {
@@ -32,6 +45,19 @@ namespace StatisticsTests.Distributions
             IDistribution d2 = IDistributionExtensions.FromXML(ele);
             Assert.Equal(d.Mean, d2.Mean);
             Assert.Equal(d.StandardDeviation, d2.StandardDeviation);
+            Assert.Equal(d.SampleSize, d2.SampleSize);
+        }
+        [Theory]
+        [InlineData(2.33, 1d, 1d, 4d, 1)]
+        public void SerializationRoundTrip_TruncatedLogNormal(double mean, double sd, double min, double max, int n)
+        {
+            IDistribution d = new LogNormal(mean, sd, min, max, n);
+            XElement ele = d.ToXML();
+            IDistribution d2 = IDistributionExtensions.FromXML(ele);
+            Assert.Equal(d.Mean, d2.Mean);
+            Assert.Equal(d.StandardDeviation, d2.StandardDeviation);
+            Assert.Equal(d.Min, d2.Min);
+            Assert.Equal(d.Max, d2.Max);
             Assert.Equal(d.SampleSize, d2.SampleSize);
         }
         [Theory]

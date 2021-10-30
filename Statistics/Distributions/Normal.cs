@@ -69,8 +69,8 @@ namespace Statistics.Distributions
             Mean = mean;
             StandardDeviation = sd;
             SampleSize = sampleSize;
-            Min = Min;
-            Max = Max;
+            Min = minValue;
+            Max = maxValue;
             Truncated = true;
             BuildFromProperties();
             
@@ -120,6 +120,7 @@ namespace Statistics.Distributions
         {
             if (Truncated && _Constructed)
             {
+                //https://en.wikipedia.org/wiki/Truncated_normal_distribution
                 p = _ProbabilityRange.Min + (p) * (_ProbabilityRange.Max - _ProbabilityRange.Min);
             }
             if (p <= _ProbabilityRange.Min) return Range.Min;
