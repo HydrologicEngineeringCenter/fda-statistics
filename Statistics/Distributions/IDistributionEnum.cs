@@ -45,6 +45,10 @@ namespace Statistics
         /// Deterministic Distribution
         /// </summary>
         Deterministic = 8,
+        /// <summary> 
+        /// Empirical Distribution
+        /// </summary>
+        Empirical = 9,
         /// <summary>
         /// Specific form of a Truncated Normal Distribution with density above or below truncation value(s) reassigned to the truncation value(s). However, the reported measures of central tendency and dispersion continue to be those of the underlying distribution NOT the truncated copy.
         /// </summary>

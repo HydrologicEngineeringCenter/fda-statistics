@@ -10,7 +10,7 @@ namespace Statistics.Distributions
 {
     class Empirical : IDistribution
     {
-        public IDistributionEnum Type => throw new NotImplementedException();
+        public IDistributionEnum Type => IDistributionEnum.Empirical;
 
         public double Mean => throw new NotImplementedException();
 
