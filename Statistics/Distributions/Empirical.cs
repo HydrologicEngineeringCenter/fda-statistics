@@ -439,7 +439,21 @@ namespace Statistics.Distributions
         }
         public XElement WriteToXML()
         {
-            throw new NotImplementedException();
+            XElement masterElem = new XElement("Empirical Distribution");
+            masterElem.SetAttributeValue("Ordinate_Count", SampleSize);
+            for (int i = 0; i<SampleSize; i++)
+            {
+                XElement rowElement = new XElement("Coordinate");
+                XElement xRowElement = new XElement("X");
+                xRowElement.SetAttributeValue("Value", ObservationValues[i]);
+                XElement yRowElement = new XElement("Y");
+                yRowElement.SetAttributeValue("Cumulative Probability", CumulativeProbabilities[i]);
+                rowElement.Add(xRowElement);
+                rowElement.Add(yRowElement);
+                masterElem.Add(rowElement);
+            }
+            return masterElem;
+
         }
         #endregion
     }

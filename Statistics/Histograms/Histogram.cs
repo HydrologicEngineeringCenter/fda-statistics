@@ -386,6 +386,23 @@ namespace Statistics.Histograms
         {
             return $"Histogram(IData: [{double.MinValue.Print()}, {double.MaxValue.Print()}], binWidth [{double.MinValue.Print()}, {double.MaxValue.Print()}])";
         }
+        public XElement WriteToXML()
+        {
+            XElement masterElem = new XElement("Histogram");
+            masterElem.SetAttributeValue("Ordinate_Count", SampleSize);
+            for (int i = 0; i < SampleSize; i++)
+            {
+                XElement rowElement = new XElement("Coordinate");
+                XElement xRowElement = new XElement("X");
+                xRowElement.SetAttributeValue("Bin Start", Min + BinWidth*(i));
+                XElement yRowElement = new XElement("Y");
+                yRowElement.SetAttributeValue("Bin Count", BinCounts[i]);
+                rowElement.Add(xRowElement);
+                rowElement.Add(yRowElement);
+                masterElem.Add(rowElement);
+            }
+            return masterElem;
+        }
         public Histogram Fit(IEnumerable<double> sample, int nBins)
         {
             double min = sample.Min();
