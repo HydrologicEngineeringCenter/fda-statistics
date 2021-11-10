@@ -369,7 +369,50 @@ namespace Statistics.Distributions
 
         public double PDF(double x)
         {
-            throw new NotImplementedException();
+            int index = ObservationValues.ToList().IndexOf(x);
+            if (index >= 0)
+            {
+                double pdfLeft;
+                if (index == 0)
+                {   // first value
+                    pdfLeft = 0;
+                }
+                else
+                {
+                    pdfLeft = (CumulativeProbabilities[index] - CumulativeProbabilities[index - 1]) / (ObservationValues[index] - ObservationValues[index - 1]);
+                }
+                double pdfRight;
+                if (index < SampleSize - 1)
+                {
+                    pdfRight = (CumulativeProbabilities[index + 1] - CumulativeProbabilities[index]) / (ObservationValues[index + 1] - ObservationValues[index]);
+                }
+                else
+                {   //last value
+                    pdfRight = 0;
+                }
+                double pdfValue = 0.5 * (pdfLeft + pdfRight);
+                return pdfValue;
+
+            }
+            else
+            {
+                index = -(index + 1);
+                // in between index-1 and index: interpolate
+                if (index == 0)
+                {   // first value
+                    return 0.0;
+                }
+                else if (index < SampleSize)
+                {
+                    double pdfValue = (CumulativeProbabilities[index] - CumulativeProbabilities[index - 1]) / (ObservationValues[index] - ObservationValues[index - 1]);
+                    return pdfValue;
+                }
+                else
+                {   // last value
+                    return 0.0;
+                }
+
+            }
         }
 
         public string Print(bool round = false)
