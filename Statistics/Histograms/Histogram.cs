@@ -76,6 +76,14 @@ namespace Statistics.Histograms
             }
             Range = GetRange(Min, Max);
         }
+        public Histogram(double min, double max, double binWidth, double[] binCounts)
+        {
+            Min = min;
+            Max = max;
+            BinWidth = binWidth;
+            BinCounts = binCounts;
+            Range = GetRange(Min, Max);
+        }
         public void BuildFromProperties()
         {
             throw new NotImplementedException();
@@ -389,19 +397,36 @@ namespace Statistics.Histograms
         public XElement WriteToXML()
         {
             XElement masterElem = new XElement("Histogram");
+            masterElem.SetAttributeValue("Min", Min);
+            masterElem.SetAttributeValue("Max", Max);
+            masterElem.SetAttributeValue("Bin Width", BinWidth);
             masterElem.SetAttributeValue("Ordinate_Count", SampleSize);
             for (int i = 0; i < SampleSize; i++)
             {
                 XElement rowElement = new XElement("Coordinate");
-                XElement xRowElement = new XElement("X");
-                xRowElement.SetAttributeValue("Bin Start", Min + BinWidth*(i));
-                XElement yRowElement = new XElement("Y");
-                yRowElement.SetAttributeValue("Bin Count", BinCounts[i]);
-                rowElement.Add(xRowElement);
-                rowElement.Add(yRowElement);
+                rowElement.SetAttributeValue("Bin Counts", BinCounts[i]);
                 masterElem.Add(rowElement);
             }
             return masterElem;
+        }
+        public static Histogram ReadFromXML(XElement element)
+        {
+            string minString = element.Attribute("Min").Value;
+            double min = Convert.ToDouble(minString);
+            string maxString = element.Attribute("Max").Value;
+            double max = Convert.ToDouble(maxString);
+            string binWidthString = element.Attribute("Bin Width").Value;
+            double binWidth = Convert.ToDouble(binWidthString);
+            string sampleSizeString = element.Attribute("Ordinate_Count").Value;
+            int sampleSize = Convert.ToInt32(sampleSizeString);
+            double[] binCounts = new double[sampleSize];
+            int i = 0;
+            foreach (XElement binCountElement in element.Elements())
+            {
+                binCounts[i] = Convert.ToDouble(binCountElement.Value);
+                i++;
+            }
+            return new Histogram(min, max, binWidth, binCounts);
         }
         public Histogram Fit(IEnumerable<double> sample, int nBins)
         {

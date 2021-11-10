@@ -453,7 +453,29 @@ namespace Statistics.Distributions
                 masterElem.Add(rowElement);
             }
             return masterElem;
-
+        }
+        public static Empirical ReadFromXML(XElement element)
+        {
+            string sampleSize = element.Attribute("Ordinate_Count").Value;
+            int size = Convert.ToInt32(sampleSize);
+            double[] observationValues = new double[size];
+            double[] cumulativeProbabilities = new double[size];
+            int i = 0;
+            foreach(XElement coordinateElement in element.Elements())
+            {
+                foreach(XElement ordinateElements in coordinateElement.Elements())
+                {
+                    if(ordinateElements.Name.ToString().Equals("X"))
+                    {
+                        observationValues[i] = Convert.ToDouble(ordinateElements.Attribute("X").Value);
+                    } else
+                    {
+                        cumulativeProbabilities[i] = Convert.ToDouble(ordinateElements.Attribute("Y").Value);
+                    }
+                }
+                i++;
+            }
+            return new Empirical(cumulativeProbabilities, observationValues);
         }
         #endregion
     }
