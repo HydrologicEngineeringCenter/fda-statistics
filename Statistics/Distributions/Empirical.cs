@@ -342,7 +342,29 @@ namespace Statistics.Distributions
 
         public double InverseCDF(double p)
         {
-            throw new NotImplementedException();
+            int index = CumulativeProbabilities.ToList().IndexOf(p);
+            if (index >= 0)
+            {
+                return ObservationValues[index];
+            }
+            else
+            {
+                index = -(index + 1); // may need to take the bitwise complement using the ~ operator in C#, e.g. index = ~index-1? not sure if the same
+                // in between index-1 and index: interpolate
+                if (index == 0)
+                {   // first value
+                    return ObservationValues[0];
+                }
+                else if (index < SampleSize)
+                {
+                    double weight = (p - CumulativeProbabilities[index - 1]) / (CumulativeProbabilities[index] - CumulativeProbabilities[index - 1]);
+                    return (1.0 - weight) * ObservationValues[index - 1] + weight * ObservationValues[index];
+                }
+                else
+                {   // last value
+                    return ObservationValues[SampleSize - 1];
+                }
+            }
         }
 
         public double PDF(double x)
