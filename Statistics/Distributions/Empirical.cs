@@ -10,36 +10,207 @@ namespace Statistics.Distributions
 {
     class Empirical : IDistribution
     {
+        #region EmpiricalProperties
+        /// <summary>
+        /// Cumulative probabilities are non-exceedance probabilities 
+        /// </summary>
+        public double[] CumulativeProbabilities;
+        public double[] ObservationValues;
+        #endregion
+
+        #region IDistributionProperties
         public IDistributionEnum Type => IDistributionEnum.Empirical;
 
-        public double Mean => throw new NotImplementedException();
+        public double Mean { get; set; }
+        public double Median { get; set; }
 
-        public double Median => throw new NotImplementedException();
+        public double Mode { get; set; }
 
-        public double Mode => throw new NotImplementedException();
+        public double StandardDeviation { get; set; }
 
-        public double Variance => throw new NotImplementedException();
+        public double Variance { get; set; }
 
-        public double StandardDeviation => throw new NotImplementedException();
+        public double Min { get; set; }
 
-        public double Min => throw new NotImplementedException();
+        public double Max { get; set; }
 
-        public double Max => throw new NotImplementedException();
+        public double Skewness { get; set; }
 
-        public double Skewness => throw new NotImplementedException();
+        public IRange<double> Range { get; set; }
 
-        public IRange<double> Range => throw new NotImplementedException();
+        public int SampleSize { get; set; }
 
-        public int SampleSize => throw new NotImplementedException();
-
+        //are we still using IMessageLevels?
         public IMessageLevels State => throw new NotImplementedException();
 
         public IEnumerable<IMessage> Messages => throw new NotImplementedException();
+        #endregion
+
+        #region Constructor
+
+        public Empirical(double[] probabilities, double[] observationValues, bool probsAreExceedance = false)
+        {
+            double[] probabilityArray = new double[probabilities.Length];
+            if (probsAreExceedance == true)
+            {
+                probabilityArray = ConvertExceedanceToNonExceedance(probabilities);
+                
+            } else
+            {
+                probabilityArray = probabilities;
+            }  
+            if (!IsMonotonicallyIncreasing(probabilityArray))
+            {   //sorting the arrays separately feels a little precarious 
+                //what if the user provides a non-monotonically increasing relationship?
+                //e.g. probs all increasing but values not or vice versa 
+                Array.Sort(probabilityArray);
+            }
+            CumulativeProbabilities = probabilityArray;
+            if (!IsMonotonicallyIncreasing(observationValues))
+            {
+                Array.Sort(observationValues);
+            }
+            ObservationValues = observationValues;
+            SampleSize = ObservationValues.Length;
+            Mean = ComputeMean();
+            StandardDeviation = ComputeStandardDeviation();
+            Variance = Math.Pow(StandardDeviation, 2);
+            
+
+        }
 
         public void BuildFromProperties()
         {
             throw new NotImplementedException();
         }
+        #endregion
+
+        #region EmpiricalFunctions
+        private double[] ConvertExceedanceToNonExceedance(double[] ExceedanceProbabilities)
+        {
+            double[] nonExceedanceProbabilities = new double[ExceedanceProbabilities.Length];
+            for (int i = 0; i<ExceedanceProbabilities.Length; i++ )
+            {
+                nonExceedanceProbabilities[i] = 1 - ExceedanceProbabilities[i];
+            }
+            return nonExceedanceProbabilities;
+        }
+
+        private double ComputeMean()
+        {
+            if (SampleSize == 0)
+            {
+                return 0.0;
+            }
+            else if (SampleSize == 1)
+            {
+                return ObservationValues[0];
+            }
+            else
+            {
+                double mean = 0;
+                int i;
+                double stepPDF, stepVal;
+                double valL, valR, cdfL, cdfR;
+                // left singleton
+                i = 0;
+                valR = ObservationValues[i];
+                cdfR = CumulativeProbabilities[i];
+                stepPDF = cdfR - 0.0;
+                mean += valR * stepPDF;
+                valL = valR;
+                cdfL = cdfR;
+                // add interval values
+                for (i = 1; i < SampleSize; ++i)
+                {
+                    valR = ObservationValues[i];
+                    cdfR = CumulativeProbabilities[i];
+                    stepPDF = cdfR - cdfL;
+                    stepVal = (valL + valR) / 2.0;
+                    mean += stepPDF * stepVal;
+                    valL = valR;
+                    cdfL = cdfR;
+                }
+                // add right singleton 
+                i = SampleSize - 1;
+                valR = ObservationValues[i];
+                cdfR = 1.0;
+                stepPDF = cdfR - cdfL;
+                mean += valR * stepPDF;
+                // 99% sure we dont need the following two lines. confirm in testing. 
+                //valL = valR; 
+                //cdfL = cdfR; 
+                return mean;
+            }
+        }
+
+        private double ComputeStandardDeviation()
+        {
+
+            if (SampleSize == 0)
+            {
+                return 0.0;
+            }
+            else if (SampleSize == 1)
+            {
+                return 0.0;
+            }
+            else
+            {
+                double mean = Mean;
+                double expect2 = 0.0;
+                int i;
+                double stepPDF, stepVal;
+                double valL, valR, cdfL, cdfR;
+                // add left singleton 
+                i = 0;
+                valR = ObservationValues[i];
+                cdfR = CumulativeProbabilities[i];
+                stepPDF = cdfR - 0.0;
+                expect2 += valR * valR * stepPDF;
+                valL = valR;
+                cdfL = cdfR;
+                // add interval values
+                for (i = 1; i < SampleSize; i++)
+                {
+                    valR = ObservationValues[i];
+                    cdfR = CumulativeProbabilities[i];
+                    stepPDF = cdfR - cdfL;
+                    stepVal = (valL * valL + valL * valR + valR * valR) / 3.0;
+                    expect2 += stepVal * stepPDF;
+                    valL = valR;
+                    cdfL = cdfR;
+                }
+                // add last singleton 
+                i = SampleSize - 1;
+                valR = ObservationValues[i];
+                cdfR = 1.0;
+                stepPDF = cdfR - cdfL;
+                expect2 += valR * stepPDF; //should this be valR*valR*stepPDF? Why did RN write this?
+                //valL = valR; same note as mean
+                //cdfL = cdfR;
+                return expect2 - mean * mean;
+            }
+        }
+
+        public bool IsMonotonicallyIncreasing(double[] arrayOfData)
+        {
+
+            for (int i = 0; i < arrayOfData.Length - 1; i++)
+            {
+                if (arrayOfData[i] >= arrayOfData[i + 1])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
+
+        #endregion
+        #region IDistributionFunctions
+
 
         public double CDF(double x)
         {
@@ -75,5 +246,7 @@ namespace Statistics.Distributions
         {
             throw new NotImplementedException();
         }
+        #endregion
     }
+
 }
