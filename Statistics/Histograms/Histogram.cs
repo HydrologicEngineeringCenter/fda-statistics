@@ -242,9 +242,22 @@ namespace Statistics.Histograms
             return qValues;
         }
 
-        public bool Equals(Histogram histogram)
+        public bool Equals(IDistribution distribution)
         {
-            throw new NotImplementedException("Need to figure this one out");
+            if (distribution.Type == IDistributionEnum.Histogram)
+            {
+                Histogram histoCompared = distribution as Histogram;
+                if(BinWidth == histoCompared.BinWidth && BinCounts == histoCompared.BinCounts)
+                {
+                    return true;
+                } else
+                {
+                    return false;
+                }
+            } else
+            {
+                return false;
+            }
         }
 
         private double FindBinCount(double x, bool cumulative = true)

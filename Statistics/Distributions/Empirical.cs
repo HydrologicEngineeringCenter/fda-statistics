@@ -321,7 +321,23 @@ namespace Statistics.Distributions
 
         public bool Equals(IDistribution distribution)
         {
-            throw new NotImplementedException();
+
+            if (distribution.Type == IDistributionEnum.Empirical)
+            {
+                Empirical distCompared = distribution as Empirical;
+                if(ObservationValues == distCompared.ObservationValues && CumulativeProbabilities == distCompared.ObservationValues )
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public double InverseCDF(double p)
