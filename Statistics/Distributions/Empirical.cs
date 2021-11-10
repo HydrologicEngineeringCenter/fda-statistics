@@ -77,6 +77,7 @@ namespace Statistics.Distributions
             Mode = ComputeMode();
             StandardDeviation = ComputeStandardDeviation();
             Variance = Math.Pow(StandardDeviation, 2);
+            Skewness = ComputeSkewness();
             
 
         }
@@ -248,17 +249,12 @@ namespace Statistics.Distributions
         /// <summary>
         public double ComputeSkewness()
         {
-            var dist = new List<Tuple<double, double>>();
-            dist = Distribution;
-            double mean = Mean; // do I need to call the methods here?
-            double standardDeviation = StandardDeviation;
-            var size = dist.Count;
             double differenceFromMeanCubed = 0;
-            for (int i = 0; i < size; ++i)
+            for (int i = 0; i < SampleSize; ++i)
             {
-                differenceFromMeanCubed += Math.Pow((mean - dist[i].Item1), 3);
+                differenceFromMeanCubed += Math.Pow((Mean - ObservationValues[i]), 3);
             }
-            return (differenceFromMeanCubed / size) / Math.Pow(standardDeviation, 3);
+            return (differenceFromMeanCubed / SampleSize) / Math.Pow(StandardDeviation, 3);
         }
         public bool IsMonotonicallyIncreasing(double[] arrayOfData)
         {
@@ -273,15 +269,35 @@ namespace Statistics.Distributions
             return true;
         }
 
-
-
         #endregion
         #region IDistributionFunctions
 
-
         public double CDF(double x)
         {
-            throw new NotImplementedException();
+            int index = ObservationValues.ToList().IndexOf(x);
+            if (index >= 0)
+            {
+                return CumulativeProbabilities[index];
+            }
+            else
+            {
+                int size = SampleSize;
+                index = -(index + 1);
+                if (index == 0)
+                {   // first value
+                    return 0.0;
+                }
+                // in between index-1 and index: interpolate
+                else if (index < size)
+                {
+                    double weight = (x - ObservationValues[index - 1]) / (ObservationValues[index] - ObservationValues[index - 1]);
+                    return (1 - weight) * CumulativeProbabilities[index - 1] + weight * CumulativeProbabilities[index];
+                }
+                else
+                {   // last value
+                    return 1.0;
+                }
+            }
         }
 
         public bool Equals(IDistribution distribution)
