@@ -376,7 +376,15 @@ namespace Statistics.Histograms
         }
         public string Requirements(bool printNotes)
         {
-            return "Histogram requirements consist of a min, max, bin width, and some data.";
+            return RequiredParameterization(printNotes);
+        }
+        public static string RequiredParameterization(bool printNotes = false)
+        {
+            return $"The Histogram requires the following parameterization: {Parameterization()}.";
+        }
+        internal static string Parameterization()
+        {
+            return $"Histogram(IData: [{double.MinValue.Print()}, {double.MaxValue.Print()}], binWidth [{double.MinValue.Print()}, {double.MaxValue.Print()}])";
         }
         public Histogram Fit(IEnumerable<double> sample, int nBins)
         {

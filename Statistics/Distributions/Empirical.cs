@@ -415,16 +415,28 @@ namespace Statistics.Distributions
             }
         }
 
-        public string Print(bool round = false)
+        public static string Print(double[] observationValues, double[] cumulativeProbabilities)
         {
-            throw new NotImplementedException();
+            string returnString = "Empirical Distribution \n Observation Values | Cumulative Probabilities \n";
+            for (int i=0; i<observationValues.Length; i++)
+            {
+                returnString += $"{observationValues[i]} | {cumulativeProbabilities[i]}";
+            }
+            return returnString;
         }
 
         public string Requirements(bool printNotes)
         {
-            throw new NotImplementedException();
+            return RequiredParameterization(printNotes);
         }
-
+        public static string RequiredParameterization(bool printNotes = false)
+        {
+            return $"The empirical distribution requires the following parameterization: {Parameterization()}.";
+        }
+        internal static string Parameterization()
+        {
+            return $"Empirical(Observation Values: [{double.MinValue.Print()}, {double.MaxValue.Print()}], Cumulative Probabilities [0,1])";
+        }
         public XElement WriteToXML()
         {
             throw new NotImplementedException();
