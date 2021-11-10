@@ -88,7 +88,7 @@ namespace Statistics.Distributions
                 probabilityArray = probabilities;
             }  
             if (!IsMonotonicallyIncreasing(probabilityArray))
-            {   //sorting the arrays separately feels a little precarious 
+            {   //TODO: sorting the arrays separately feels a little precarious 
                 //what if the user provides a non-monotonically increasing relationship?
                 //e.g. probs all increasing but values not or vice versa 
                 Array.Sort(probabilityArray);
@@ -165,9 +165,7 @@ namespace Statistics.Distributions
                 return mean;
             }
         }
-        /// <summary>
-        /// Method for computing the median of a data series
-        /// <summary>
+
         public double ComputeMedian()
         {
             if (SampleSize == 0)
@@ -263,9 +261,7 @@ namespace Statistics.Distributions
                 return expect2 - mean * mean;
             }
         }
-        /// <summary>
-        /// Method for computing skewness of a data series 
-        /// <summary>
+
         public double ComputeSkewness()
         {
             double differenceFromMeanCubed = 0;
@@ -424,6 +420,7 @@ namespace Statistics.Distributions
             }
             return returnString;
         }
+        public string Print(bool round = false) => round ? Print(ObservationValues,CumulativeProbabilities) : $"Empirical(Observation Values: {ObservationValues}, Cumulative Probabilities {CumulativeProbabilities})";
 
         public string Requirements(bool printNotes)
         {
