@@ -73,6 +73,8 @@ namespace Statistics.Distributions
             ObservationValues = observationValues;
             SampleSize = ObservationValues.Length;
             Mean = ComputeMean();
+            Median = ComputeMedian();
+            Mode = ComputeMode();
             StandardDeviation = ComputeStandardDeviation();
             Variance = Math.Pow(StandardDeviation, 2);
             
@@ -143,7 +145,56 @@ namespace Statistics.Distributions
                 return mean;
             }
         }
+        /// <summary>
+        /// Method for computing the median of a data series
+        /// <summary>
+        public double ComputeMedian()
+        {
+            if (SampleSize == 0)
+            {
+                throw new ArgumentException("Sample cannot be null");
+            }
+            else if (SampleSize == 1)
+            {
+                return ObservationValues[SampleSize-1];
+            }
+            else
+            {
+                if ((SampleSize % 2) == 0)
+                {
+                    return (ObservationValues[SampleSize / 2] + ObservationValues[SampleSize / 2 - 1]) / 2;
+                }
+                else
+                {
+                    return ObservationValues[(SampleSize - 1) / 2];
+                }
 
+            }
+        }
+       private double ComputeMode()
+        {
+            if (SampleSize == 0)
+            {
+                throw new ArgumentException("Sample cannot be null");
+            }
+            else if (SampleSize == 1)
+            {
+                return ObservationValues[SampleSize - 1];
+            }
+            else
+            {
+                int i = 0;
+                double[] pdf = new double[CumulativeProbabilities.Length];
+                pdf[i] = CumulativeProbabilities[i];
+                for (i = 1; i< CumulativeProbabilities.Length; i++)
+                {
+                    pdf[i] = CumulativeProbabilities[i] - CumulativeProbabilities[i - 1];
+                }
+                double maxPDF = pdf.Max();
+                int indexMaxPDF = pdf.ToList().IndexOf(maxPDF);
+                return ObservationValues[indexMaxPDF];
+            }
+        }
         private double ComputeStandardDeviation()
         {
 
@@ -192,7 +243,23 @@ namespace Statistics.Distributions
                 return expect2 - mean * mean;
             }
         }
-
+        /// <summary>
+        /// Method for computing skewness of a data series 
+        /// <summary>
+        public double ComputeSkewness()
+        {
+            var dist = new List<Tuple<double, double>>();
+            dist = Distribution;
+            double mean = Mean; // do I need to call the methods here?
+            double standardDeviation = StandardDeviation;
+            var size = dist.Count;
+            double differenceFromMeanCubed = 0;
+            for (int i = 0; i < size; ++i)
+            {
+                differenceFromMeanCubed += Math.Pow((mean - dist[i].Item1), 3);
+            }
+            return (differenceFromMeanCubed / size) / Math.Pow(standardDeviation, 3);
+        }
         public bool IsMonotonicallyIncreasing(double[] arrayOfData)
         {
 
