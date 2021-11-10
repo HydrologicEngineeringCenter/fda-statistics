@@ -21,24 +21,52 @@ namespace Statistics.Distributions
         #region IDistributionProperties
         public IDistributionEnum Type => IDistributionEnum.Empirical;
 
-        public double Mean { get; set; }
-        public double Median { get; set; }
+        public double Mean { get 
+            {
+                return ComputeMean();
+            } 
+        }
+        public double Median { get 
+            {
+                return ComputeMedian();
+            } 
+        }
 
-        public double Mode { get; set; }
+        public double Mode { get 
+            {
+                return ComputeMode(); 
+            } 
+        }
 
-        public double StandardDeviation { get; set; }
+        public double StandardDeviation { get
+            {
+                return ComputeStandardDeviation();
+            }
+        }
 
-        public double Variance { get; set; }
+        public double Variance { get 
+            {
+                return Math.Pow(StandardDeviation, 2);
+
+            } 
+        }
 
         public double Min { get; set; }
 
         public double Max { get; set; }
 
-        public double Skewness { get; set; }
+        public double Skewness { get 
+            {
+                return ComputeSkewness();
+            } 
+        }
 
         public IRange<double> Range { get; set; }
 
-        public int SampleSize { get; set; }
+        public int SampleSize { get {
+                return ObservationValues.Length;
+            } 
+        }
 
         //are we still using IMessageLevels?
         public IMessageLevels State => throw new NotImplementedException();
@@ -70,16 +98,7 @@ namespace Statistics.Distributions
             {
                 Array.Sort(observationValues);
             }
-            ObservationValues = observationValues;
-            SampleSize = ObservationValues.Length;
-            Mean = ComputeMean();
-            Median = ComputeMedian();
-            Mode = ComputeMode();
-            StandardDeviation = ComputeStandardDeviation();
-            Variance = Math.Pow(StandardDeviation, 2);
-            Skewness = ComputeSkewness();
-            
-
+            ObservationValues = observationValues;    
         }
 
         public void BuildFromProperties()
