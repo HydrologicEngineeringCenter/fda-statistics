@@ -49,14 +49,15 @@ namespace Statistics.Histograms
         public IDistributionEnum Type => IDistributionEnum.Histogram;
         #endregion      
         #region IMessagePublisher Properties
-        public IMessageLevels State { get; }
-        public IEnumerable<IMessage> Messages { get; }
+        public IMessageLevels State { get; private set; }
+        public IEnumerable<IMessage> Messages { get; private set; }
         #endregion
         #endregion
 
         #region Constructor
         public Histogram(IData data, double binWidth)
-        {//need to be able to handle null
+        {
+            if (!Validation.HistogramValidator.IsConstructable(data, binWidth, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             BinWidth = binWidth;
             if (data == null)
             {
@@ -75,18 +76,25 @@ namespace Statistics.Histograms
 
             }
             Range = GetRange(Min, Max);
+            State = Validate(new Validation.HistogramValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
         }
         public Histogram(double min, double max, double binWidth, double[] binCounts)
         {
+            if (!Validation.HistogramValidator.IsConstructable(min, max, binWidth, binCounts, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             Min = min;
             Max = max;
             BinWidth = binWidth;
             BinCounts = binCounts;
             Range = GetRange(Min, Max);
+            State = Validate(new Validation.HistogramValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
         }
         public void BuildFromProperties()
         {
-            throw new NotImplementedException();
+            if (!Validation.HistogramValidator.IsConstructable(Min,Max,BinWidth,BinCounts, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            State = Validate(new Validation.HistogramValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
         }
         #endregion
 
@@ -313,6 +321,7 @@ namespace Statistics.Histograms
             return validator.IsValid(this, out messages);
         }
         #endregion
+        //TODO: print could accept and print more useful arguments
         public static string Print(int n, int nBins, IRange<double> range) => $"Histogram(observations: {n.Print()}, bins: {nBins.Print()}, range: {range.Print(true)})";
         public string Print(bool round) => round ? Print(SampleSize, BinCounts.Length, Range) : $"Histogram(observations: {SampleSize}, bins: {BinCounts.Length}, range: {Range.Print()})";
 
