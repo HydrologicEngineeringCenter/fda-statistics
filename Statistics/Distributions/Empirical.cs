@@ -55,10 +55,17 @@ namespace Statistics.Distributions
 
             } 
         }
+        public double Min { get 
+            {
+                return ObservationValues[0];
+            }  
+        }
 
-        public double Min { get; set; }
-
-        public double Max { get; set; }
+        public double Max { get 
+            {
+                return ObservationValues[ObservationValues.Length - 1];
+            }
+        }
 
         public double Skewness { get 
             {
@@ -98,8 +105,7 @@ namespace Statistics.Distributions
             {   //TODO: sorting the arrays separately feels a little precarious 
                 //what if the user provides a non-monotonically increasing relationship?
                 //e.g. probs all increasing but values not or vice versa 
-
-                //I think we can probably do some checking where we sort only if both are not monotonically increasing
+                //I think we can probably do some checking where we sort only if both are not monotonically increasing?
                 Array.Sort(probabilityArray);
             }
             CumulativeProbabilities = probabilityArray;
@@ -123,8 +129,7 @@ namespace Statistics.Distributions
             {   //TODO: sorting the arrays separately feels a little precarious 
                 //what if the user provides a non-monotonically increasing relationship?
                 //e.g. probs all increasing but values not or vice versa 
-
-                //I think we can probably do some checking where we sort only if both are not monotonically increasing
+                //I think we can probably do some checking where we sort only if both are not monotonically increasing?
                 Array.Sort(CumulativeProbabilities);
             }
             if (!IsMonotonicallyIncreasing(ObservationValues))
@@ -187,10 +192,7 @@ namespace Statistics.Distributions
                 valR = ObservationValues[i];
                 cdfR = 1.0;
                 stepPDF = cdfR - cdfL;
-                mean += valR * stepPDF;
-                // 99% sure we dont need the following two lines. confirm in testing. 
-                //valL = valR; 
-                //cdfL = cdfR; 
+                mean += valR * stepPDF; 
                 return mean;
             }
         }
@@ -284,9 +286,7 @@ namespace Statistics.Distributions
                 valR = ObservationValues[i];
                 cdfR = 1.0;
                 stepPDF = cdfR - cdfL;
-                expect2 += valR * stepPDF; //should this be valR*valR*stepPDF? Why did RN write this?
-                //valL = valR; same note as mean
-                //cdfL = cdfR;
+                expect2 += valR * stepPDF; 
                 return expect2 - mean * mean;
             }
         }
@@ -367,14 +367,14 @@ namespace Statistics.Distributions
 
         public double InverseCDF(double p)
         {
-            int index = CumulativeProbabilities.ToList().IndexOf(p);
+            int index = Array.BinarySearch(CumulativeProbabilities,p);
             if (index >= 0)
             {
                 return ObservationValues[index];
             }
             else
             {
-                index = -(index + 1); // may need to take the bitwise complement using the ~ operator in C#, e.g. index = ~index-1? not sure if the same
+                index = -(index + 1); 
                 // in between index-1 and index: interpolate
                 if (index == 0)
                 {   // first value

@@ -68,7 +68,7 @@ namespace StatisticsTests.Distributions
         [InlineData(1234, 1000000, 0.0080, -2.41)]
         [InlineData(4321, 1000000, 0.1230, -1.161)]
         [InlineData(2345, 1000000, 0.8770, 1.16)]
-        [InlineData(5432, 1000000, 0.9970, 2.85)]
+        [InlineData(5432, 1000000, 0.9970, 2.75)]
         public void EmpiricalInvCDF_Test(int seed, int sampleSize, double cumulativeProbability, double expected)
         {
             Random random = new Random(seed);
@@ -85,14 +85,16 @@ namespace StatisticsTests.Distributions
             Array.Sort(observationValues);
             Empirical empirical = new Empirical(cumulativeProbabilities, observationValues);
             double actual = empirical.InverseCDF(cumulativeProbability);
-            Assert.True(Math.Abs(expected - actual) < 0.001);
+            double err = Math.Abs((expected - actual) / expected);
+            double tol = 0.01;
+            Assert.True(err < tol);
         }
 
         [Theory]
         [InlineData(1234, 1000000, 0.0080, -2.41)]
         [InlineData(4321, 1000000, 0.1230, -1.161)]
         [InlineData(2345, 1000000, 0.8770, 1.16)]
-        [InlineData(5432, 1000000, 0.9970, 2.85)]
+        [InlineData(5432, 1000000, 0.9970, 2.75)]
         public void EmpiricalCDF_Test(int seed, int sampleSize, double expected, double observationValue)
         {
             Random random = new Random(seed);

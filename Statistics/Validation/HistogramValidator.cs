@@ -41,7 +41,10 @@ namespace Statistics.Validation
         private static string ReportFatalErrors(IData data, double binWidth)
         {
             string msg = "";
-            if ((binWidth>(data.Elements.Max()-data.Elements.Min()))) msg += $"{Resources.FatalParameterizationNotice(Histograms.Histogram.Print(data.Elements.Count(), Convert.ToInt32((data.Elements.Max() - data.Elements.Min())/binWidth), IRangeFactory.Factory(data.Elements.Min(), data.Elements.Max())))} {Histograms.Histogram.RequiredParameterization(true)} {Resources.SampleSizeSuggestion()}.";
+            if (!data.IsNull())
+            {
+                if ((binWidth > (data.Elements.Max() - data.Elements.Min()))) msg += $"{Resources.FatalParameterizationNotice(Histograms.Histogram.Print(data.Elements.Count(), Convert.ToInt32((data.Elements.Max() - data.Elements.Min()) / binWidth), IRangeFactory.Factory(data.Elements.Min(), data.Elements.Max())))} {Histograms.Histogram.RequiredParameterization(true)} {Resources.SampleSizeSuggestion()}.";
+            }
             return msg;
         }
         private static string ReportFatalErrors(double min, double max, double binWidth, double[] binCounts)
