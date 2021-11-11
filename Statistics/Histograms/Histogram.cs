@@ -314,6 +314,8 @@ namespace Statistics.Histograms
         }
         #endregion
         public static string Print(int n, int nBins, IRange<double> range) => $"Histogram(observations: {n.Print()}, bins: {nBins.Print()}, range: {range.Print(true)})";
+        public string Print(bool round) => round ? Print(SampleSize, BinCounts.Length, Range) : $"Histogram(observations: {SampleSize}, bins: {BinCounts.Length}, range: {Range.Print()})";
+
         #endregion
         #region IDistribution Functions 
         public double PDF(double x)
@@ -443,50 +445,9 @@ namespace Statistics.Histograms
         #endregion
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
  
-        public string Print(bool round) => round ? Print(SampleSize, BinCounts.Length, Range) : $"Histogram(observations: {SampleSize}, bins: {BinCounts.Length}, range: {Range.Print()})";
-        public bool Equals(IDistribution distribution) => distribution.Type == IDistributionEnum.Histogram ? Equals((Histogram)distribution) : false;
 
-        public static readonly string XML_BINS = "Bins";
-        public static readonly string XML_BIN = "Bin";
-        public static readonly string XML_MIN = "Inclusive Min";
-        public static readonly string XML_MAX = "Exclusive Max";
-        public static readonly string XML_MIDPOINT = "MidPoint";
-        public static readonly string XML_COUNT = "Count";
-        //TODO: write test on WriteToXML and ReadToXML
-        public XElement WriteToXML()
-        {
-            XElement masterElem = new XElement(XML_BINS);
-            for (Int64 i=0; i<BinCounts.Length; i++)
-            {
-                XElement binElem = new XElement(XML_BIN);
-                binElem.SetAttributeValue(XML_MIN, i*BinWidth);
-                binElem.SetAttributeValue(XML_MAX, (i+1)*BinWidth);
-                binElem.SetAttributeValue(XML_MIDPOINT, (i+0.5)*BinWidth);
-                binElem.SetAttributeValue(XML_COUNT, BinCounts[i]);
 
-                masterElem.Add(binElem);
-            }
-            return masterElem;
-        }
-        //TODO: implement ReadFromXML
-        public static Histogram ReadFromXML(string histogramXMLString)
-        {
-            throw new NotImplementedException();
-        }
         #endregion
 
     }

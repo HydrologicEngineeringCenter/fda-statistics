@@ -91,6 +91,8 @@ namespace Statistics.Distributions
             {   //TODO: sorting the arrays separately feels a little precarious 
                 //what if the user provides a non-monotonically increasing relationship?
                 //e.g. probs all increasing but values not or vice versa 
+
+                //I think we can probably do some checking where we sort only if both are not monotonically increasing
                 Array.Sort(probabilityArray);
             }
             CumulativeProbabilities = probabilityArray;
