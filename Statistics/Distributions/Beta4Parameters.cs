@@ -30,6 +30,7 @@ namespace Statistics.Distributions
             get { return Range.Max; }
         }
         public int SampleSize { get; }
+        public bool Truncated { get; set; }
         public IMessageLevels State { get; }
         public IEnumerable<IMessage> Messages { get; }
         #endregion

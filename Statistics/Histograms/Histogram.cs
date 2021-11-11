@@ -44,6 +44,7 @@ namespace Statistics.Histograms
                 return GetSampleSize();
             }
         }
+        public bool Truncated { get; set; }
         public double Mode { get; }
         
         public IDistributionEnum Type => IDistributionEnum.Histogram;

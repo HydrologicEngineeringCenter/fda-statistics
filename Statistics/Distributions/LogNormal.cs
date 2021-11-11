@@ -11,6 +11,7 @@ namespace Statistics.Distributions
     {      
         internal IRange<double> _ProbabilityRange;
         private MathNet.Numerics.Distributions.LogNormal _Distribution;
+        private bool _Constructed;
 
         #region Properties
         public IDistributionEnum Type => IDistributionEnum.LogNormal;
@@ -28,17 +29,20 @@ namespace Statistics.Distributions
         public double Skewness => _Distribution.Skewness;
 
         public IRange<double> Range { get; set; }
+        [Stored(Name = "Min", type = typeof(double))]
         public double Min
         {
-            get { return Range.Min; }
+            get; set;
         }
+        [Stored(Name = "Max", type = typeof(double))]
         public double Max
         {
-            get { return Range.Max; }
+            get; set;
         }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
         public int SampleSize { get; set; }
-
+        [Stored(Name = "Truncated", type = typeof(bool))]
+        public bool Truncated { get; set; }
         public IMessageLevels State { get; private set; }
         public IEnumerable<IMessage> Messages { get; private set; }
         #endregion
@@ -49,24 +53,38 @@ namespace Statistics.Distributions
             //for reflection
             _Distribution = new MathNet.Numerics.Distributions.LogNormal(1, 1);
         }
-        internal LogNormal(double mean, double standardDeviation, int sampleSize = int.MaxValue)
+        public LogNormal(double mean, double standardDeviation, int sampleSize = int.MaxValue)
         {
-            if (!Validation.LogNormalValidator.IsConstructable(mean, standardDeviation, sampleSize, out string msg)) throw new InvalidConstructorArgumentsException(msg);
-            _Distribution = new MathNet.Numerics.Distributions.LogNormal(mean, standardDeviation);
-            _ProbabilityRange = FiniteRange();
-            Range = IRangeFactory.Factory(_Distribution.InverseCumulativeDistribution(_ProbabilityRange.Min), _Distribution.InverseCumulativeDistribution(_ProbabilityRange.Max));
+            Mean = mean;
+            StandardDeviation = standardDeviation;
             SampleSize = sampleSize;
-            State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
+            Min = double.NegativeInfinity;
+            Max = double.PositiveInfinity;
+            BuildFromProperties();
+        }
+        public LogNormal(double mean, double standardDeviation, double min, double max, int sampleSize = int.MaxValue)
+        {
+            Mean = mean;
+            StandardDeviation = standardDeviation;
+            SampleSize = sampleSize;
+            Min = min;
+            Max = max;
+            Truncated = true;
+            BuildFromProperties();
+            
         }
         public void BuildFromProperties()
         {
+
             if (!Validation.LogNormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new InvalidConstructorArgumentsException(msg);
             _Distribution = new MathNet.Numerics.Distributions.LogNormal(Mean, StandardDeviation);
-            _ProbabilityRange = FiniteRange();
+            _ProbabilityRange = FiniteRange(Min, Max);
             Range = IRangeFactory.Factory(_Distribution.InverseCumulativeDistribution(_ProbabilityRange.Min), _Distribution.InverseCumulativeDistribution(_ProbabilityRange.Max));
+            Min = Range.Min;
+            Max = Range.Max;
             State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
+            _Constructed = true;
         }
         #endregion
 
@@ -75,16 +93,23 @@ namespace Statistics.Distributions
         {
             return validator.IsValid(this, out msgs);
         }
-        private IRange<double> FiniteRange()
+        private IRange<double> FiniteRange(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
         {
-            double min = double.NegativeInfinity, max = double.PositiveInfinity, p = 0, epsilon = 1 / 1000000000d;
+            double pmin = 0, epsilon = 1 / 1000000000d;
+            double pmax = 1 - pmin;
+            if (min.IsFinite() || max.IsFinite())//not entirely sure how inclusive or works with one sided truncation and the while loop below.
+            {
+                pmin = _Distribution.CumulativeDistribution(min);
+                pmax = _Distribution.CumulativeDistribution(max);
+            }
             while (!(min.IsFinite() && max.IsFinite()))
             {
-                p += epsilon;
-                if (!min.IsFinite()) min = _Distribution.InverseCumulativeDistribution(p);
-                if (!max.IsFinite()) max = _Distribution.InverseCumulativeDistribution(1 - p);
+                pmin += epsilon;
+                pmax -= epsilon;
+                if (!min.IsFinite()) min = _Distribution.InverseCumulativeDistribution(pmin);
+                if (!max.IsFinite()) max = _Distribution.InverseCumulativeDistribution(pmax);
             }
-            return IRangeFactory.Factory(epsilon, 1 - epsilon);
+            return IRangeFactory.Factory(pmin, pmax);
         }
 
         #region IDistribution
@@ -92,6 +117,10 @@ namespace Statistics.Distributions
         public double CDF(double x) => _Distribution.CumulativeDistribution(x);
         public double InverseCDF(double p)
         {
+            if (Truncated && _Constructed)
+            {
+                p = _ProbabilityRange.Min + (p) * (_ProbabilityRange.Max - _ProbabilityRange.Min);
+            }
             if (p <= _ProbabilityRange.Min) return Range.Min;
             if (p >= _ProbabilityRange.Max) return Range.Max;
             return _Distribution.InverseCumulativeDistribution(p);

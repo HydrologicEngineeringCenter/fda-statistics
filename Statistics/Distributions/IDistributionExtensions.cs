@@ -94,6 +94,10 @@ namespace Statistics
                             double valD = Convert.ToDouble(ele.Attribute(sa.Name).Value);
                             pi.SetValue(dist, valD);
                             break;
+                        case "Boolean":
+                            bool valB = Convert.ToBoolean(ele.Attribute(sa.Name).Value);
+                            pi.SetValue(dist, valB);
+                            break;
                         case "Int32":
                             int vali = Convert.ToInt32(ele.Attribute(sa.Name).Value);
                             pi.SetValue(dist, vali);
