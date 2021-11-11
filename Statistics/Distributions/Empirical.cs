@@ -10,12 +10,17 @@ namespace Statistics.Distributions
 {
     class Empirical : IDistribution
     {
+        #region PrivateFields 
+        private bool _ProbabilitiesWereAcceptedAsExceedance;
+        #endregion
         #region EmpiricalProperties
         /// <summary>
         /// Cumulative probabilities are non-exceedance probabilities 
         /// </summary>
+
         public double[] CumulativeProbabilities;
         public double[] ObservationValues;
+        
         #endregion
 
         #region IDistributionProperties
@@ -68,25 +73,27 @@ namespace Statistics.Distributions
             } 
         }
 
-        //are we still using IMessageLevels?
-        public IMessageLevels State => throw new NotImplementedException();
+        public IMessageLevels State { get; private set; }
 
-        public IEnumerable<IMessage> Messages => throw new NotImplementedException();
+        public IEnumerable<IMessage> Messages { get; private set; }
         #endregion
 
         #region Constructor
 
         public Empirical(double[] probabilities, double[] observationValues, bool probsAreExceedance = false)
         {
+            if (!Validation.EmpiricalValidator.IsConstructable(probabilities, observationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            _ProbabilitiesWereAcceptedAsExceedance = probsAreExceedance;
             double[] probabilityArray = new double[probabilities.Length];
-            if (probsAreExceedance == true)
+            if (_ProbabilitiesWereAcceptedAsExceedance == true)
             {
                 probabilityArray = ConvertExceedanceToNonExceedance(probabilities);
                 
             } else
             {
                 probabilityArray = probabilities;
-            }  
+            }
+
             if (!IsMonotonicallyIncreasing(probabilityArray))
             {   //TODO: sorting the arrays separately feels a little precarious 
                 //what if the user provides a non-monotonically increasing relationship?
@@ -100,12 +107,32 @@ namespace Statistics.Distributions
             {
                 Array.Sort(observationValues);
             }
-            ObservationValues = observationValues;    
+            ObservationValues = observationValues;
+            State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
         }
 
         public void BuildFromProperties()
         {
-            throw new NotImplementedException();
+            if (!Validation.EmpiricalValidator.IsConstructable(CumulativeProbabilities, ObservationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            if (_ProbabilitiesWereAcceptedAsExceedance == true)
+            {
+               CumulativeProbabilities = ConvertExceedanceToNonExceedance(CumulativeProbabilities);
+            }
+            if (!IsMonotonicallyIncreasing(CumulativeProbabilities))
+            {   //TODO: sorting the arrays separately feels a little precarious 
+                //what if the user provides a non-monotonically increasing relationship?
+                //e.g. probs all increasing but values not or vice versa 
+
+                //I think we can probably do some checking where we sort only if both are not monotonically increasing
+                Array.Sort(CumulativeProbabilities);
+            }
+            if (!IsMonotonicallyIncreasing(ObservationValues))
+            {
+                Array.Sort(ObservationValues);
+            }
+            State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
         }
         #endregion
 
@@ -414,7 +441,7 @@ namespace Statistics.Distributions
         }
 
         public static string Print(double[] observationValues, double[] cumulativeProbabilities)
-        {
+        {   //refactor this to be something like Head in R
             string returnString = "Empirical Distribution \n Observation Values | Cumulative Probabilities \n";
             for (int i=0; i<observationValues.Length; i++)
             {
@@ -435,6 +462,10 @@ namespace Statistics.Distributions
         internal static string Parameterization()
         {
             return $"Empirical(Observation Values: [{double.MinValue.Print()}, {double.MaxValue.Print()}], Cumulative Probabilities [0,1])";
+        }
+        public IMessageLevels Validate(IValidator<Empirical> validator, out IEnumerable<IMessage> messages)
+        {
+            return validator.IsValid(this, out messages);
         }
         public XElement WriteToXML()
         {
