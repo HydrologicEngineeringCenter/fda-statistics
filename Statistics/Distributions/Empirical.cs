@@ -291,7 +291,7 @@ namespace Statistics.Distributions
 
         public double CDF(double x)
         {
-            int index = ObservationValues.ToList().IndexOf(x);
+            int index = Array.BinarySearch(ObservationValues,x);
             if (index >= 0)
             {
                 return CumulativeProbabilities[index];
