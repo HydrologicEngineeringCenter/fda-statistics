@@ -50,14 +50,15 @@ namespace Statistics.Histograms
         public IDistributionEnum Type => IDistributionEnum.Histogram;
         #endregion      
         #region IMessagePublisher Properties
-        public IMessageLevels State { get; }
-        public IEnumerable<IMessage> Messages { get; }
+        public IMessageLevels State { get; private set; }
+        public IEnumerable<IMessage> Messages { get; private set; }
         #endregion
         #endregion
 
         #region Constructor
         public Histogram(IData data, double binWidth)
-        {//need to be able to handle null
+        {
+            if (!Validation.HistogramValidator.IsConstructable(data, binWidth, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             BinWidth = binWidth;
             if (data == null)
             {
@@ -76,10 +77,25 @@ namespace Statistics.Histograms
 
             }
             Range = GetRange(Min, Max);
+            State = Validate(new Validation.HistogramValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
+        }
+        public Histogram(double min, double max, double binWidth, double[] binCounts)
+        {
+            if (!Validation.HistogramValidator.IsConstructable(min, max, binWidth, binCounts, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            Min = min;
+            Max = max;
+            BinWidth = binWidth;
+            BinCounts = binCounts;
+            Range = GetRange(Min, Max);
+            State = Validate(new Validation.HistogramValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
         }
         public void BuildFromProperties()
         {
-            throw new NotImplementedException();
+            if (!Validation.HistogramValidator.IsConstructable(Min,Max,BinWidth,BinCounts, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            State = Validate(new Validation.HistogramValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
         }
         #endregion
 
@@ -243,9 +259,22 @@ namespace Statistics.Histograms
             return qValues;
         }
 
-        public bool Equals(Histogram histogram)
+        public bool Equals(IDistribution distribution)
         {
-            throw new NotImplementedException("Need to figure this one out");
+            if (distribution.Type == IDistributionEnum.Histogram)
+            {
+                Histogram histoCompared = distribution as Histogram;
+                if(BinWidth == histoCompared.BinWidth && BinCounts == histoCompared.BinCounts)
+                {
+                    return true;
+                } else
+                {
+                    return false;
+                }
+            } else
+            {
+                return false;
+            }
         }
 
         private double FindBinCount(double x, bool cumulative = true)
@@ -293,7 +322,10 @@ namespace Statistics.Histograms
             return validator.IsValid(this, out messages);
         }
         #endregion
+        //TODO: print could accept and print more useful arguments
         public static string Print(int n, int nBins, IRange<double> range) => $"Histogram(observations: {n.Print()}, bins: {nBins.Print()}, range: {range.Print(true)})";
+        public string Print(bool round) => round ? Print(SampleSize, BinCounts.Length, Range) : $"Histogram(observations: {SampleSize}, bins: {BinCounts.Length}, range: {Range.Print()})";
+
         #endregion
         #region IDistribution Functions 
         public double PDF(double x)
@@ -364,7 +396,49 @@ namespace Statistics.Histograms
         }
         public string Requirements(bool printNotes)
         {
-            return "Histogram requirements consist of a min, max, bin width, and some data.";
+            return RequiredParameterization(printNotes);
+        }
+        public static string RequiredParameterization(bool printNotes = false)
+        {
+            return $"The Histogram requires the following parameterization: {Parameterization()}.";
+        }
+        internal static string Parameterization()
+        {
+            return $"Histogram(IData: [{double.MinValue.Print()}, {double.MaxValue.Print()}], binWidth [{double.MinValue.Print()}, {double.MaxValue.Print()}])";
+        }
+        public XElement WriteToXML()
+        {
+            XElement masterElem = new XElement("Histogram");
+            masterElem.SetAttributeValue("Min", Min);
+            masterElem.SetAttributeValue("Max", Max);
+            masterElem.SetAttributeValue("Bin Width", BinWidth);
+            masterElem.SetAttributeValue("Ordinate_Count", SampleSize);
+            for (int i = 0; i < SampleSize; i++)
+            {
+                XElement rowElement = new XElement("Coordinate");
+                rowElement.SetAttributeValue("Bin Counts", BinCounts[i]);
+                masterElem.Add(rowElement);
+            }
+            return masterElem;
+        }
+        public static Histogram ReadFromXML(XElement element)
+        {
+            string minString = element.Attribute("Min").Value;
+            double min = Convert.ToDouble(minString);
+            string maxString = element.Attribute("Max").Value;
+            double max = Convert.ToDouble(maxString);
+            string binWidthString = element.Attribute("Bin Width").Value;
+            double binWidth = Convert.ToDouble(binWidthString);
+            string sampleSizeString = element.Attribute("Ordinate_Count").Value;
+            int sampleSize = Convert.ToInt32(sampleSizeString);
+            double[] binCounts = new double[sampleSize];
+            int i = 0;
+            foreach (XElement binCountElement in element.Elements())
+            {
+                binCounts[i] = Convert.ToDouble(binCountElement.Value);
+                i++;
+            }
+            return new Histogram(min, max, binWidth, binCounts);
         }
         public Histogram Fit(IEnumerable<double> sample, int nBins)
         {
@@ -381,50 +455,9 @@ namespace Statistics.Histograms
         #endregion
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
  
-        public string Print(bool round) => round ? Print(SampleSize, BinCounts.Length, Range) : $"Histogram(observations: {SampleSize}, bins: {BinCounts.Length}, range: {Range.Print()})";
-        public bool Equals(IDistribution distribution) => distribution.Type == IDistributionEnum.Histogram ? Equals((Histogram)distribution) : false;
 
-        public static readonly string XML_BINS = "Bins";
-        public static readonly string XML_BIN = "Bin";
-        public static readonly string XML_MIN = "Inclusive Min";
-        public static readonly string XML_MAX = "Exclusive Max";
-        public static readonly string XML_MIDPOINT = "MidPoint";
-        public static readonly string XML_COUNT = "Count";
-        //TODO: write test on WriteToXML and ReadToXML
-        public XElement WriteToXML()
-        {
-            XElement masterElem = new XElement(XML_BINS);
-            for (Int64 i=0; i<BinCounts.Length; i++)
-            {
-                XElement binElem = new XElement(XML_BIN);
-                binElem.SetAttributeValue(XML_MIN, i*BinWidth);
-                binElem.SetAttributeValue(XML_MAX, (i+1)*BinWidth);
-                binElem.SetAttributeValue(XML_MIDPOINT, (i+0.5)*BinWidth);
-                binElem.SetAttributeValue(XML_COUNT, BinCounts[i]);
 
-                masterElem.Add(binElem);
-            }
-            return masterElem;
-        }
-        //TODO: implement ReadFromXML
-        public static Histogram ReadFromXML(string histogramXMLString)
-        {
-            throw new NotImplementedException();
-        }
         #endregion
 
     }
