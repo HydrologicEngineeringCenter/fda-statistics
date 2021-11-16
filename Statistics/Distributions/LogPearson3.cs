@@ -18,14 +18,7 @@ namespace Statistics.Distributions
         public IDistributionEnum Type => IDistributionEnum.LogPearsonIII;
         [Stored(Name = "Mean", type = typeof(double))]
         public double Mean { get; set; }
-        public double Median { get 
-            {
-                return InverseCDF(0.5);
-            } private set
-            {
-                Median = value;
-            }
-        }
+        public double Median { get; set;}
         public double Variance { get; set; }
         [Stored(Name = "St_Dev", type = typeof(double))]
         public double StandardDeviation { get; set; }
