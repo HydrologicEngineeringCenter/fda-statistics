@@ -13,6 +13,7 @@ namespace Statistics.Distributions
         #region Fields 
         private bool _ProbabilitiesWereAcceptedAsExceedance;
         internal IRange<double> _ProbabilityRange;
+        internal bool _Constructed;
         #endregion
         #region EmpiricalProperties
         /// <summary>
@@ -95,24 +96,12 @@ namespace Statistics.Distributions
             {
                 probabilityArray = probabilities;
             }
-
-            if (!IsMonotonicallyIncreasing(probabilityArray))
-            {   //TODO: sorting the arrays separately feels a little precarious 
-                //what if the user provides a non-monotonically increasing relationship?
-                //e.g. probs all increasing but values not or vice versa 
-                //I think we can probably do some checking where we sort only if both are not monotonically increasing?
-                Array.Sort(probabilityArray);
-            }
             CumulativeProbabilities = probabilityArray;
-            if (!IsMonotonicallyIncreasing(observationValues))
-            {
-                Array.Sort(observationValues);
-            }
             ObservationValues = observationValues;
+            //TODO: Should Min and Max be identified through extrapolation to the bounds of the probability domain?
             Min = ObservationValues[0];
             Max = ObservationValues[ObservationValues.Length - 1];
-            State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
+            BuildFromProperties();
         }
         public Empirical(double[] probabilities, double[] observationValues, double min, double max, bool probsAreExceedance = false)
         {
@@ -122,28 +111,17 @@ namespace Statistics.Distributions
             if (_ProbabilitiesWereAcceptedAsExceedance == true)
             {
                 probabilityArray = ConvertExceedanceToNonExceedance(probabilities);
-
             }
             else
             {
                 probabilityArray = probabilities;
             }
-
-            if (!IsMonotonicallyIncreasing(probabilityArray))
-            {   //The to-do statement above applies here, too. 
-                Array.Sort(probabilityArray);
-            }
             CumulativeProbabilities = probabilityArray;
-            if (!IsMonotonicallyIncreasing(observationValues))
-            {
-                Array.Sort(observationValues);
-            }
             ObservationValues = observationValues;
             Min = min;
             Max = max;
             Truncated = true;
-            State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
+            BuildFromProperties();
         }
         public void BuildFromProperties()
         {
@@ -153,7 +131,10 @@ namespace Statistics.Distributions
                CumulativeProbabilities = ConvertExceedanceToNonExceedance(CumulativeProbabilities);
             }
             if (!IsMonotonicallyIncreasing(CumulativeProbabilities))
-            {   //The to-do statement applies here, too
+            {   //TODO: sorting the arrays separately feels a little precarious 
+                //what if the user provides a non-monotonically increasing relationship?
+                //e.g. probs all increasing but values not or vice versa 
+                //I think we can probably do some checking where we sort only if both are not monotonically increasing?
                 Array.Sort(CumulativeProbabilities);
             }
             if (!IsMonotonicallyIncreasing(ObservationValues))
@@ -163,6 +144,8 @@ namespace Statistics.Distributions
             _ProbabilityRange = FiniteRange(Min, Max);
             State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
+            _Constructed = true;
+            
         }
         #endregion
 
@@ -420,29 +403,48 @@ namespace Statistics.Distributions
 
         public double InverseCDF(double p)
         {
-            int index = Array.BinarySearch(CumulativeProbabilities,p);
-            if (index >= 0)
+            if (Truncated && _Constructed)
             {
-                return ObservationValues[index];
+                p = _ProbabilityRange.Min + (p) * (_ProbabilityRange.Max - _ProbabilityRange.Min);
             }
-            else
+            if (!p.IsFinite())
             {
-                index = -(index + 1); 
-                // in between index-1 and index: interpolate
-                if (index == 0)
-                {   // first value
-                    return ObservationValues[0];
-                }
-                else if (index < SampleSize)
+                throw new ArgumentException($"The value of specified probability parameter: {p} is invalid because it is not on the valid probability range: [0, 1].");
+            }
+            else if (p <= _ProbabilityRange.Min)
+            {
+                return Min;
+                   
+            } else if (p >= _ProbabilityRange.Max)
+            {
+                return Max;
+            } else
+            {
+                int index = Array.BinarySearch(CumulativeProbabilities, p);
+                if (index >= 0)
                 {
-                    double weight = (p - CumulativeProbabilities[index - 1]) / (CumulativeProbabilities[index] - CumulativeProbabilities[index - 1]);
-                    return (1.0 - weight) * ObservationValues[index - 1] + weight * ObservationValues[index];
+                    return ObservationValues[index];
                 }
                 else
-                {   // last value
-                    return ObservationValues[SampleSize - 1];
+                {
+                    index = -(index + 1);
+                    // in between index-1 and index: interpolate
+                    if (index == 0)
+                    {   // first value
+                        return ObservationValues[0];
+                    }
+                    else if (index < SampleSize)
+                    {
+                        double weight = (p - CumulativeProbabilities[index - 1]) / (CumulativeProbabilities[index] - CumulativeProbabilities[index - 1]);
+                        return (1.0 - weight) * ObservationValues[index - 1] + weight * ObservationValues[index];
+                    }
+                    else
+                    {   // last value
+                        return ObservationValues[SampleSize - 1];
+                    }
                 }
             }
+
         }
 
         public double PDF(double x)
