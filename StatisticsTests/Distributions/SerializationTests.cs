@@ -87,19 +87,20 @@ namespace StatisticsTests.Distributions
         [InlineData(3.4, 4.5, 5.6, 1)]
         public void SerializationRoundTrip_Triangular(double min, double mostlikely, double max, int n)
         {
-            IDistribution d = new Triangular(min, mostlikely,max ,n);
-            XElement ele = d.ToXML();
-            IDistribution d2 = IDistributionExtensions.FromXML(ele);
-            Assert.Equal(d.Min, d2.Min);
-            Assert.Equal(min, d.Min);
-            Assert.Equal(min, d2.Min);
-            Assert.Equal(d.Max, d2.Max);
-            Assert.Equal(max, d.Max);
-            Assert.Equal(max, d2.Max);
-            Assert.Equal(d.Mode, d2.Mode);
-            Assert.Equal(mostlikely, d.Mode);
-            Assert.Equal(mostlikely, d2.Mode);
-            Assert.Equal(d.SampleSize, d2.SampleSize);
+            Triangular distributionTriangular = new Triangular(min, mostlikely,max ,n);
+            XElement element = distributionTriangular.ToXML();
+            IDistribution distribution = IDistributionExtensions.FromXML(element);
+            Triangular distributionTriangular2 = distribution as Triangular;
+            Assert.Equal(distributionTriangular.Min, distributionTriangular2.Min);
+            Assert.Equal(min, distributionTriangular.Min);
+            Assert.Equal(min, distributionTriangular2.Min);
+            Assert.Equal(distributionTriangular.Max, distributionTriangular2.Max);
+            Assert.Equal(max, distributionTriangular.Max);
+            Assert.Equal(max, distributionTriangular2.Max);
+            Assert.Equal(distributionTriangular.Mode, distributionTriangular2.Mode);
+            Assert.Equal(mostlikely, distributionTriangular.Mode);
+            Assert.Equal(mostlikely, distributionTriangular2.Mode);
+            Assert.Equal(distributionTriangular.SampleSize, distributionTriangular2.SampleSize);
         }
     }
 }
