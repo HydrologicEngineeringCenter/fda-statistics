@@ -10,14 +10,14 @@ namespace Statistics.Distributions
 {
     class Empirical : IDistribution
     {
-        #region PrivateFields 
+        #region Fields 
         private bool _ProbabilitiesWereAcceptedAsExceedance;
+        internal IRange<double> _ProbabilityRange;
         #endregion
         #region EmpiricalProperties
         /// <summary>
         /// Cumulative probabilities are non-exceedance probabilities 
         /// </summary>
-
         public double[] CumulativeProbabilities;
         public double[] ObservationValues;
         
@@ -25,7 +25,7 @@ namespace Statistics.Distributions
 
         #region IDistributionProperties
         public IDistributionEnum Type => IDistributionEnum.Empirical;
-
+      
         public double Mean { get 
             {
                 return ComputeMean();
@@ -55,17 +55,10 @@ namespace Statistics.Distributions
 
             } 
         }
-        public double Min { get 
-            {
-                return ObservationValues[0];
-            }  
-        }
+        public double Min { get; set; }
 
-        public double Max { get 
-            {
-                return ObservationValues[ObservationValues.Length - 1];
-            }
-        }
+        public double Max { get; set; }
+        
 
         public double Skewness { get 
             {
@@ -116,10 +109,42 @@ namespace Statistics.Distributions
                 Array.Sort(observationValues);
             }
             ObservationValues = observationValues;
+            Min = ObservationValues[0];
+            Max = ObservationValues[ObservationValues.Length - 1];
             State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
         }
+        public Empirical(double[] probabilities, double[] observationValues, double min, double max, bool probsAreExceedance = false)
+        {
+            if (!Validation.EmpiricalValidator.IsConstructable(probabilities, observationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            _ProbabilitiesWereAcceptedAsExceedance = probsAreExceedance;
+            double[] probabilityArray = new double[probabilities.Length];
+            if (_ProbabilitiesWereAcceptedAsExceedance == true)
+            {
+                probabilityArray = ConvertExceedanceToNonExceedance(probabilities);
 
+            }
+            else
+            {
+                probabilityArray = probabilities;
+            }
+
+            if (!IsMonotonicallyIncreasing(probabilityArray))
+            {   //The to-do statement above applies here, too. 
+                Array.Sort(probabilityArray);
+            }
+            CumulativeProbabilities = probabilityArray;
+            if (!IsMonotonicallyIncreasing(observationValues))
+            {
+                Array.Sort(observationValues);
+            }
+            ObservationValues = observationValues;
+            Min = min;
+            Max = max;
+            Truncated = true;
+            State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
+        }
         public void BuildFromProperties()
         {
             if (!Validation.EmpiricalValidator.IsConstructable(CumulativeProbabilities, ObservationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
@@ -128,22 +153,48 @@ namespace Statistics.Distributions
                CumulativeProbabilities = ConvertExceedanceToNonExceedance(CumulativeProbabilities);
             }
             if (!IsMonotonicallyIncreasing(CumulativeProbabilities))
-            {   //TODO: sorting the arrays separately feels a little precarious 
-                //what if the user provides a non-monotonically increasing relationship?
-                //e.g. probs all increasing but values not or vice versa 
-                //I think we can probably do some checking where we sort only if both are not monotonically increasing?
+            {   //The to-do statement applies here, too
                 Array.Sort(CumulativeProbabilities);
             }
             if (!IsMonotonicallyIncreasing(ObservationValues))
             {
                 Array.Sort(ObservationValues);
             }
+            _ProbabilityRange = FiniteRange(Min, Max);
             State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
         }
         #endregion
 
         #region EmpiricalFunctions
+        private IRange<double> FiniteRange(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
+        {
+            double pmin = 0, epsilon = 1 / 1000000000d;
+            double pmax = 1 - pmin;
+            if (min.IsFinite() || max.IsFinite())//we are not entirely sure how inclusive or works with one sided truncation and the while loop below.
+            {
+                pmin = CDF(min);
+                pmax = CDF(max);
+            }
+            else
+            {
+                pmin = .0000001;
+                pmax = 1 - pmin;
+                min = InverseCDF(pmin);
+                max = InverseCDF(pmax);
+            }
+            while (!(min.IsFinite() && max.IsFinite()))
+            {
+                pmin += epsilon;
+                pmax -= epsilon;
+                if (!min.IsFinite()) min = InverseCDF(pmin);
+                if (!max.IsFinite()) max = InverseCDF(pmax);
+                if (pmin > 0.25)
+                    throw new InvalidConstructorArgumentsException($"The log Pearson III object is not constructable because 50% or more of its distribution returns {double.NegativeInfinity} and {double.PositiveInfinity}.");
+            }
+            return IRangeFactory.Factory(pmin, pmax);
+
+        }
         private double[] ConvertExceedanceToNonExceedance(double[] ExceedanceProbabilities)
         {
             double[] nonExceedanceProbabilities = new double[ExceedanceProbabilities.Length];

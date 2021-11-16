@@ -45,7 +45,6 @@ namespace Statistics.Distributions
         public IMessageLevels State { get; private set; }
         public IEnumerable<Utilities.IMessage> Messages { get; private set; }
 
-        public double Mode => throw new NotImplementedException();
         #endregion
 
         #region Constructor
