@@ -152,9 +152,7 @@ namespace StatisticsTests.Histograms
         {
             IDistribution stdNormal = new Statistics.Distributions.Normal(0, 1);
             var rand = new Random(1234);
-            double[] initialObs = new double[1] { stdNormal.InverseCDF(rand.NextDouble()) };
-            IData initialData = new Data(initialObs);
-            Histogram histogram = new Histogram(initialData, binWidth);
+            Histogram histogram = new Histogram(null, binWidth);
             double[] data = new double[n];
             
             for (Int64 i = 0; i < n; i++)
@@ -176,9 +174,7 @@ namespace StatisticsTests.Histograms
         {
             IDistribution stdNormal = new Statistics.Distributions.Normal(mean, standardDeviation);
             var rand = new Random();
-            double[] initialObs = new double[1] { stdNormal.InverseCDF(rand.NextDouble()) };
-            IData initialData = new Data(initialObs);
-            Histogram histogram = new Histogram(initialData, binWidth);
+            Histogram histogram = new Histogram(null, binWidth);
             double[] data = new double[n];
             for (Int64 i = 0; i < n; i++)
             {
