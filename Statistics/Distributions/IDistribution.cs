@@ -25,10 +25,6 @@ namespace Statistics
         /// </summary>
         double Median { get;}
         /// <summary>
-        /// The most likely value.
-        /// </summary>
-        double Mode { get; }
-        /// <summary>
         /// The expected squared deviation of the distribution values from the distribution <see cref="IDistribution.Mean"/>.
         /// </summary>
         double Variance { get;  }

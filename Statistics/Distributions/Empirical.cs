@@ -83,6 +83,8 @@ namespace Statistics.Distributions
         public IMessageLevels State { get; private set; }
 
         public IEnumerable<IMessage> Messages { get; private set; }
+
+        public bool Truncated { get; set; }
         #endregion
 
         #region Constructor
