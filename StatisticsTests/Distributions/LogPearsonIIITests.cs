@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Utilities;
 using Xunit;
+using Statistics;
 
 namespace StatisticsTests.Distributions
 {
@@ -241,5 +242,6 @@ namespace StatisticsTests.Distributions
             double result = testObj.Skewness;
             Assert.Equal(skew, result, 9);
         }
+
     }
 }
