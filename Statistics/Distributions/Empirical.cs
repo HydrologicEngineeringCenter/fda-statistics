@@ -27,57 +27,21 @@ namespace Statistics.Distributions
         #region IDistributionProperties
         public IDistributionEnum Type => IDistributionEnum.Empirical;
       
-        public double Mean { get 
-            {
-                return ComputeMean();
-            } 
-        }
-        public double Median { get 
-            {
-                return ComputeMedian();
-            } 
-        }
-
-        public double Mode { get 
-            {
-                return ComputeMode(); 
-            } 
-        }
-
-        public double StandardDeviation { get
-            {
-                return ComputeStandardDeviation();
-            }
-        }
-
-        public double Variance { get 
-            {
-                return Math.Pow(StandardDeviation, 2);
-
-            } 
-        }
+        public double Mean { get; set; }
+        public double Median { get; set; }
+        public double Mode { get; set; }
+        public double StandardDeviation { get; set; }
+        public double Variance { get; set; }
         public double Min { get; set; }
 
         public double Max { get; set; }
         
+        public double Skewness { get; set; }
 
-        public double Skewness { get 
-            {
-                return ComputeSkewness();
-            } 
-        }
-
+        public int SampleSize { get; set; }
         public IRange<double> Range { get; set; }
-
-        public int SampleSize { get {
-                return ObservationValues.Length;
-            } 
-        }
-
         public IMessageLevels State { get; private set; }
-
         public IEnumerable<IMessage> Messages { get; private set; }
-
         public bool Truncated { get; set; }
         #endregion
 
@@ -142,6 +106,13 @@ namespace Statistics.Distributions
                 Array.Sort(ObservationValues);
             }
             _ProbabilityRange = FiniteRange(Min, Max);
+            SampleSize = ObservationValues.Length;
+            Mean = ComputeMean();
+            Median = ComputeMedian();
+            Mode = ComputeMode();
+            StandardDeviation = ComputeStandardDeviation();
+            Variance = Math.Pow(StandardDeviation, 2);
+            Skewness = ComputeSkewness();
             State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
             _Constructed = true;
