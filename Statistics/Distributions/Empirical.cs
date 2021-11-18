@@ -144,7 +144,7 @@ namespace Statistics.Distributions
                 if (!min.IsFinite()) min = InverseCDF(pmin);
                 if (!max.IsFinite()) max = InverseCDF(pmax);
                 if (pmin > 0.25)
-                    throw new InvalidConstructorArgumentsException($"The log Pearson III object is not constructable because 50% or more of its distribution returns {double.NegativeInfinity} and {double.PositiveInfinity}.");
+                    throw new InvalidConstructorArgumentsException($"The Empirical object is not constructable because 50% or more of its distribution returns {double.NegativeInfinity} and {double.PositiveInfinity}.");
             }
             return IRangeFactory.Factory(pmin, pmax);
 
