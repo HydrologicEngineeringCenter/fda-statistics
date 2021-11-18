@@ -10,14 +10,15 @@ namespace Statistics.Distributions
 {
     class Empirical : IDistribution
     {
-        #region PrivateFields 
+        #region Fields 
         private bool _ProbabilitiesWereAcceptedAsExceedance;
+        internal IRange<double> _ProbabilityRange;
+        internal bool _Constructed;
         #endregion
         #region EmpiricalProperties
         /// <summary>
         /// Cumulative probabilities are non-exceedance probabilities 
         /// </summary>
-
         public double[] CumulativeProbabilities;
         public double[] ObservationValues;
         
@@ -25,65 +26,22 @@ namespace Statistics.Distributions
 
         #region IDistributionProperties
         public IDistributionEnum Type => IDistributionEnum.Empirical;
+      
+        public double Mean { get; set; }
+        public double Median { get; set; }
+        public double Mode { get; set; }
+        public double StandardDeviation { get; set; }
+        public double Variance { get; set; }
+        public double Min { get; set; }
 
-        public double Mean { get 
-            {
-                return ComputeMean();
-            } 
-        }
-        public double Median { get 
-            {
-                return ComputeMedian();
-            } 
-        }
+        public double Max { get; set; }
+        
+        public double Skewness { get; set; }
 
-        public double Mode { get 
-            {
-                return ComputeMode(); 
-            } 
-        }
-
-        public double StandardDeviation { get
-            {
-                return ComputeStandardDeviation();
-            }
-        }
-
-        public double Variance { get 
-            {
-                return Math.Pow(StandardDeviation, 2);
-
-            } 
-        }
-        public double Min { get 
-            {
-                return ObservationValues[0];
-            }  
-        }
-
-        public double Max { get 
-            {
-                return ObservationValues[ObservationValues.Length - 1];
-            }
-        }
-
-        public double Skewness { get 
-            {
-                return ComputeSkewness();
-            } 
-        }
-
+        public int SampleSize { get; set; }
         public IRange<double> Range { get; set; }
-
-        public int SampleSize { get {
-                return ObservationValues.Length;
-            } 
-        }
-
         public IMessageLevels State { get; private set; }
-
         public IEnumerable<IMessage> Messages { get; private set; }
-
         public bool Truncated { get; set; }
         #endregion
 
@@ -102,24 +60,33 @@ namespace Statistics.Distributions
             {
                 probabilityArray = probabilities;
             }
-
-            if (!IsMonotonicallyIncreasing(probabilityArray))
-            {   //TODO: sorting the arrays separately feels a little precarious 
-                //what if the user provides a non-monotonically increasing relationship?
-                //e.g. probs all increasing but values not or vice versa 
-                //I think we can probably do some checking where we sort only if both are not monotonically increasing?
-                Array.Sort(probabilityArray);
+            CumulativeProbabilities = probabilityArray;
+            ObservationValues = observationValues;
+            //TODO: Should Min and Max be identified through extrapolation to the bounds of the probability domain?
+            Min = ObservationValues[0];
+            Max = ObservationValues[ObservationValues.Length - 1];
+            BuildFromProperties();
+        }
+        public Empirical(double[] probabilities, double[] observationValues, double min, double max, bool probsAreExceedance = false)
+        {
+            if (!Validation.EmpiricalValidator.IsConstructable(probabilities, observationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            _ProbabilitiesWereAcceptedAsExceedance = probsAreExceedance;
+            double[] probabilityArray = new double[probabilities.Length];
+            if (_ProbabilitiesWereAcceptedAsExceedance == true)
+            {
+                probabilityArray = ConvertExceedanceToNonExceedance(probabilities);
+            }
+            else
+            {
+                probabilityArray = probabilities;
             }
             CumulativeProbabilities = probabilityArray;
-            if (!IsMonotonicallyIncreasing(observationValues))
-            {
-                Array.Sort(observationValues);
-            }
             ObservationValues = observationValues;
-            State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
+            Min = min;
+            Max = max;
+            Truncated = true;
+            BuildFromProperties();
         }
-
         public void BuildFromProperties()
         {
             if (!Validation.EmpiricalValidator.IsConstructable(CumulativeProbabilities, ObservationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
@@ -138,12 +105,50 @@ namespace Statistics.Distributions
             {
                 Array.Sort(ObservationValues);
             }
+            _ProbabilityRange = FiniteRange(Min, Max);
+            SampleSize = ObservationValues.Length;
+            Mean = ComputeMean();
+            Median = ComputeMedian();
+            Mode = ComputeMode();
+            StandardDeviation = ComputeStandardDeviation();
+            Variance = Math.Pow(StandardDeviation, 2);
+            Skewness = ComputeSkewness();
             State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
+            _Constructed = true;
+            
         }
         #endregion
 
         #region EmpiricalFunctions
+        private IRange<double> FiniteRange(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
+        {
+            double pmin = 0, epsilon = 1 / 1000000000d;
+            double pmax = 1 - pmin;
+            if (min.IsFinite() || max.IsFinite())//we are not entirely sure how inclusive or works with one sided truncation and the while loop below.
+            {
+                pmin = CDF(min);
+                pmax = CDF(max);
+            }
+            else
+            {
+                pmin = .0000001;
+                pmax = 1 - pmin;
+                min = InverseCDF(pmin);
+                max = InverseCDF(pmax);
+            }
+            while (!(min.IsFinite() && max.IsFinite()))
+            {
+                pmin += epsilon;
+                pmax -= epsilon;
+                if (!min.IsFinite()) min = InverseCDF(pmin);
+                if (!max.IsFinite()) max = InverseCDF(pmax);
+                if (pmin > 0.25)
+                    throw new InvalidConstructorArgumentsException($"The Empirical object is not constructable because 50% or more of its distribution returns {double.NegativeInfinity} and {double.PositiveInfinity}.");
+            }
+            return IRangeFactory.Factory(pmin, pmax);
+
+        }
         private double[] ConvertExceedanceToNonExceedance(double[] ExceedanceProbabilities)
         {
             double[] nonExceedanceProbabilities = new double[ExceedanceProbabilities.Length];
@@ -369,29 +374,48 @@ namespace Statistics.Distributions
 
         public double InverseCDF(double p)
         {
-            int index = Array.BinarySearch(CumulativeProbabilities,p);
-            if (index >= 0)
+            if (Truncated && _Constructed)
             {
-                return ObservationValues[index];
+                p = _ProbabilityRange.Min + (p) * (_ProbabilityRange.Max - _ProbabilityRange.Min);
             }
-            else
+            if (!p.IsFinite())
             {
-                index = -(index + 1); 
-                // in between index-1 and index: interpolate
-                if (index == 0)
-                {   // first value
-                    return ObservationValues[0];
-                }
-                else if (index < SampleSize)
+                throw new ArgumentException($"The value of specified probability parameter: {p} is invalid because it is not on the valid probability range: [0, 1].");
+            }
+            else if (p <= _ProbabilityRange.Min)
+            {
+                return Min;
+                   
+            } else if (p >= _ProbabilityRange.Max)
+            {
+                return Max;
+            } else
+            {
+                int index = Array.BinarySearch(CumulativeProbabilities, p);
+                if (index >= 0)
                 {
-                    double weight = (p - CumulativeProbabilities[index - 1]) / (CumulativeProbabilities[index] - CumulativeProbabilities[index - 1]);
-                    return (1.0 - weight) * ObservationValues[index - 1] + weight * ObservationValues[index];
+                    return ObservationValues[index];
                 }
                 else
-                {   // last value
-                    return ObservationValues[SampleSize - 1];
+                {
+                    index = -(index + 1);
+                    // in between index-1 and index: interpolate
+                    if (index == 0)
+                    {   // first value
+                        return ObservationValues[0];
+                    }
+                    else if (index < SampleSize)
+                    {
+                        double weight = (p - CumulativeProbabilities[index - 1]) / (CumulativeProbabilities[index] - CumulativeProbabilities[index - 1]);
+                        return (1.0 - weight) * ObservationValues[index - 1] + weight * ObservationValues[index];
+                    }
+                    else
+                    {   // last value
+                        return ObservationValues[SampleSize - 1];
+                    }
                 }
             }
+
         }
 
         public double PDF(double x)

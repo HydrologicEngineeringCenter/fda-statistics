@@ -45,7 +45,6 @@ namespace Statistics.Distributions
         public IMessageLevels State { get; private set; }
         public IEnumerable<Utilities.IMessage> Messages { get; private set; }
 
-        public double Mode => throw new NotImplementedException();
         #endregion
 
         #region Constructor
@@ -195,11 +194,6 @@ namespace Statistics.Distributions
         }
         internal static string Parameterization() => $"log PearsonIII(mean: (0, {Math.Log10(double.MaxValue).Print()}], sd: (0, {Math.Log10(double.MaxValue).Print()}], skew: [{(Math.Log10(double.MaxValue) * -1).Print()}, {Math.Log10(double.MaxValue).Print()}], sample size: > 0)";
         internal static string RequirementNotes() => $"The distribution parameters are computed from log base 10 random numbers (e.g. the log Pearson III distribution is a distribution of log base 10 Pearson III distributed random values). Therefore the mean and standard deviation parameters must be positive finite numbers and while a large range of numbers are acceptable a relative small rate will produce meaningful results.";
-
-        public static LogPearson3 Fit(IEnumerable<double> sample, bool isLogSample = false)
-        {
-            return Fit(sample, isLogSample);
-        }
         public static LogPearson3 Fit(IEnumerable<double> sample, int sampleSize, bool isLogSample = false)
         {
             return Fit(sample, isLogSample, sampleSize);

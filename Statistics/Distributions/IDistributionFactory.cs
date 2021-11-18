@@ -73,7 +73,7 @@ namespace Statistics
                     case IDistributionEnum.Histogram:
                         return (IDistribution)Fit(sample, nBins: 100);
                     case IDistributionEnum.LogPearsonIII:
-                        return Distributions.LogPearson3.Fit(sample);
+                        return Distributions.LogPearson3.Fit(sample,sample.Count());
                     default:
                         throw new NotImplementedException($"An unexpected error occurred. The requested return type: {returnType} is unsupported");
                 }

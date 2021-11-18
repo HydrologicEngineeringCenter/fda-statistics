@@ -21,8 +21,26 @@ namespace StatisticsTests.Distributions
                 randyPacket[i] = ((double)i +0.5) / (double)dist.SampleSize;
             }
             Statistics.IDistribution bootstrap = dist.Sample(randyPacket);
-            Assert.Equal(bootstrap.Mean, .5);
-            Assert.Equal(bootstrap.Type, IDistributionEnum.Uniform);
+            Assert.Equal(.5, bootstrap.Mean);
+            Assert.Equal(IDistributionEnum.Uniform, bootstrap.Type);
+        }
+
+        [Theory]
+        [InlineData(3.537,.438,.075,125,1234, 3.537)]
+        public void BootstrapWorksForLP3_Test(double mean, double standardDeviation, double skew, int sampleSize,int seed, double expected)
+        {
+            IDistribution distributionLP3 = IDistributionFactory.FactoryLogPearsonIII(mean, standardDeviation, skew, sampleSize);
+            double[] randomNumberArray = new double[distributionLP3.SampleSize];
+            Random random = new Random(seed);
+            for (int i = 0; i<distributionLP3.SampleSize; i++)
+            {
+                randomNumberArray[i] = random.NextDouble();
+            }
+            IDistribution testBootstrapDistribution = distributionLP3.Sample(randomNumberArray);
+            double actual = testBootstrapDistribution.Mean;
+            double difference = expected - actual;
+            double relativeDifference = difference / expected;
+            Assert.True(relativeDifference < .05);
         }
     }
 }
