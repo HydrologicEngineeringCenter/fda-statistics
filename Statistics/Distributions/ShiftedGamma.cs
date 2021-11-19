@@ -17,9 +17,7 @@ namespace Statistics.Distributions
             //      (2) beta is the rate or inverse scale parameter
 
             //attempt to get around a gamma bug
-            double alphaRounded = Math.Round(alpha, 4);
-            double betaRounded = Math.Round(beta, 4);
-            _Gamma = new MathNet.Numerics.Distributions.Gamma(alphaRounded, 1/betaRounded);
+            _Gamma = new MathNet.Numerics.Distributions.Gamma(alpha, 1/beta);
             Shift = shift;
         }
 
@@ -39,7 +37,8 @@ namespace Statistics.Distributions
 
         internal double InverseCDF(double p)
         {
-            return _Gamma.InverseCumulativeDistribution(p) + Shift;
+            double prob = Math.Round(p, 4);
+            return _Gamma.InverseCumulativeDistribution(prob) + Shift;
         }
     }
 }
