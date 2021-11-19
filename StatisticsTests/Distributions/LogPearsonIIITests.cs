@@ -242,6 +242,5 @@ namespace StatisticsTests.Distributions
             double result = testObj.Skewness;
             Assert.Equal(skew, result, 9);
         }
-
     }
 }
