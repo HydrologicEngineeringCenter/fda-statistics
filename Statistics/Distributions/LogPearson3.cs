@@ -63,7 +63,7 @@ namespace Statistics.Distributions
         {
             Mean = mean;
             StandardDeviation = standardDeviation;
-            Skewness = ValidateSkewness(skew);
+            Skewness = skew;
             SampleSize = sampleSize;
             Min = double.NegativeInfinity;
             Max = double.PositiveInfinity;
@@ -73,7 +73,7 @@ namespace Statistics.Distributions
         {
             Mean = mean;
             StandardDeviation = standardDeviation;
-            Skewness = ValidateSkewness(skew);
+            Skewness = skew;
             SampleSize = sampleSize;
             Min = min;
             Max = max;
@@ -133,26 +133,6 @@ namespace Statistics.Distributions
             }
             return IRangeFactory.Factory(pmin, pmax);
 
-        }
-        /// <summary>
-        /// Added skew validation that steps around a .NET bug where for skewness !=0 and -.002 < skewness < 0.002, an exception is erroneously thrown. 
-        /// </summary>
-        /// <param name="skew"></param>
-        /// <returns></returns>
-        internal double ValidateSkewness(double skew)
-        {
-            if (skew < .002 && skew > 0)
-            {
-                return 0.002;
-            }
-            else if (skew > -.002 && skew < 0)
-            {
-                return -0.002;
-            }
-            else
-            {
-                return skew;
-            }
         }
         #region IDistribution Functions
         public double PDF(double x)
