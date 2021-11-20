@@ -134,6 +134,26 @@ namespace Statistics.Distributions
             return IRangeFactory.Factory(pmin, pmax);
 
         }
+        /// <summary>
+        /// Added skew validation that steps around a .NET bug where for skewness !=0 and -.002 < skewness < 0.002, an exception is erroneously thrown. 
+        /// </summary>
+        /// <param name="skew"></param>
+        /// <returns></returns>
+        internal double ValidateSkewness(double skew)
+        {
+            if (skew < .002 && skew > 0)
+            {
+                return 0.002;
+            }
+            else if (skew > -.002 && skew < 0)
+            {
+                return -0.002;
+            }
+            else
+            {
+                return skew;
+            }
+        }
         #region IDistribution Functions
         public double PDF(double x)
         {
@@ -184,20 +204,7 @@ namespace Statistics.Distributions
         public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
         public bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print(), StringComparison.InvariantCultureIgnoreCase) == 0 ? true : false;
         #endregion
-        internal double ValidateSkewness(double skew)
-        {
-            if (skew < .002 && skew > 0)
-            {
-                return 0.002;
-            }
-            else if(skew > -.002 && skew < 0)
-            {
-                return -0.002;
-            } else
-            {
-                return skew;
-            }
-        }
+
         internal static string Print(double mean, double sd, double skew, int n) => $"log PearsonIII(mean: {mean.Print()}, sd: {sd.Print()}, skew: {skew.Print()}, sample size: {n.Print()})";
         internal static string RequiredParameterization(bool printNotes = true)
         {
