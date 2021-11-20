@@ -63,7 +63,7 @@ namespace Statistics.Distributions
         {
             Mean = mean;
             StandardDeviation = standardDeviation;
-            Skewness = skew;
+            Skewness = ValidateSkewness(skew);
             SampleSize = sampleSize;
             Min = double.NegativeInfinity;
             Max = double.PositiveInfinity;
@@ -73,7 +73,7 @@ namespace Statistics.Distributions
         {
             Mean = mean;
             StandardDeviation = standardDeviation;
-            Skewness = skew;
+            Skewness = ValidateSkewness(skew);
             SampleSize = sampleSize;
             Min = min;
             Max = max;
@@ -184,7 +184,20 @@ namespace Statistics.Distributions
         public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
         public bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print(), StringComparison.InvariantCultureIgnoreCase) == 0 ? true : false;
         #endregion
-
+        internal double ValidateSkewness(double skew)
+        {
+            if (skew < .002 && skew > 0)
+            {
+                return 0.002;
+            }
+            else if(skew > -.002 && skew < 0)
+            {
+                return -0.002;
+            } else
+            {
+                return skew;
+            }
+        }
         internal static string Print(double mean, double sd, double skew, int n) => $"log PearsonIII(mean: {mean.Print()}, sd: {sd.Print()}, skew: {skew.Print()}, sample size: {n.Print()})";
         internal static string RequiredParameterization(bool printNotes = true)
         {
