@@ -10,7 +10,7 @@ namespace Statistics.Distributions
         /// <summary>
         /// A minimum skewness value based on the PearsonIII class in the William Lehman's Statistics assembly.
         /// </summary>
-        private readonly double _NoSkewness = 0.00001;
+        private readonly double _NoSkewness = 0.002;
         /// <summary>
         /// A minimum standard deviation value based on the Pearson III class in William Lehman's Statistics assembly.
         /// </summary>

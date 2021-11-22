@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Linq;
 using Utilities;
 using Xunit;
 using Statistics;
@@ -106,7 +107,7 @@ namespace StatisticsTests.Distributions
         public void GoodData_Returns_FiniteRange2(double mean, double sd, double skew)
         {
             var testObj = new Statistics.Distributions.LogPearson3(mean, sd, skew);
-           // testObj.CDF();
+            // testObj.CDF();
             Assert.True(testObj.Range.IsFinite());
         }
         [Theory]
@@ -185,7 +186,7 @@ namespace StatisticsTests.Distributions
             double result = testObj.Range.Max;
             double fraction = Math.Abs((output - result) / output);
 
-            Assert.True(fraction<.01);
+            Assert.True(fraction < .01);
         }
         [Theory]
         [InlineData(.33d, 2d, 1d, 0.00023424651174493445)] //USGS-R SMWR
@@ -199,9 +200,9 @@ namespace StatisticsTests.Distributions
             var testObj = new Statistics.Distributions.LogPearson3(mean, sd, skew);
             double result = testObj.Range.Min;
             double fraction = Math.Abs((output - result) / output);
-    
-                Assert.True(fraction < .001);
-     
+
+            Assert.True(fraction < .001);
+
         }
         [Theory]
         [InlineData(.33d, 2d, 1d)]
@@ -243,5 +244,8 @@ namespace StatisticsTests.Distributions
             Assert.Equal(skew, result, 9);
         }
 
+
     }
+
+
 }
