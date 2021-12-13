@@ -59,7 +59,17 @@ namespace Statistics.Distributions
         #region IDistribution Functions
         public double CDF(double x)
         {
-            throw new NotImplementedException();
+            if (x <= 0)
+            {
+                return 0;
+            } else if(x >= double.MaxValue)
+            {
+                return 1;
+            }
+            else
+            {
+                return SpecialFunctions.regIncompleteGamma(_Shape, x / _Scale);
+            }
         }
 
         public bool Equals(IDistribution distribution)
