@@ -9,19 +9,18 @@ using Utilities;
 namespace Statistics.Distributions { 
 public class SpecialFunctions
 {
-	public
-	const double EulerConst = 0.5772156649015329;
-	private static double GAMMA = 0.5772156649015329;
-	private static double GAMMA_MINX = 1.0E-12;
-	private static double DIGAMMA_MINNEGX = -1250;
-	private static double C_LIMIT = 49;
-	private static double S_LIMIT = 1.0E-5;
+	public const double EulerConst = 0.5772156649015329;
+	private const double GAMMA = 0.5772156649015329;
+	private const double GAMMA_MINX = 1.0E-12;
+	private const double DIGAMMA_MINNEGX = -1250;
+	private const double C_LIMIT = 49;
+	private const double S_LIMIT = 1.0E-5;
 	//********** GAMMA **********
 	public static double logGamma(double t)
 	{
 		if (double.IsNaN(t) || t <= 0.0)
 		{
-			return java.lang.Double.NaN;
+			return double.NaN;
 		}
 		if (t < 0.5)
 		{
@@ -30,10 +29,10 @@ public class SpecialFunctions
 		}
 		else
 		{
-			// Coefficients used by the GNU Scientific Library
-			var sum = 0.9999999999998099 + 676.5203681218851 / (t) - 1259.1392167224028 / (t + 1.0) + 771.3234287776531 / (t + 2.0) - 176.6150291621406 / (t + 3.0) + 12.507343278686905 / (t + 4.0) - 0.13857109526572012 / (t + 5.0) + 9.984369578019572E-6 / (t + 6.0) + 1.5056327351493116E-7 / (t + 7.0);
-			var base = t + 7 - 0.5;
-			return ((0.5 * Math.Log(2.0 * Math.PI) + Math.Log(sum)) - base) + (t - 0.5) * Math.Log(base);
+				// Coefficients used by the GNU Scientific Library
+				var sum = 0.9999999999998099 + 676.5203681218851 / (t) - 1259.1392167224028 / (t + 1.0) + 771.3234287776531 / (t + 2.0) - 176.6150291621406 / (t + 3.0) + 12.507343278686905 / (t + 4.0) - 0.13857109526572012 / (t + 5.0) + 9.984369578019572E-6 / (t + 6.0) + 1.5056327351493116E-7 / (t + 7.0);
+				var baseNumber = t + 7 - 0.5;
+				return ((0.5 * Math.Log(2.0 * Math.PI) + Math.Log(sum)) - baseNumber) + (t - 0.5) * Math.Log(baseNumber);
 		}
 	}
 	public static double logFactorial(int n)
@@ -44,7 +43,7 @@ public class SpecialFunctions
 	{
 		return Math.Exp(SpecialFunctions.logGamma(t));
 	}
-	public static long factorial(int n)
+	public static double factorial(int n)
 	{
 		return Math.Round(SpecialFunctions.gamma(n + 1.0));
 	}
@@ -94,7 +93,7 @@ public class SpecialFunctions
 		{
 			return double.PositiveInfinity;
 		}
-		var value = 0;
+		double value = 0;
 		while (true)
 		{
 			if (x >= 0 && x < SpecialFunctions.GAMMA_MINX)
@@ -141,7 +140,7 @@ public class SpecialFunctions
 		var ret = 0.0;
 		if (double.IsNaN(a) || double.IsNaN(x) || (a <= 0.0) || (x < 0.0))
 		{
-			ret = java.lang.Double.NaN;
+			ret = double.NaN;
 		}
 		else if (x == 0.0)
 		{
@@ -200,12 +199,12 @@ public class SpecialFunctions
 		* @param maxIterations Maximum number of "iterations" to complete.
 		* @return the regularized gamma function P(a, x)
 		*/
-	private static double regularizedGammaQ(final double a, double x, double epsilon, int maxIterations)
+	private static double regularizedGammaQ(double a, double x, double epsilon, int maxIterations)
 	{
 		double ret;
 		if (double.IsNaN(a) || double.IsNaN(x) || (a <= 0.0) || (x < 0.0))
 		{
-			ret = java.lang.Double.NaN;
+			ret = double.NaN;
 		}
 		else if (x == 0.0)
 		{
@@ -241,7 +240,6 @@ public class SpecialFunctions
 		*/
 	private static double evaluateCFGammaQ(double a, double x, double epsilon, int maxIterations)
 	{
-		final
 		var small = 1.0E-50;
 		var hPrev = ((2.0 * 0.0) + 1.0) - a + x;
 		//getA(0, x);
@@ -256,10 +254,10 @@ public class SpecialFunctions
 		var hN = hPrev;
 		while (n < maxIterations)
 		{
-			final
+			
 			var aa = ((2.0 * n) + 1.0) - a + x;
 			//getA(n, x);
-			final
+			
 			var bb = n * (a - n);
 			//getB(n, x);
 			var dN = aa + bb * dPrev;
@@ -273,7 +271,7 @@ public class SpecialFunctions
 				cN = small;
 			}
 			dN = 1 / dN;
-			final
+			
 			var deltaN = cN * dN;
 			hN = hPrev * deltaN;
 			if (double.IsInfinity(hN))
@@ -298,7 +296,7 @@ public class SpecialFunctions
 	{
 		if (double.IsNaN(s) || double.IsNaN(t) || s <= 0.0 || t <= 0.0)
 		{
-			return java.lang.Double.NaN;
+			return double.NaN;
 		}
 		return SpecialFunctions.logGamma(s) + (SpecialFunctions.logGamma(t) - SpecialFunctions.logGamma(s + t));
 	}
@@ -330,12 +328,12 @@ public class SpecialFunctions
 		* @param maxIterations Maximum number of "iterations" to complete.
 		* @return the regularized beta function I(x, a, b)
 		*/
-	public static double regularizedBeta(final double a, final double b, double x, double epsilon, int maxIterations)
+	public static double regularizedBeta(double a, double b, double x, double epsilon, int maxIterations)
 	{
 		double ret;
 		if (double.IsNaN(x) || double.IsNaN(a) || double.IsNaN(b) || x < 0 || x > 1 || a <= 0.0 || b <= 0.0)
 		{
-			ret = java.lang.Double.NaN;
+			ret = double.NaN;
 		}
 		else if (x > (a + 1) / (2 + b + a) && 1 - x <= (b + 1) / (2 + b + a))
 		{
@@ -343,7 +341,7 @@ public class SpecialFunctions
 		}
 		else
 		{
-			ret = Math.Exp((a * Math.Log(x)) + (b * Math.log1p(-x)) - Math.Log(a) - SpecialFunctions.logBeta(a, b)) * 1.0 / SpecialFunctions.evaluateCFBeta(a, b, x, epsilon, maxIterations);
+			ret = Math.Exp((a * Math.Log(x)) + (b * Math.Log(-x+1)) - Math.Log(a) - SpecialFunctions.logBeta(a, b)) * 1.0 / SpecialFunctions.evaluateCFBeta(a, b, x, epsilon, maxIterations);
 		}
 		return ret;
 	}
@@ -362,8 +360,7 @@ public class SpecialFunctions
 	const double B6 = 1.0 / 42.0;
 	private
 	const double B8 = -1.0 / 30.0;
-	private
-	const double c = Math.Pow(Math.PI, 2.0 / 6.0);
+	private	static double c = Math.Pow(Math.PI, 2.0 / 6.0);
 	private
 	const double c1 = -2.4041138063191885;
 	private
@@ -374,9 +371,9 @@ public class SpecialFunctions
 	{
 		if (double.IsNaN(x) || double.IsInfinity(x) || 0.0.CompareTo(x) == 0 || (x < 0.0 && Math.Floor(x).CompareTo(x) == 0))
 		{
-			return java.lang.Double.NaN;
+			return double.NaN;
 		}
-		var y = 0;
+		double y = 0;
 		if (x < 0.0)
 		{
 			var val = (Math.PI * (1.0 / Math.Sin(-Math.PI * x)));
@@ -414,7 +411,7 @@ public class SpecialFunctions
 		*/
 	private static double evaluateCFBeta(double a, double b, double x, double epsilon, int maxIterations)
 	{
-		final
+		
 		var small = 1.0E-50;
 		var hPrev = 1.0;
 		//getA(0, x);
@@ -429,10 +426,10 @@ public class SpecialFunctions
 		var hN = hPrev;
 		while (n < maxIterations)
 		{
-			final
+			
 			var aa = 1.0;
 			//getA(n, x);
-			final double bb;
+			double bb;
 			//getB(n, x);
 			double m;
 			if (n % 2 == 0)
@@ -457,7 +454,7 @@ public class SpecialFunctions
 				cN = small;
 			}
 			dN = 1 / dN;
-			final
+			
 			var deltaN = cN * dN;
 			hN = hPrev * deltaN;
 			if (double.IsInfinity(hN))
@@ -519,9 +516,9 @@ public class SpecialFunctions
 	{
 		if (n < k)
 		{
-			java.util.logging.Logger.getLogger(SpecialFunctions.class.getName().ToString()).log(java.util.logging.Level.SEVERE, "N has to be greater than k");
-}
-return (int)(((int)SpecialFunctions.factorial(n)) / (((int)SpecialFunctions.factorial(k)) * ((int)SpecialFunctions.factorial(n - k))));
+				throw new Exception("N has to be greater than k!");
+		}
+		return (int)(((int)SpecialFunctions.factorial(n)) / (((int)SpecialFunctions.factorial(k)) * ((int)SpecialFunctions.factorial(n - k))));
 	}
 	public static double singleParGammaPDF(double alpha, double x)
 {
