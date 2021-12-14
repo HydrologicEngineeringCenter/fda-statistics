@@ -79,18 +79,18 @@ namespace Statistics.Distributions
         #endregion
 
         #region Supporting Methods
-        protected double invCDFNewtonBiSearch(double p, double xMin, double xMax, double tolX, int maxIter)
+        private double invCDFNewtonBiSearch(double p, double xMin, double xMax, double tolX, int maxIter)
         {
             return newtonBiSearch(p, xMin, xMax, tolX, maxIter);
         }
 
-        public double f(double x)
+        private double f(double x)
             {
                 return CDF(x);
             }
             
     
-        public double dfdx(double x)
+        private double dfdx(double x)
             {
                 return PDF(x);
             }
@@ -105,7 +105,7 @@ namespace Statistics.Distributions
      *         found using the Newton method and bisection searchin the interval [xMin,xMax]
      *         It is required that f(xMax)-y and f(xMin)-y have opposite signs.
      */
-    public double newtonBiSearch(double y, double xMin, double xMax, double tolX, int maxIter)
+    private double newtonBiSearch(double y, double xMin, double xMax, double tolX, int maxIter)
         { 
             int j;
             double dfrts, dx, dxold, frts, fh, fl;
