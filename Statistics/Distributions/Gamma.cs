@@ -111,11 +111,11 @@ namespace Statistics.Distributions
             
         }
 
-
-
         public double PDF(double x)
         {
-            throw new NotImplementedException();
+            if (x <= 0.0) return 0.0;
+            return Math.Exp(-x / _Scale + (_Shape - 1.0) * Math.Log(x) -
+                    _Shape * Math.Log(_Scale) - SpecialFunctions.logGamma(_Shape));
         }
 
         public string Print(bool round = false)
@@ -140,8 +140,6 @@ namespace Statistics.Distributions
             return newtonBiSearch(p, xMin, xMax, tolX, maxIter);
         }
 
-  
-    
         public double f(double x)
             {
                 return CDF(x);
@@ -152,12 +150,8 @@ namespace Statistics.Distributions
             {
                 return PDF(x);
             }
-       
-
+    
     //********** GENERAL COMBINATION NEWTON / BISECTION SEARCH FORMULA **********
-
-
-
     /**
      * @param f = a real function, a method with a double parameter that returns a double
      * @param dfdx = derivative of f, a method with a double parameter that returns a double
@@ -167,10 +161,8 @@ namespace Statistics.Distributions
      *         found using the Newton method and bisection searchin the interval [xMin,xMax]
      *         It is required that f(xMax)-y and f(xMin)-y have opposite signs.
      */
-    public double newtonBiSearch(double y,
-            double xMin, double xMax, double tolX, int maxIter)
-    {
-        {
+    public double newtonBiSearch(double y, double xMin, double xMax, double tolX, int maxIter)
+        { 
             int j;
             double dfrts, dx, dxold, frts, fh, fl;
             double temp, xh, xl, rts, rtsOld;
@@ -246,9 +238,7 @@ namespace Statistics.Distributions
                 }
             }
             return double.NaN;
-        }
     }
-
     #endregion
 }
 }
