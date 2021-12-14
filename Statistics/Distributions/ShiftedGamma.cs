@@ -6,7 +6,7 @@ namespace Statistics.Distributions
 {
     internal class ShiftedGamma
     {
-        private readonly MathNet.Numerics.Distributions.Gamma _Gamma;
+        private readonly Gamma _Gamma;
         
         internal double Shift { get; }
         
@@ -15,7 +15,7 @@ namespace Statistics.Distributions
             // The Gamma distribution is defined by 2 parameters: 
             //      (1) alpha is the shape parameter 
             //      (2) beta is the rate or inverse scale parameter
-            _Gamma = new MathNet.Numerics.Distributions.Gamma(alpha, 1/beta);
+            _Gamma = new Gamma(alpha, 1/beta);
             Shift = shift;
         }
 
@@ -26,16 +26,16 @@ namespace Statistics.Distributions
             {
                 val = 0;
             }
-            return _Gamma.CumulativeDistribution(val);
+            return _Gamma.CDF(val);
         }
         internal double PDF(double x)
         {
-            return _Gamma.Density(x - Shift);
+            return _Gamma.PDF(x - Shift);
         }
 
         internal double InverseCDF(double p)
         {
-            return _Gamma.InverseCumulativeDistribution(p) + Shift;
+            return _Gamma.InverseCDF(p) + Shift;
         }
     }
 }
