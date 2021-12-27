@@ -42,22 +42,6 @@ namespace Statistics.Distributions
         public Deterministic(double x)
         {
             Value = x;
-            BuildFromProperties();
-        }
-        public void BuildFromProperties()
-        {
-
-                Mean = Value;
-                Median = Value;
-                Mode = Value;
-                Min = Value;
-                Max = Value;
-                Variance = 0;
-                StandardDeviation = 0;
-                Skewness = 0;
-                SampleSize = 1;
-                Range = IRangeFactory.Factory(Value, Value);
-
         }
         #endregion
 
@@ -76,14 +60,14 @@ namespace Statistics.Distributions
 
         public bool Equals(IDistribution distribution)
         {
-            if (Value == distribution.Mean)
-            {
-                return true;
+            if (Type==distribution.Type){
+                Deterministic dist = (Deterministic)distribution;
+                if (Value == dist.Value)
+                {
+                    return true;
+                }                
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         public double InverseCDF(double p)
@@ -118,15 +102,6 @@ namespace Statistics.Distributions
             return $"{Value}";
 
         }
-
-        XElement ISerializeToXML<IDistribution>.WriteToXML()
-        {
-            XElement ordinateElem = new XElement("DeterministicDistribution");
-            ordinateElem.SetAttributeValue("Constant Value", Value);
-            return ordinateElem;
-        }
-
-
         #endregion
     }
 }

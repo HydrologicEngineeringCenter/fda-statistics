@@ -7,47 +7,14 @@ namespace Statistics
     /// <summary>
     /// Provides and interface for double precision numbers stored as statistical distributions rather than static values.
     /// </summary>
-    public interface IDistribution: Utilities.ISerializeToXML<IDistribution>, Utilities.IMessagePublisher
+    public interface IDistribution: Utilities.IMessagePublisher
     {
         #region Properties
         /// <summary>
         /// The type of the statistical distribution (e.g. Normal, Triangular, etc.). 
         /// Supported distributions are listed in <see cref="IDistributionEnum"/> set of enumerated values.
         /// </summary>
-        IDistributionEnum Type { get; }
-        /// <summary>
-        /// The arithmetic average value of the distribution.
-        /// </summary>
-        double Mean { get; }
-        /// <summary>
-        /// The "middle" value of the distribution. 
-        /// The value of the distribution which separates the smaller half of values from the larger half of values.
-        /// </summary>
-        double Median { get;}
-        /// <summary>
-        /// The expected squared deviation of the distribution values from the distribution <see cref="IDistribution.Mean"/>.
-        /// </summary>
-        double Variance { get;  }
-        /// <summary>
-        /// The expected absolute value for the deviation of the distribution values from the distribution <see cref="IDistribution.Mean"/>. It is the square root of the <see cref="IDistribution.Variance"/>.
-        /// </summary>
-        double StandardDeviation { get; }
-        double Min { get; }
-        double Max { get; }
-        /// <summary>
-        /// Measures the asymmetry of the distribution.
-        /// Zero skew values represent a symmetrical distribution.
-        /// Negative skew values represent a left side skew or skew toward values below the mean.
-        /// Positive skew values represent a right side skew or skew toward values above the mean.
-        /// Skewness can be thought of as the cubed deviation of the distribution values from the mean.
-        /// </summary>
-        double Skewness { get; }
-        /// <summary>
-        /// The maximum and minimum value for the distribution.
-        /// For continuous distributions which span the real number line from negative to positive infinity, this is approximated a value very close to <see cref="double.NegativeInfinity"/> or <see cref="double.PositiveInfinity"/>.
-        /// </summary>
-        [Obsolete("IDistribution.Range is Obsolete, Please use Min and Max instead.")]
-        Utilities.IRange<double> Range { get; }    
+        IDistributionEnum Type { get; } 
         /// <summary>
         /// The sample size used to fit the distribution.
         /// </summary>
@@ -56,7 +23,6 @@ namespace Statistics
         bool Truncated { get; }
         #endregion
         #region Voids
-        void BuildFromProperties();
         #endregion
         #region Functions
         /// <summary>

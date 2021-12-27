@@ -57,7 +57,7 @@ namespace Statistics.Distributions
             SampleSize = 1;
             Min = double.NegativeInfinity;
             Max = double.PositiveInfinity;
-            BuildFromProperties();
+            //BuildFromProperties();
         }
         public LogPearson3(double mean, double standardDeviation, double skew, int sampleSize = int.MaxValue)
         {
@@ -67,7 +67,7 @@ namespace Statistics.Distributions
             SampleSize = sampleSize;
             Min = double.NegativeInfinity;
             Max = double.PositiveInfinity;
-            BuildFromProperties();
+            //BuildFromProperties();
         }
         public LogPearson3(double mean, double standardDeviation, double skew, double min, double max, int sampleSize = int.MaxValue)
         {
@@ -78,9 +78,10 @@ namespace Statistics.Distributions
             Min = min;
             Max = max;
             Truncated = true;
-            BuildFromProperties();
+            //BuildFromProperties();
             
         }
+        /*
         public void BuildFromProperties()
         {
             if (!Validation.LogPearson3Validator.IsConstructable(Mean, StandardDeviation, Skewness, SampleSize, out string error)) throw new Utilities.InvalidConstructorArgumentsException(error);
@@ -98,6 +99,7 @@ namespace Statistics.Distributions
             }
             _Constructed = true;
         }
+        */
         #endregion
 
         #region Functions

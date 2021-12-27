@@ -25,8 +25,8 @@ namespace Statistics.Validation
             List<IMessage> msgs = new List<IMessage>();
             if (obj.IsNull()) throw new ArgumentNullException(nameof(obj), "The normal distribution could not be validated because it is null.");
             if (!(obj.SampleSize > 0)) msgs.Add(IMessageFactory.Factory(IMessageLevels.Error, $"{Resources.InvalidParameterizationNotice(obj.Print(true))} {obj.Requirements(false)} {Resources.SampleSizeSuggestion()}."));
-            if (!obj.Range.IsFinite()) msgs.Add(IMessageFactory.Factory(IMessageLevels.Error, $"{Resources.NonFiniteRangeNotice(obj)}"));
-            msgs.Add(IMessageFactory.Factory(IMessageLevels.Message, $"The normal distribution has been restricted to the finite range: {obj.Range.Print(true)} which spans the probability range: {obj._ProbabilityRange.Print(true)}."));            
+            //if (!obj.Range.IsFinite()) msgs.Add(IMessageFactory.Factory(IMessageLevels.Error, $"{Resources.NonFiniteRangeNotice(obj)}"));
+            //msgs.Add(IMessageFactory.Factory(IMessageLevels.Message, $"The normal distribution has been restricted to a finite range which spans a subset of the probability range."));            
             return msgs;
         }
         
