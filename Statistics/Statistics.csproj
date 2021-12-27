@@ -12,6 +12,7 @@
 		<Description>A library for computing statistics within HEC-FDA</Description>
 		<Authors>Hydrologic Engineering Center</Authors>
 		<RepositoryUrl>https://github.com/HydrologicEngineeringCenter/fda-statistics</RepositoryUrl>
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
   <ItemGroup>
