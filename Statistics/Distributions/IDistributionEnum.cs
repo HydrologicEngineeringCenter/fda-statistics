@@ -22,10 +22,6 @@ namespace Statistics
         /// </summary>
         Uniform = 2,
         /// <summary>
-        /// Scaled Beta distribution.
-        /// </summary>
-        Beta4Parameters = 3,
-        /// <summary>
         /// Triangular distribution.
         /// </summary>
         Triangular = 4,
@@ -57,10 +53,6 @@ namespace Statistics
         /// Specific form of a Truncated Uniform Distribution with density above or below truncation value(s) reassigned to the truncation value(s). However, the reported measures of central tendency and dispersion continue to be those of the underlying distribution NOT the truncated copy.
         /// </summary>
         TruncatedUniform = 20,
-        /// <summary>
-        /// Specific form of a Truncated 4 Parameter Beta Distribution with density above or below truncation value(s) (e.g. typical upper and lower bounds) reassigned to the truncation value(s). However, the reported measures of central tendency and dispersion continue to be those of the underlying distribution NOT the truncated copy.
-        /// </summary>
-        TruncatedBeta4Parameter = 30,
         /// <summary>
         /// Specific form of a Truncated Triangular Distribution with density above or below truncation value(s) (e.g. typical upper and lower bounds) reassigned to the truncation value(s). However, the reported measures of central tendency and dispersion continue to be those of the underlying distribution NOT the truncated copy.
         /// </summary>
