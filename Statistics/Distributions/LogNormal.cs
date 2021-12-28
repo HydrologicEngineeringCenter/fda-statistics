@@ -9,7 +9,7 @@ namespace Statistics.Distributions
 {
     public class LogNormal : IDistribution, Utilities.IValidate<LogNormal>
     {      
-        #region Fields and Propertiesj
+        #region Fields and Properties
         private double _mean;
         private double _standardDeviation;
         private double _min;

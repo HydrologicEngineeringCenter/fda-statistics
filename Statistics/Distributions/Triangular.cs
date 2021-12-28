@@ -8,7 +8,7 @@ using Utilities.Serialization;
 
 namespace Statistics.Distributions
 {
-    internal class Triangular: IDistribution, IValidate<Triangular> 
+    public class Triangular: IDistribution, IValidate<Triangular> 
     {
         //TODO: Sample
         #region Fields and Properties
