@@ -14,8 +14,7 @@ namespace StatisticsTests.Distributions
         [Fact]
         public void Triangular_EqualMinMax_ReturnsObjWithMessage()
         {
-            IDistribution t = new Statistics.Distributions.Triangular(0, 0, 0);
-            Assert.True(t.Messages.Max() == IMessageLevels.Message);
+            Assert.Throws<InvalidConstructorArgumentsException>(() => new Statistics.Distributions.Triangular(0, 0, 0));        
         }
         [Fact]
         public void Triangular_MinGreaterThanMax_Throws_InvalidConstructorArgumentsException()
