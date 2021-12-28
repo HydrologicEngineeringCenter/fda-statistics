@@ -136,17 +136,22 @@ namespace Statistics.Distributions
         public bool Equals(IDistribution distribution){
             if (Type==distribution.Type){
                 Normal dist = (Normal)distribution;
-                if (Min == dist.Min){
-                    if(Max == dist.Max){
-                        if(SampleSize == dist.SampleSize){
-                            if(Mean==dist.Mean){
-                                if(StandardDeviation==dist.StandardDeviation){
-                                    return true;
+                if(SampleSize == dist.SampleSize){
+                    if(Mean==dist.Mean){
+                        if(StandardDeviation==dist.StandardDeviation){
+                            if( Truncated){
+                                if (Truncated == dist.Truncated){
+                                    if (Min == dist.Min){
+                                        if(Max == dist.Max){
+                                            return true;
+                                        }
+                                    }
                                 }
-                            } 
-                        } 
-                    }
-                }                
+                            }
+                            return true;
+                        }
+                    } 
+                }              
             }
             return false;
         }

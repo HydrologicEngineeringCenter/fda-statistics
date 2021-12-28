@@ -87,11 +87,25 @@ namespace Statistics
                 {
                     switch (sa.type.Name){
                         case "double":
-                            double vald =  Convert.ToDouble(ele.Attribute(sa.Name).Value);
-                            pi.SetValue(dist,vald);
+                            double vald = 0.0;
+                            if(ele.Attribute(sa.Name).Value=="Infinity"){
+                                vald = double.PositiveInfinity;
+                            }else if(ele.Attribute(sa.Name).Value=="-Infinity"){
+                                vald = double.NegativeInfinity;
+                            }else{
+                                vald = Convert.ToDouble(ele.Attribute(sa.Name).Value);
+                            }
+                            pi.SetValue(dist, vald);
                             break;
                         case "Double":
-                            double valD = Convert.ToDouble(ele.Attribute(sa.Name).Value);
+                        double valD = 0.0;
+                            if(ele.Attribute(sa.Name).Value=="Infinity"){
+                                valD = double.PositiveInfinity;
+                            }else if(ele.Attribute(sa.Name).Value=="-Infinity"){
+                                valD = double.NegativeInfinity;
+                            }else{
+                                valD = Convert.ToDouble(ele.Attribute(sa.Name).Value);
+                            }
                             pi.SetValue(dist, valD);
                             break;
                         case "Boolean":
