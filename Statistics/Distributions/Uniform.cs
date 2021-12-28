@@ -12,21 +12,15 @@ namespace Statistics.Distributions
     {
         //TODO: Validation
         #region Fields and Properties
-        private MathNet.Numerics.Distributions.ContinuousUniform _Distribution;
+        private double _min;
+        private double _max;
 
         #region IDistribution Properties
         public IDistributionEnum Type => IDistributionEnum.Uniform;
-        public double Mean => _Distribution.Mean;
-        public double Median => _Distribution.Median;
-        public double Variance => _Distribution.Variance;
-        public double StandardDeviation => _Distribution.StdDev;
-        public double Skewness => _Distribution.Skewness;
-        public Utilities.IRange<double> Range { get; set; }
         [Stored(Name = "Min", type =typeof(double))]
-        public double Min { get; set; }
+        public double Min { get{return _min;} set{_min = value;} }
         [Stored(Name = "Max", type = typeof(double))]
-        public double Max { get; set; }
-        public double Mode => _Distribution.Mode;
+        public double Max { get{return _max;} set{_max = value;} }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
         public int SampleSize { get; set; }
         public bool Truncated { get; set; }
@@ -42,22 +36,14 @@ namespace Statistics.Distributions
             Min = 0;
             Max = 1;
             SampleSize = 0;
-            BuildFromProperties();
         }
         public Uniform(double min, double max, int sampleSize = int.MaxValue)
         {
             Min = min;
             Max = max;
             SampleSize = sampleSize;
-            BuildFromProperties();
         }
-        public void BuildFromProperties()
-        {
-            _Distribution = new MathNet.Numerics.Distributions.ContinuousUniform(Min, Max);
-            Range = Utilities.IRangeFactory.Factory(_Distribution.Minimum, _Distribution.Maximum);
-            State = Validate(new Validation.UniformValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
-        }
+
         #endregion
 
         #region Functions
@@ -67,23 +53,45 @@ namespace Statistics.Distributions
         }
         
         #region IDistribution Functions
-        public double PDF(double x) => _Distribution.Density(x);
-        public double CDF(double x) => _Distribution.CumulativeDistribution(x);
-        public double InverseCDF(double p) => _Distribution.InverseCumulativeDistribution(p);
-
-        //public double Sample(Random r = null) => InverseCDF(r == null ? new Random().NextDouble() : r.NextDouble());
-        ////public double[] Sample(Random numberGenerator = null) => Sample(SampleSize, numberGenerator);
-        //public double[] Sample(int sampleSize, Random numberGenerator = null)
-        //{
-        //    if (numberGenerator == null) numberGenerator = new Random();
-        //    double[] sample = new double[sampleSize];
-        //    for (int i = 0; i < sample.Length; i++) sample[i] = InverseCDF(numberGenerator.NextDouble());
-        //    return sample;
-        //}
-        //public IDistribution SampleDistribution(Random numberGenerator = null) => Fit(Sample(SampleSize, numberGenerator));
-        public string Print(bool round = false) => round ? Print(Range) : $"Uniform(range: {Range.Print()})";
+        public double PDF(double x){
+            if(x<Min){
+                return 0;
+            }else if(x<= Max){
+                return 1/(Max-Min);
+            }else{
+                return 0;
+            }
+        }
+        public double CDF(double x){
+            if(x<Min){
+                return 0;
+            }else if(x<= Max){
+                return (x-Min)/(Max-Min);
+            }else{
+                return 0;
+            }
+        }
+        public double InverseCDF(double p){
+            return Min +((Max-Min)*p);
+        }
+        public string Print(bool round = false) {
+           return "Uniform(range: {Min:"+Min+", Max:"+Max+"})";
+        }
         public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
-        public bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print()) == 0 ? true : false;
+        public bool Equals(IDistribution distribution){
+            if (Type==distribution.Type){
+                Uniform dist = (Uniform)distribution;
+                if (Min == dist.Min)
+                {
+                    if(Max == dist.Max){
+                        if(SampleSize == dist.SampleSize){
+                            return true;
+                        } 
+                    }
+                }                
+            }
+            return false;
+        }
         #endregion
 
         internal static string Print(IRange<double> range) => $"Uniform(range: {range.Print(true)})";
@@ -96,19 +104,6 @@ namespace Statistics.Distributions
             if (!(data.State < IMessageLevels.Error) || data.Elements.Count() < 3) throw new ArgumentException($"The {nameof(sample)} is invalid because it contains an insufficient number of finite, numeric values (3 are required but only {data.Elements.Count()} were provided).");
             ISampleStatistics stats = ISampleStatisticsFactory.Factory(data);
             return new Uniform(stats.Range.Min, stats.Range.Max, stats.SampleSize);
-        }
-
-        public XElement WriteToXML()
-        {
-            XElement ordinateElem = new XElement(SerializationConstants.UNIFORM);
-            //min
-            ordinateElem.SetAttributeValue(SerializationConstants.MIN, Range.Min);
-            //max
-            ordinateElem.SetAttributeValue(SerializationConstants.MAX, Range.Max);
-            //sample size
-            ordinateElem.SetAttributeValue(SerializationConstants.SAMPLE_SIZE, SampleSize);
-
-            return ordinateElem;
         }
         #endregion
     }

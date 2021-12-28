@@ -10,7 +10,7 @@ namespace Statistics.Distributions
 {
     public class LogPearson3: IDistribution, IValidate<LogPearson3> 
     {
-        internal PearsonIII _Distribution;
+        
         internal IRange<double> _ProbabilityRange;
         private bool _Constructed;
 
@@ -18,13 +18,10 @@ namespace Statistics.Distributions
         public IDistributionEnum Type => IDistributionEnum.LogPearsonIII;
         [Stored(Name = "Mean", type = typeof(double))]
         public double Mean { get; set; }
-        public double Median { get; set;}
-        public double Variance { get; set; }
         [Stored(Name = "St_Dev", type = typeof(double))]
         public double StandardDeviation { get; set; }
         [Stored(Name = "Skew", type = typeof(double))]
         public double Skewness { get; set; }
-        public Utilities.IRange<double> Range { get; set; }
         [Stored(Name = "Min", type = typeof(double))]
         public double Min
         {
@@ -78,26 +75,23 @@ namespace Statistics.Distributions
             Min = min;
             Max = max;
             Truncated = true;
+            
             BuildFromProperties();
             
         }
+
         public void BuildFromProperties()
         {
             if (!Validation.LogPearson3Validator.IsConstructable(Mean, StandardDeviation, Skewness, SampleSize, out string error)) throw new Utilities.InvalidConstructorArgumentsException(error);
             else
             {
-                _Distribution = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
-                Variance = Math.Pow(StandardDeviation, 2);
-                Median = InverseCDF(0.50);
-                _ProbabilityRange = FiniteRange(Min, Max);
-                Range = IRangeFactory.Factory(InverseCDF(_ProbabilityRange.Min), InverseCDF(_ProbabilityRange.Max));
-                Min = Range.Min;
-                Max = Range.Max;
+               SetProbabilityRangeAndMinAndMax(Min, Max);
                 State = Validate(new Validation.LogPearson3Validator(), out IEnumerable<Utilities.IMessage> msgs);
                 Messages = msgs;
             }
             _Constructed = true;
         }
+        
         #endregion
 
         #region Functions
@@ -106,9 +100,10 @@ namespace Statistics.Distributions
             return validator.IsValid(this, out msgs);
         }
 
-        private IRange<double> FiniteRange(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
+        private void SetProbabilityRangeAndMinAndMax(double min, double max)
         {
-            double pmin = 0, epsilon = 1 / 1000000000d;
+            double pmin = 0;
+            double epsilon = 1 / 1000000000d;
             double pmax = 1 - pmin;
             if (min.IsFinite() || max.IsFinite())//not entirely sure how inclusive or works with one sided truncation and the while loop below.
             {
@@ -131,28 +126,32 @@ namespace Statistics.Distributions
                 if (pmin > 0.25)
                     throw new InvalidConstructorArgumentsException($"The log Pearson III object is not constructable because 50% or more of its distribution returns {double.NegativeInfinity} and {double.PositiveInfinity}.");
             }
-            return IRangeFactory.Factory(pmin, pmax);
-
+            //apparently we have done everything we need at this point.
+            Max = max;
+            Min = min;
+            _ProbabilityRange = IRangeFactory.Factory(pmin, pmax);
         }
         #region IDistribution Functions
         public double PDF(double x)
         {
-            if (x < Range.Min || x > Range.Max) return double.Epsilon;
+            if (x < Min || x > Max) return double.Epsilon;
             else
             {
-                return _Distribution.PDF(Math.Log10(x))/x/Math.Log(10);
+                PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
+                return d.PDF(Math.Log10(x))/x/Math.Log(10);
 
             }          
         }
         public double CDF(double x)
         {
-            if (x < Range.Min) return 0;
-            if (x == Range.Min) return _ProbabilityRange.Min;
-            if (x == Range.Max) return _ProbabilityRange.Max;
-            if (x > Range.Max) return 1;
+            if (x < Min) return 0;
+            if (x == Min) return _ProbabilityRange.Min;
+            if (x == Max) return _ProbabilityRange.Max;
+            if (x > Max) return 1;
             if (x > 0)
             {
-                return _Distribution.CDF(Math.Log10(x));
+                PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
+                return d.CDF(Math.Log10(x));
             }
             else return 0;
         }
@@ -168,17 +167,14 @@ namespace Statistics.Distributions
             }
             else // Range has been set check p against [_ProbabilityRange.Min, _ProbabilityRange.Max]
             {
-                if (Range.IsNull()) // object is being constructued
-                { 
-                    if (p < 0 || p > 1) throw new ArgumentException($"The value of specified probability parameter: {p} is invalid because it is not on the valid probability range: [0, 1].");
-                }
-                else
+                if (_Constructed) // object is constructed
                 {
-                    if (p <= _ProbabilityRange.Min) return Range.Min;
-                    if (p >= _ProbabilityRange.Max) return Range.Max;
+                    if (p <= _ProbabilityRange.Min) return Min;
+                    if (p >= _ProbabilityRange.Max) return Max;
                 }
             }
-            return Math.Pow(10, _Distribution.InverseCDF(p));
+            PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
+            return Math.Pow(10, d.InverseCDF(p));
         }
         public string Print(bool round = false) => round ? Print(Mean, StandardDeviation, Skewness, SampleSize) : $"log PearsonIII(mean: {Mean}, sd: {StandardDeviation}, skew: {Skewness}, sample size: {SampleSize})";
         public string Requirements(bool printNotes) => RequiredParameterization(printNotes);

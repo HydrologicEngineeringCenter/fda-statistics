@@ -9,83 +9,73 @@ namespace Statistics.Distributions
 {
     public class LogNormal : IDistribution, Utilities.IValidate<LogNormal>
     {      
+        #region Fields and Properties
+        private double _mean;
+        private double _standardDeviation;
+        private double _min;
+        private double _max;
         internal IRange<double> _ProbabilityRange;
-        private MathNet.Numerics.Distributions.LogNormal _Distribution;
-        private bool _Constructed;
 
-        #region Properties
-        public IDistributionEnum Type => IDistributionEnum.LogNormal;
+        #region IDistribution Properties
+        public IDistributionEnum Type => IDistributionEnum.Normal;
         [Stored(Name = "Mean", type = typeof(double))]
-        public double Mean { get; set; }
-
-        public double Median => _Distribution.Median;
-
-        public double Mode => _Distribution.Mode;
-
-        public double Variance => _Distribution.Variance;
-        [Stored(Name = "St_Dev", type = typeof(double))]
-        public double StandardDeviation{ get; set; }
-
-        public double Skewness => _Distribution.Skewness;
-
-        public IRange<double> Range { get; set; }
-        [Stored(Name = "Min", type = typeof(double))]
-        public double Min
-        {
-            get; set;
-        }
+         public double Mean { get{return _mean;} set{_mean = value;} }
+        [Stored(Name = "Standard_Deviation", type = typeof(double))]
+        public double StandardDeviation { get{return _standardDeviation;} set{_standardDeviation = value;} }
+        [Stored(Name = "Min", type =typeof(double))]
+        public double Min { get{return _min;} set{_min = value;} }
         [Stored(Name = "Max", type = typeof(double))]
-        public double Max
-        {
-            get; set;
-        }
+        public double Max { get{return _max;} set{_max = value;} }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
         public int SampleSize { get; set; }
         [Stored(Name = "Truncated", type = typeof(bool))]
         public bool Truncated { get; set; }
+        #endregion
+        #region IMessagePublisher Properties
         public IMessageLevels State { get; private set; }
-        public IEnumerable<IMessage> Messages { get; private set; }
+        public IEnumerable<Utilities.IMessage> Messages { get; private set; }
+        #endregion
+
         #endregion
 
         #region Constructor
         public LogNormal()
         {
-            //for reflection
-            _Distribution = new MathNet.Numerics.Distributions.LogNormal(1, 1);
-        }
-        public LogNormal(double mean, double standardDeviation, int sampleSize = int.MaxValue)
-        {
-            Mean = mean;
-            StandardDeviation = standardDeviation;
-            SampleSize = sampleSize;
-            Min = double.NegativeInfinity;
-            Max = double.PositiveInfinity;
-            BuildFromProperties();
-        }
-        public LogNormal(double mean, double standardDeviation, double min, double max, int sampleSize = int.MaxValue)
-        {
-            Mean = mean;
-            StandardDeviation = standardDeviation;
-            SampleSize = sampleSize;
-            Min = min;
-            Max = max;
-            Truncated = true;
-            BuildFromProperties();
-            
-        }
-        public void BuildFromProperties()
-        {
-
-            if (!Validation.LogNormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new InvalidConstructorArgumentsException(msg);
-            _Distribution = new MathNet.Numerics.Distributions.LogNormal(Mean, StandardDeviation);
-            _ProbabilityRange = FiniteRange(Min, Max);
-            Range = IRangeFactory.Factory(_Distribution.InverseCumulativeDistribution(_ProbabilityRange.Min), _Distribution.InverseCumulativeDistribution(_ProbabilityRange.Max));
-            Min = Range.Min;
-            Max = Range.Max;
+            //for reflection;
+            Mean = 0;
+            StandardDeviation = 1.0;
+            _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
+            Min = InverseCDF(0.0000000000001);
+            Max = InverseCDF(1-0.0000000000001);
             State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
-            _Constructed = true;
         }
+        public LogNormal(double mean, double sd, int sampleSize = int.MaxValue)
+        {
+            Mean = mean;
+            StandardDeviation = sd;
+            SampleSize = sampleSize;
+            _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
+            Min = InverseCDF(0.0000000000001);
+            Max = InverseCDF(1-0.0000000000001);
+            State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
+
+        }
+        public LogNormal(double mean, double sd, double minValue, double maxValue, int sampleSize = int.MaxValue)
+        {
+            Mean = mean;
+            StandardDeviation = sd;
+            SampleSize = sampleSize;
+            Min = minValue;
+            Max = maxValue;
+            Truncated = true;
+            _ProbabilityRange = FiniteRange(Min, Max);
+            State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
+            
+        }
+
         #endregion
 
         #region Functions
@@ -93,37 +83,37 @@ namespace Statistics.Distributions
         {
             return validator.IsValid(this, out msgs);
         }
-        private IRange<double> FiniteRange(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
+        private IRange<double> FiniteRange(double min, double max)
         {
-            double pmin = 0, epsilon = 1 / 1000000000d;
+            double pmin = 0;
             double pmax = 1 - pmin;
-            if (min.IsFinite() || max.IsFinite())//not entirely sure how inclusive or works with one sided truncation and the while loop below.
+            if (min.IsFinite() || max.IsFinite())
             {
-                pmin = _Distribution.CumulativeDistribution(min);
-                pmax = _Distribution.CumulativeDistribution(max);
-            }
-            while (!(min.IsFinite() && max.IsFinite()))
-            {
-                pmin += epsilon;
-                pmax -= epsilon;
-                if (!min.IsFinite()) min = _Distribution.InverseCumulativeDistribution(pmin);
-                if (!max.IsFinite()) max = _Distribution.InverseCumulativeDistribution(pmax);
+                pmin = CDF(min);
+                pmax = CDF(max);
             }
             return IRangeFactory.Factory(pmin, pmax);
         }
 
         #region IDistribution
-        public double PDF(double x) => _Distribution.Density(x);
-        public double CDF(double x) => _Distribution.CumulativeDistribution(x);
+        public double PDF(double x){
+            Normal sn = new Normal();
+            return sn.PDF(Math.Log(x));
+        }
+        public double CDF(double x){
+            Normal sn = new Normal();
+            return sn.CDF(Math.Log(x));
+        }
         public double InverseCDF(double p)
         {
-            if (Truncated && _Constructed)
+            if (Truncated)
             {
                 p = _ProbabilityRange.Min + (p) * (_ProbabilityRange.Max - _ProbabilityRange.Min);
             }
-            if (p <= _ProbabilityRange.Min) return Range.Min;
-            if (p >= _ProbabilityRange.Max) return Range.Max;
-            return _Distribution.InverseCumulativeDistribution(p);
+            if (p <= _ProbabilityRange.Min) return Min;
+            if (p >= _ProbabilityRange.Max) return Max;
+            Normal sn = new Normal();
+            return Math.Exp(Mean+sn.InverseCDF(p)*StandardDeviation);
         }
         public string Print(bool round = false) => round ? Print(Mean, StandardDeviation, SampleSize) : $"LogNormal(mean: {Mean}, sd: {StandardDeviation}, sample size: {SampleSize})";
         public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
@@ -149,10 +139,6 @@ namespace Statistics.Distributions
             ISampleStatistics stats = ISampleStatisticsFactory.Factory(data);
             return new LogNormal(stats.Mean, stats.StandardDeviation, stats.SampleSize);
         }   
-        public XElement WriteToXML()
-        {
-            throw new NotImplementedException();
-        }
         #endregion
     }
 }

@@ -59,7 +59,7 @@ namespace StatisticsTests.Distributions
         public void GoodData_Returns_ValidFiniteRange()
         {
             var testObj = new Statistics.Distributions.LogPearson3(mean: 1, standardDeviation: 0.01, skew: -2);
-            var min = testObj.Range.Min;
+            var min = testObj.Min;
             Assert.True(min.IsFinite());
         }
         [Theory]
@@ -80,7 +80,8 @@ namespace StatisticsTests.Distributions
         public void GoodData_Returns_FiniteRange(double mean, double sd, double skew)
         {
             var testObj = new Statistics.Distributions.LogPearson3(mean, sd, skew);
-            Assert.True(testObj.Range.IsFinite());
+            Assert.True(testObj.Min.IsFinite());
+            Assert.True(testObj.Max.IsFinite());
         }
         /// <summary>
         /// Tests that valid parameters return the <see cref="Statistics.Distributions.LogPearson3"/> in a non-error state. A <see cref="Statistics.Distributions.LogPearson3.State"/> should be <see cref="IMessageLevels.Message"/> since a message is added describing the finite range of the object.
@@ -108,7 +109,8 @@ namespace StatisticsTests.Distributions
         {
             var testObj = new Statistics.Distributions.LogPearson3(mean, sd, skew);
             // testObj.CDF();
-            Assert.True(testObj.Range.IsFinite());
+            Assert.True(testObj.Min.IsFinite());
+            Assert.True(testObj.Max.IsFinite());
         }
         [Theory]
         [InlineData(.33d, 2d, 1d, 0.0000001d, 0.00023424651174493445)]//USGS-R SMWR
@@ -183,7 +185,7 @@ namespace StatisticsTests.Distributions
         {
             //https://github.com/xunit/xunit/issues/1293
             var testObj = new Statistics.Distributions.LogPearson3(mean, sd, skew);
-            double result = testObj.Range.Max;
+            double result = testObj.Max;
             double fraction = Math.Abs((output - result) / output);
 
             Assert.True(fraction < .01);
@@ -198,7 +200,7 @@ namespace StatisticsTests.Distributions
         public void LPIII_Minimums(double mean, double sd, double skew, double output)
         {
             var testObj = new Statistics.Distributions.LogPearson3(mean, sd, skew);
-            double result = testObj.Range.Min;
+            double result = testObj.Min;
             double fraction = Math.Abs((output - result) / output);
 
             Assert.True(fraction < .001);

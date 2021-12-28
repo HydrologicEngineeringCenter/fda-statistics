@@ -28,8 +28,6 @@ namespace Statistics
             {
                 case IDistributionEnum.Histogram:
                     throw new NotImplementedException("Parametrization is not implemented for histograms");
-                case IDistributionEnum.Beta4Parameters:
-                    return Distributions.Beta4Parameters.RequiredParameterization(true);
                 case IDistributionEnum.LogPearsonIII:
                     return Distributions.LogPearson3.RequiredParameterization(true);
                 case IDistributionEnum.Normal:
@@ -38,7 +36,6 @@ namespace Statistics
                     return Distributions.Triangular.RequiredParameterization(true);
                 case IDistributionEnum.Uniform:
                     return Distributions.Uniform.RequiredParameterization(true);
-                case IDistributionEnum.TruncatedBeta4Parameter:
                 case IDistributionEnum.TruncatedHistogram:
                 case IDistributionEnum.TruncatedNormal:
                 case IDistributionEnum.TruncatedTriangular:
@@ -66,8 +63,6 @@ namespace Statistics
                         return Distributions.Normal.Fit(sample);
                     case IDistributionEnum.Uniform:
                         return Distributions.Uniform.Fit(sample);
-                    case IDistributionEnum.Beta4Parameters:
-                        return Distributions.Beta4Parameters.Fit(sample);
                     case IDistributionEnum.Triangular:
                         return Distributions.Triangular.Fit(sample);
                     case IDistributionEnum.Histogram:
@@ -151,19 +146,6 @@ namespace Statistics
             return normal;
         }
         /// <summary>
-        /// Constructs a scaled beta distribution.
-        /// </summary>
-        /// <param name="alpha"> Exponential shape parameter, must be positive, alpha > 0. </param>
-        /// <param name="beta"> Exponential shape parameter, must be positive, beta > 0. </param>
-        /// <param name="location"> The lower bound or minimum of the scaled distribution (e.g. shift from an unscaled distribution). </param>
-        /// <param name="scale"> The range of the distribution (e.g. upper bound or maximum minus the lower bound or minimum), must be positive scale > 0. </param>
-        /// <param name="sampleSize"> An optional sample size parameter. If a population rather than sample distribution is intended leave this parameter blank. Set to <see cref="int.MaxValue"/> by default. </param>
-        /// <returns> A scaled beta distribution. </returns>
-        public static IDistribution FactoryBeta(double alpha, double beta, double location, double scale, int sampleSize = int.MaxValue)
-        {
-            return new Distributions.Beta4Parameters(alpha, beta, location, scale, sampleSize); 
-        }
-        /// <summary>
         /// Constructs a <see cref="IDistributionEnum.LogPearsonIII"/> <see cref="IDistribution"/>
         /// </summary>
         /// <param name="mean"> The mean of the logged distribution (or sample data). NOTE: this is the mean of the logged data, NOT the log of the mean. </param>
@@ -213,7 +195,8 @@ namespace Statistics
         {
             if (lpIII.IsNull()) throw new ArgumentNullException(nameof(lpIII));
             if (lpIII.Type != IDistributionEnum.LogPearsonIII) throw new ArgumentException($"The {nameof(FactoryTruncatedLogPearsonIII)} factory requires a {nameof(IDistributionEnum.LogPearsonIII)} {nameof(lpIII)} parameter, instead a {nameof(lpIII.Type)} was provided.");
-            return new Statistics.Distributions.LogPearson3(lpIII.Mean,lpIII.StandardDeviation,lpIII.Skewness, min, max, lpIII.SampleSize);
+            Statistics.Distributions.LogPearson3 ldist = (Statistics.Distributions.LogPearson3)lpIII;
+            return new Statistics.Distributions.LogPearson3(ldist.Mean,ldist.StandardDeviation,ldist.Skewness, min, max, lpIII.SampleSize);
         }
         /// <summary>
         /// Constructs a <see cref="IDistribution"/> bound on the range specified by the <paramref name="min"/> and <paramref name="max"/> values."/>
@@ -228,7 +211,8 @@ namespace Statistics
             switch (distribution.Type) 
             {
                 case IDistributionEnum.Normal:
-                    return FactoryTruncatedNormal(distribution.Mean, distribution.StandardDeviation, min, max, distribution.SampleSize);
+                    Statistics.Distributions.Normal ndist = (Statistics.Distributions.Normal)distribution;
+                    return FactoryTruncatedNormal(ndist.Mean, ndist.StandardDeviation, min, max, distribution.SampleSize);
                 case IDistributionEnum.LogPearsonIII:
                     return FactoryTruncatedLogPearsonIII(distribution, min, max);
                 default:

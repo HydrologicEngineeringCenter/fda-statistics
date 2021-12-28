@@ -11,31 +11,23 @@ namespace Statistics.Distributions
     public class Normal : IDistribution, Utilities.IValidate<Normal> //IOrdinate<IDistribution>
     {
         //TODO: Sample
-        #region Fields and Properties
+        #region Fields and Propertiesj
+        private double _mean;
+        private double _standardDeviation;
+        private double _min;
+        private double _max;
         internal IRange<double> _ProbabilityRange;
-        private MathNet.Numerics.Distributions.Normal _Distribution;
-        private bool _Constructed;
+
         #region IDistribution Properties
         public IDistributionEnum Type => IDistributionEnum.Normal;
         [Stored(Name = "Mean", type = typeof(double))]
-        public double Mean { get; set; }
-        public double Median => _Distribution.Median;
-        public double Mode => _Distribution.Mode;
-        public double Variance => _Distribution.Variance;
+         public double Mean { get{return _mean;} set{_mean = value;} }
         [Stored(Name = "Standard_Deviation", type = typeof(double))]
-        public double StandardDeviation { get; set; }
-        public double Skewness => _Distribution.Skewness;
-        public Utilities.IRange<double> Range { get; set; }
-        [Stored(Name = "Min", type = typeof(double))]
-        public double Min
-        {
-            get;set;
-        }
+        public double StandardDeviation { get{return _standardDeviation;} set{_standardDeviation = value;} }
+        [Stored(Name = "Min", type =typeof(double))]
+        public double Min { get{return _min;} set{_min = value;} }
         [Stored(Name = "Max", type = typeof(double))]
-        public double Max
-        {
-            get; set;
-        }
+        public double Max { get{return _max;} set{_max = value;} }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
         public int SampleSize { get; set; }
         [Stored(Name = "Truncated", type = typeof(bool))]
@@ -52,17 +44,28 @@ namespace Statistics.Distributions
         public Normal()
         {
             //for reflection;
-            _Distribution = new MathNet.Numerics.Distributions.Normal(0, 1);
-            _ProbabilityRange = FiniteRange(double.NegativeInfinity, double.PositiveInfinity);
+            Mean = 0;
+            StandardDeviation = 1.0;
+
+            if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
+            Min = InverseCDF(0.0000000000001);
+            Max = InverseCDF(1-0.0000000000001);
+            State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
         }
         public Normal(double mean, double sd, int sampleSize = int.MaxValue)
         {
             Mean = mean;
             StandardDeviation = sd;
             SampleSize = sampleSize;
-            Min = double.NegativeInfinity;
-            Max = double.PositiveInfinity;
-            BuildFromProperties();
+            if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
+            Min = InverseCDF(0.0000000000001);
+            Max = InverseCDF(1-0.0000000000001);
+            State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            Messages = msgs;
+
         }
         public Normal(double mean, double sd, double minValue, double maxValue, int sampleSize = int.MaxValue)
         {
@@ -72,21 +75,13 @@ namespace Statistics.Distributions
             Min = minValue;
             Max = maxValue;
             Truncated = true;
-            BuildFromProperties();
-            
-        }
-        public void BuildFromProperties()
-        {
             if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
-            _Distribution = new MathNet.Numerics.Distributions.Normal(Mean, StandardDeviation);
             _ProbabilityRange = FiniteRange(Min, Max);
-            Range = IRangeFactory.Factory(_Distribution.InverseCumulativeDistribution(_ProbabilityRange.Min), _Distribution.InverseCumulativeDistribution(_ProbabilityRange.Max));
-            Min = Range.Min;
-            Max = Range.Max;
             State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
-            _Constructed = true;
+            
         }
+
         #endregion
 
         #region Functions
@@ -96,42 +91,71 @@ namespace Statistics.Distributions
         }
         private IRange<double> FiniteRange(double min, double max)
         {
-            double pmin = 0, epsilon = 1 / 1000000000d;
+            double pmin = 0;
             double pmax = 1 - pmin;
-            if (min.IsFinite() || max.IsFinite())//not entirely sure how inclusive or works with one sided truncation and the while loop below.
+            if (min.IsFinite() || max.IsFinite())
             {
-                pmin = _Distribution.CumulativeDistribution(min);
-                pmax = _Distribution.CumulativeDistribution(max);
-            }
-            while (!(min.IsFinite() && max.IsFinite()))
-            {
-                pmin += epsilon;
-                pmax -= epsilon;
-                if (!min.IsFinite()) min = _Distribution.InverseCumulativeDistribution(pmin);
-                if (!max.IsFinite()) max = _Distribution.InverseCumulativeDistribution(pmax);
+                pmin = CDF(min);
+                pmax = CDF(max);
             }
             return IRangeFactory.Factory(pmin, pmax);
         }
         
         #region IDistribution Functions
-        public double PDF(double x) => _Distribution.Density(x);
-        public double CDF(double x) => _Distribution.CumulativeDistribution(x);
+        public double PDF(double x){
+            return Math.Exp(-(x-Mean)*(x-Mean)/(2.0*StandardDeviation*StandardDeviation))/(Math.Sqrt(2.0*Math.PI)*StandardDeviation);
+        }
+        public double CDF(double x){
+            if (x == Double.PositiveInfinity){
+			    return 1.0;
+            }
+            else if (x == Double.NegativeInfinity){
+                return 0.0;
+            }
+            else if(x>=Mean){
+                return 0.5*(1.0+SpecialFunctions.regIncompleteGamma(0.5, (x-Mean)*(x-Mean)/(2.0*StandardDeviation*StandardDeviation)));
+            }
+            else{
+                return 0.5*(1.0-SpecialFunctions.regIncompleteGamma(0.5, (x-Mean)*(x-Mean)/(2.0*StandardDeviation*StandardDeviation)));
+            }
+        }
         public double InverseCDF(double p)
         {
-            if (Truncated && _Constructed)
+            if (Truncated)
             {
                 //https://en.wikipedia.org/wiki/Truncated_normal_distribution
                 p = _ProbabilityRange.Min + (p) * (_ProbabilityRange.Max - _ProbabilityRange.Min);
             }
-            if (p <= _ProbabilityRange.Min) return Range.Min;
-            if (p >= _ProbabilityRange.Max) return Range.Max;
-            return _Distribution.InverseCumulativeDistribution(p);
+            if (p <= _ProbabilityRange.Min) return Min;
+            if (p >= _ProbabilityRange.Max) return Max;
+            return invCDFNewton(p, Mean, 1e-10,100);
         }
 
 
         public string Print(bool round = false) => round ? Print(Mean, StandardDeviation, SampleSize): $"Normal(mean: {Mean}, sd: {StandardDeviation}, sample size: {SampleSize})";
         public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
-        public bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print()) == 0 ? true : false;
+        public bool Equals(IDistribution distribution){
+            if (Type==distribution.Type){
+                Normal dist = (Normal)distribution;
+                if(SampleSize == dist.SampleSize){
+                    if(Mean==dist.Mean){
+                        if(StandardDeviation==dist.StandardDeviation){
+                            if( Truncated){
+                                if (Truncated == dist.Truncated){
+                                    if (Min == dist.Min){
+                                        if(Max == dist.Max){
+                                            return true;
+                                        }
+                                    }
+                                }
+                            }
+                            return true;
+                        }
+                    } 
+                }              
+            }
+            return false;
+        }
         #endregion
 
         internal static string Print(double mean, double sd, int n) => $"Normal(mean: {mean.Print()}, sd: {sd.Print()}, sample size: {n.Print()})";
@@ -147,19 +171,33 @@ namespace Statistics.Distributions
             return new Normal(stats.Mean, stats.StandardDeviation, stats.SampleSize);
         }
 
-        public XElement WriteToXML()
-        {
-            XElement ordinateElem = new XElement(SerializationConstants.NORMAL);
-            //mean
-            ordinateElem.SetAttributeValue(SerializationConstants.MEAN, Mean);
-            //st dev
-            ordinateElem.SetAttributeValue(SerializationConstants.ST_DEV, StandardDeviation);
-            //sample size
-            ordinateElem.SetAttributeValue(SerializationConstants.SAMPLE_SIZE, SampleSize);
-
-            return ordinateElem;
+        	/**
+	 * @param p = probability between 0 and 1
+	 * @return a value corresponding to the inverse of 
+	 *         cumulative probability distribution
+	 *         found using the Newton method
+	 *         This method is not guarantee to converge
+	 */
+	private double invCDFNewton(double p, double valGuess, double tolP, int maxIter){
+        double x=valGuess;
+        double testY = CDF(x)-p;
+        for(int i=0;i<maxIter;i++){
+        	
+        	double dfdx = PDF(x);
+        	if (Double.MinValue > Math.Abs(dfdx))
+        	{
+        		//this is a minimum or maximum. Can't get any closer
+        		return x;
+        	}
+        	
+            x = x - testY / dfdx;
+			testY = CDF(x)-p;
+            if(Math.Abs(testY) <= tolP){
+                return x;
+            } 
         }
-
+        return Double.NaN;
+	}
         #endregion
-    }
+}
 }

@@ -8,31 +8,26 @@ using Utilities.Serialization;
 
 namespace Statistics.Distributions
 {
-    internal class Triangular: IDistribution, IValidate<Triangular> 
+    public class Triangular: IDistribution, IValidate<Triangular> 
     {
         //TODO: Sample
         #region Fields and Properties
-        private MathNet.Numerics.Distributions.Triangular _Distribution;
-
+        private double _min;
+        private double _max;
+        private double _mostlikely;
         #region IDistribution Properties
         public IDistributionEnum Type => IDistributionEnum.Triangular;
-        public double Mean => _Distribution.Mean;
-        public double Median => _Distribution.Median;
-        public double Variance => _Distribution.Variance;
-        public double StandardDeviation => _Distribution.StdDev;
-        public double Skewness => _Distribution.Skewness;
-        public IRange<double> Range { get; set; }
-        [Stored(Name = "Min", type = typeof(double))]
-        public double Min { get; set; }
+        [Stored(Name = "Min", type =typeof(double))]
+        public double Min { get{return _min;} set{_min = value;} }
         [Stored(Name = "Max", type = typeof(double))]
-        public double Max { get; set; }
+        public double Max { get{return _max;} set{_max = value;} }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
         public int SampleSize { get; set; }
         public bool Truncated { get; set; }
         public IMessageLevels State { get; private set; }
         public IEnumerable<IMessage> Messages { get; private set; }
         [Stored(Name = "MostLikely", type = typeof(double))]
-        public double Mode { get; set; }
+        public double MostLikely{ get{return _mostlikely;} set{_mostlikely = value;} }
         #endregion
         #endregion
 
@@ -42,29 +37,16 @@ namespace Statistics.Distributions
             //for reflection
             Min = 0;
             Max = 1;
-            Mode = .5;
+            MostLikely = .5;
             SampleSize = 0;
-            BuildFromProperties();
         }
         public Triangular(double min, double mode, double max, int sampleSize = int.MaxValue)
         {
             Min = min;
             Max = max;
             SampleSize = sampleSize;
-            Mode = mode;IRange<double> range = IRangeFactory.Factory(min, max,true, true, true, false);
-            BuildFromProperties();
-        }
-        public void BuildFromProperties()
-        {
-            IRange<double> range = IRangeFactory.Factory(Min, Max, true, true, true, false);
-            if (!Validation.TriangularValidator.IsConstructable(Mode, range, out string error)) throw new InvalidConstructorArgumentsException(error);
-            else
-            {
-                _Distribution = new MathNet.Numerics.Distributions.Triangular(Min, Max, Mode);
-                Range = range;
-                State = Validate(new Validation.TriangularValidator(), out IEnumerable<IMessage> msgs);
-                Messages = msgs;
-            }
+            MostLikely = mode;
+            if (!Validation.TriangularValidator.IsConstructable(MostLikely, min, max, out string error)) throw new InvalidConstructorArgumentsException(error);
         }
         #endregion
 
@@ -84,17 +66,61 @@ namespace Statistics.Distributions
         internal static string RequirementNotes() => "The mode parameter is also sometimes referred to as the most likely value.";
         
         #region IDistribution Functions
-        public double PDF(double x) => _Distribution.Density(x);
-        public double CDF(double x) =>  _Distribution.CumulativeDistribution(x);
-        public double InverseCDF(double p) => p.IsOnRange(0,1) ? _Distribution.InverseCumulativeDistribution(p): throw new ArgumentOutOfRangeException($"The specified probability parameter, p: {p} is invalid because it it not on the valid range [0, 1].");
-
-        public string Print(bool round = false) => round ? Print(_Distribution.Mode, Range) : $"Triangular(mode: {_Distribution.Mode}, range: {Range.Print()}, sample size: {SampleSize})";
+        public double PDF(double x){
+            if(x<Min){
+                return 0;
+            }else if(x<=MostLikely){
+                return 2*(x-Min)/((Max-Min)*(MostLikely-Min));
+            }else if(x<=Max){
+                return 2*(Max-x)/((Max-Min)*(Max-MostLikely));
+            }else{
+                return 0;
+            }
+        }
+        public double CDF(double x){
+            if(x<Min){
+                return 0;
+            }else if (x<= MostLikely){
+                return Math.Pow(x-Min,2)/((Max-Min)*(MostLikely-Min));
+            }else if(x <= Max){
+                return 1- Math.Pow(Max-x,2)/((Max-Min)*(Max-MostLikely));
+            }else{
+                return 1;
+            }
+        }
+        public double InverseCDF(double p){
+            double a = MostLikely - Min;
+            double b = Max - MostLikely;
+            if (p <= 0){
+                return Min;
+            }else if(p<a/(Max-Min)){
+                return Min + Math.Sqrt(p*(Max-Min)*a);
+            }else if( p<1){
+                return Max - Math.Sqrt((1-p)*(Max-Min)*b);
+            }else{
+                return Max;
+            }
+        }
+        public string Print(bool round = false){
+           return "Tringular(parameters: {Min:"+Min+", Max:"+Max+", Mostlikely:"+MostLikely+"})";
+        }
         public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
-        public bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print()) == 0 ? true : false;
+        public bool Equals(IDistribution distribution){
+            if (Type==distribution.Type){
+                Triangular dist = (Triangular)distribution;
+                if (Min == dist.Min){
+                    if(Max == dist.Max){
+                        if(SampleSize == dist.SampleSize){
+                            if(MostLikely== dist.MostLikely){
+                                return true;
+                            }
+                        } 
+                    }
+                }                
+            }
+            return false;
+        }
         #endregion
-
-
-
         public static Triangular Fit(IEnumerable<double> sample)
         {
             IData data = sample.IsNullOrEmpty() ? throw new ArgumentNullException(nameof(sample)) : IDataFactory.Factory(sample);
@@ -103,20 +129,6 @@ namespace Statistics.Distributions
             return new Triangular(stats.Range.Min, stats.Mean, stats.Range.Max, stats.SampleSize);
         }
 
-        public XElement WriteToXML()
-        {
-            XElement ordinateElem = new XElement(SerializationConstants.TRIANGULAR);
-            //min
-            ordinateElem.SetAttributeValue(SerializationConstants.MIN, Range.Min);
-            //most likely
-            ordinateElem.SetAttributeValue(SerializationConstants.MODE, Mode);
-            //max
-            ordinateElem.SetAttributeValue(SerializationConstants.MAX, Range.Max);
-            //sample size
-            ordinateElem.SetAttributeValue(SerializationConstants.SAMPLE_SIZE, SampleSize);
-
-            return ordinateElem;
-        }
         #endregion
     }
 }
