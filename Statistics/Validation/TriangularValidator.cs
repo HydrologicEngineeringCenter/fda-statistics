@@ -27,23 +27,23 @@ namespace Statistics.Validation
             return msgs;
         }
 
-        internal static bool IsConstructable(double mode, IRange<double> range, out string msg)
+        internal static bool IsConstructable(double mostlikely, double min, double max, out string msg)
         {
-            msg = ReportFatalError(mode, range);
+            msg = ReportFatalError(mostlikely, min,max);
             return msg.Length == 0;
         }
-        private static string ReportFatalError(double mode, IRange<double> range)
+        private static string ReportFatalError(double mode, double min, double max)
         {
             string msg = "";
-            if (range.IsNull()) msg += "The triangular distribution cannot be constructed because it range is null.";
+            if (min==max && max == mode) msg += "The triangular distribution cannot be constructed because it range is null.";
 
             bool isModeInfinite = !mode.IsFinite();
-            bool doesRangeHaveErrorMessages = range.Messages.Max() > IMessageLevels.Message;
-            bool isNotOnRange = !ValidationExtensions.IsOnRange(mode, range.Min, range.Max);
+            bool doesRangeHaveErrorMessages = max<=min;
+            bool isNotOnRange = !ValidationExtensions.IsOnRange(mode, min, max);
 
             if (isModeInfinite || doesRangeHaveErrorMessages || isNotOnRange)
             {
-                msg += $"{Resources.FatalParameterizationNotice(Triangular.Print(mode, range))} {Triangular.RequiredParameterization(true)} {Resources.SampleSizeSuggestion()}";
+                msg += $"{Triangular.RequiredParameterization(true)} {Resources.SampleSizeSuggestion()}";
             }
             return msg;
         }

@@ -46,6 +46,7 @@ namespace Statistics.Distributions
             Max = max;
             SampleSize = sampleSize;
             MostLikely = mode;
+            if (!Validation.TriangularValidator.IsConstructable(MostLikely, min, max, out string error)) throw new InvalidConstructorArgumentsException(error);
         }
         #endregion
 
