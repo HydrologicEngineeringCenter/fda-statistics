@@ -46,10 +46,11 @@ namespace Statistics.Distributions
             //for reflection;
             Mean = 0;
             StandardDeviation = 1.0;
-            Min = double.NegativeInfinity;
-            Max = double.PositiveInfinity;
+
             if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
+            Min = InverseCDF(0.0000000000001);
+            Max = InverseCDF(1-0.0000000000001);
             State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
         }
@@ -58,10 +59,10 @@ namespace Statistics.Distributions
             Mean = mean;
             StandardDeviation = sd;
             SampleSize = sampleSize;
-            Min = double.NegativeInfinity;
-            Max = double.PositiveInfinity;
             if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
+                        Min = InverseCDF(0.0000000000001);
+            Max = InverseCDF(1-0.0000000000001);
             State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
 
