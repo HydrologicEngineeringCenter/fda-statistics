@@ -122,6 +122,11 @@ namespace Statistics
                     
                 }
             }
+            if(dist.Type==Statistics.IDistributionEnum.LogPearsonIII){
+                Statistics.Distributions.LogPearson3 lp3 = (Statistics.Distributions.LogPearson3)dist;
+                lp3.BuildFromProperties();
+                return lp3 as Statistics.IDistribution;
+            }
             return dist;
         }
     }

@@ -22,7 +22,6 @@ namespace Statistics.Distributions
         public double StandardDeviation { get; set; }
         [Stored(Name = "Skew", type = typeof(double))]
         public double Skewness { get; set; }
-        public Utilities.IRange<double> Range { get; set; }
         [Stored(Name = "Min", type = typeof(double))]
         public double Min
         {
@@ -86,10 +85,7 @@ namespace Statistics.Distributions
             if (!Validation.LogPearson3Validator.IsConstructable(Mean, StandardDeviation, Skewness, SampleSize, out string error)) throw new Utilities.InvalidConstructorArgumentsException(error);
             else
             {
-                _ProbabilityRange = FiniteRange(Min, Max);
-                Range = IRangeFactory.Factory(InverseCDF(_ProbabilityRange.Min), InverseCDF(_ProbabilityRange.Max));
-                Min = Range.Min;
-                Max = Range.Max;
+               SetProbabilityRangeAndMinAndMax(Min, Max);
                 State = Validate(new Validation.LogPearson3Validator(), out IEnumerable<Utilities.IMessage> msgs);
                 Messages = msgs;
             }
@@ -104,7 +100,7 @@ namespace Statistics.Distributions
             return validator.IsValid(this, out msgs);
         }
 
-        private IRange<double> FiniteRange(double min = double.NegativeInfinity, double max = double.PositiveInfinity)
+        private void SetProbabilityRangeAndMinAndMax(double min, double max)
         {
             double pmin = 0, epsilon = 1 / 1000000000d;
             double pmax = 1 - pmin;
@@ -115,7 +111,7 @@ namespace Statistics.Distributions
             }
             else
             {
-                pmin = .0000001;
+                pmin = .0000000001;
                 pmax = 1 - pmin;
                 min = InverseCDF(pmin);
                 max = InverseCDF(pmax);
@@ -129,13 +125,15 @@ namespace Statistics.Distributions
                 if (pmin > 0.25)
                     throw new InvalidConstructorArgumentsException($"The log Pearson III object is not constructable because 50% or more of its distribution returns {double.NegativeInfinity} and {double.PositiveInfinity}.");
             }
-            return IRangeFactory.Factory(pmin, pmax);
-
+            //apparently we have done everything we need at this point.
+            Max = max;
+            Min = min;
+            _ProbabilityRange = IRangeFactory.Factory(pmin, pmax);
         }
         #region IDistribution Functions
         public double PDF(double x)
         {
-            if (x < Range.Min || x > Range.Max) return double.Epsilon;
+            if (x < Min || x > Max) return double.Epsilon;
             else
             {
                 PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
@@ -145,10 +143,10 @@ namespace Statistics.Distributions
         }
         public double CDF(double x)
         {
-            if (x < Range.Min) return 0;
-            if (x == Range.Min) return _ProbabilityRange.Min;
-            if (x == Range.Max) return _ProbabilityRange.Max;
-            if (x > Range.Max) return 1;
+            if (x < Min) return 0;
+            if (x == Min) return _ProbabilityRange.Min;
+            if (x == Max) return _ProbabilityRange.Max;
+            if (x > Max) return 1;
             if (x > 0)
             {
                 PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
@@ -168,14 +166,10 @@ namespace Statistics.Distributions
             }
             else // Range has been set check p against [_ProbabilityRange.Min, _ProbabilityRange.Max]
             {
-                if (Range.IsNull()) // object is being constructued
-                { 
-                    if (p < 0 || p > 1) throw new ArgumentException($"The value of specified probability parameter: {p} is invalid because it is not on the valid probability range: [0, 1].");
-                }
-                else
+                if (_Constructed) // object is constructed
                 {
-                    if (p <= _ProbabilityRange.Min) return Range.Min;
-                    if (p >= _ProbabilityRange.Max) return Range.Max;
+                    if (p <= _ProbabilityRange.Min) return Min;
+                    if (p >= _ProbabilityRange.Max) return Max;
                 }
             }
             PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
