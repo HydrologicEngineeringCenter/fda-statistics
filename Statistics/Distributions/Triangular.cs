@@ -104,7 +104,21 @@ namespace Statistics.Distributions
            return "Tringular(parameters: {Min:"+Min+", Max:"+Max+", Mostlikely:"+MostLikely+"})";
         }
         public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
-        public bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print()) == 0 ? true : false;
+        public bool Equals(IDistribution distribution){
+            if (Type==distribution.Type){
+                Triangular dist = (Triangular)distribution;
+                if (Min == dist.Min){
+                    if(Max == dist.Max){
+                        if(SampleSize == dist.SampleSize){
+                            if(MostLikely== dist.MostLikely){
+                                return true;
+                            }
+                        } 
+                    }
+                }                
+            }
+            return false;
+        }
         #endregion
         public static Triangular Fit(IEnumerable<double> sample)
         {

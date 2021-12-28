@@ -78,7 +78,20 @@ namespace Statistics.Distributions
            return "Uniform(range: {Min:"+Min+", Max:"+Max+"})";
         }
         public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
-        public bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print()) == 0 ? true : false;
+        public bool Equals(IDistribution distribution){
+            if (Type==distribution.Type){
+                Uniform dist = (Uniform)distribution;
+                if (Min == dist.Min)
+                {
+                    if(Max == dist.Max){
+                        if(SampleSize == dist.SampleSize){
+                            return true;
+                        } 
+                    }
+                }                
+            }
+            return false;
+        }
         #endregion
 
         internal static string Print(IRange<double> range) => $"Uniform(range: {range.Print(true)})";

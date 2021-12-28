@@ -11,10 +11,11 @@ namespace StatisticsTests.Distributions
     {
         [Theory]
         [InlineData(0d, 1d)]
-        public void GoodDataParameters_Return_ExpectedMean(double min, double max)
+        public void GoodDataParameters_Set_Properly(double min, double max)
         {
-            var testObj = new Statistics.Distributions.Uniform(0, 1);
-            Assert.Equal(0.5d, testObj.Mean, 2);
+            var testObj = new Statistics.Distributions.Uniform(min, max);
+            Assert.Equal(min, testObj.Min, 2);
+            Assert.Equal(max, testObj.Max, 2);
         }
 
     }

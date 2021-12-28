@@ -130,7 +130,23 @@ namespace Statistics.Distributions
 
         public string Print(bool round = false) => round ? Print(Mean, StandardDeviation, SampleSize): $"Normal(mean: {Mean}, sd: {StandardDeviation}, sample size: {SampleSize})";
         public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
-        public bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print()) == 0 ? true : false;
+        public bool Equals(IDistribution distribution){
+            if (Type==distribution.Type){
+                Normal dist = (Normal)distribution;
+                if (Min == dist.Min){
+                    if(Max == dist.Max){
+                        if(SampleSize == dist.SampleSize){
+                            if(Mean==dist.Mean){
+                                if(StandardDeviation==dist.StandardDeviation){
+                                    return true;
+                                }
+                            } 
+                        } 
+                    }
+                }                
+            }
+            return false;
+        }
         #endregion
 
         internal static string Print(double mean, double sd, int n) => $"Normal(mean: {mean.Print()}, sd: {sd.Print()}, sample size: {n.Print()})";

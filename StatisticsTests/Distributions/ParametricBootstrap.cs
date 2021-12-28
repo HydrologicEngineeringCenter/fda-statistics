@@ -21,7 +21,8 @@ namespace StatisticsTests.Distributions
                 randyPacket[i] = ((double)i +0.5) / (double)dist.SampleSize;
             }
             Statistics.IDistribution bootstrap = dist.Sample(randyPacket);
-            Assert.Equal(.5, bootstrap.Mean);
+            Statistics.Distributions.Uniform bu = (Statistics.Distributions.Uniform)bootstrap;
+            Assert.Equal(.5, (bu.Min+bu.Max)/2);
             Assert.Equal(IDistributionEnum.Uniform, bootstrap.Type);
         }
 
@@ -37,7 +38,8 @@ namespace StatisticsTests.Distributions
                 randomNumberArray[i] = random.NextDouble();
             }
             IDistribution testBootstrapDistribution = distributionLP3.Sample(randomNumberArray);
-            double actual = testBootstrapDistribution.Mean;
+            Statistics.Distributions.LogPearson3 tbd = (Statistics.Distributions.LogPearson3)testBootstrapDistribution;
+            double actual = tbd.Mean;
             double difference = expected - actual;
             double relativeDifference = difference / expected;
             Assert.True(relativeDifference < .05);
