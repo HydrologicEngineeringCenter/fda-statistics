@@ -10,7 +10,7 @@ namespace Statistics.Distributions
 {
     public class LogPearson3: IDistribution, IValidate<LogPearson3> 
     {
-        internal PearsonIII _Distribution;
+        
         internal IRange<double> _ProbabilityRange;
         private bool _Constructed;
 
@@ -18,8 +18,6 @@ namespace Statistics.Distributions
         public IDistributionEnum Type => IDistributionEnum.LogPearsonIII;
         [Stored(Name = "Mean", type = typeof(double))]
         public double Mean { get; set; }
-        public double Median { get; set;}
-        public double Variance { get; set; }
         [Stored(Name = "St_Dev", type = typeof(double))]
         public double StandardDeviation { get; set; }
         [Stored(Name = "Skew", type = typeof(double))]
@@ -88,9 +86,6 @@ namespace Statistics.Distributions
             if (!Validation.LogPearson3Validator.IsConstructable(Mean, StandardDeviation, Skewness, SampleSize, out string error)) throw new Utilities.InvalidConstructorArgumentsException(error);
             else
             {
-                _Distribution = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
-                Variance = Math.Pow(StandardDeviation, 2);
-                Median = InverseCDF(0.50);
                 _ProbabilityRange = FiniteRange(Min, Max);
                 Range = IRangeFactory.Factory(InverseCDF(_ProbabilityRange.Min), InverseCDF(_ProbabilityRange.Max));
                 Min = Range.Min;
@@ -143,7 +138,8 @@ namespace Statistics.Distributions
             if (x < Range.Min || x > Range.Max) return double.Epsilon;
             else
             {
-                return _Distribution.PDF(Math.Log10(x))/x/Math.Log(10);
+                PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
+                return d.PDF(Math.Log10(x))/x/Math.Log(10);
 
             }          
         }
@@ -155,7 +151,8 @@ namespace Statistics.Distributions
             if (x > Range.Max) return 1;
             if (x > 0)
             {
-                return _Distribution.CDF(Math.Log10(x));
+                PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
+                return d.CDF(Math.Log10(x));
             }
             else return 0;
         }
@@ -181,7 +178,8 @@ namespace Statistics.Distributions
                     if (p >= _ProbabilityRange.Max) return Range.Max;
                 }
             }
-            return Math.Pow(10, _Distribution.InverseCDF(p));
+            PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
+            return Math.Pow(10, d.InverseCDF(p));
         }
         public string Print(bool round = false) => round ? Print(Mean, StandardDeviation, Skewness, SampleSize) : $"log PearsonIII(mean: {Mean}, sd: {StandardDeviation}, skew: {Skewness}, sample size: {SampleSize})";
         public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
