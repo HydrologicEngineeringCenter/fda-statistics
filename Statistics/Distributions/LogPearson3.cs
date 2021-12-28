@@ -102,7 +102,8 @@ namespace Statistics.Distributions
 
         private void SetProbabilityRangeAndMinAndMax(double min, double max)
         {
-            double pmin = 0, epsilon = 1 / 1000000000d;
+            double pmin = 0;
+            double epsilon = 1 / 1000000000d;
             double pmax = 1 - pmin;
             if (min.IsFinite() || max.IsFinite())//not entirely sure how inclusive or works with one sided truncation and the while loop below.
             {
@@ -111,7 +112,7 @@ namespace Statistics.Distributions
             }
             else
             {
-                pmin = .0000000001;
+                pmin = .0000001;
                 pmax = 1 - pmin;
                 min = InverseCDF(pmin);
                 max = InverseCDF(pmax);
