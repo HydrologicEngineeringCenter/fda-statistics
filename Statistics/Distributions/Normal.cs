@@ -61,7 +61,7 @@ namespace Statistics.Distributions
             SampleSize = sampleSize;
             if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
-                        Min = InverseCDF(0.0000000000001);
+            Min = InverseCDF(0.0000000000001);
             Max = InverseCDF(1-0.0000000000001);
             State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
