@@ -81,7 +81,7 @@ namespace StatisticsTests.Histograms
             Assert.Equal(expected, actual,3);//this gives much more meaningful error reporting
         }
         [Theory]
-        [InlineData(1, 1.58113883)]
+        [InlineData(1, 1.414214)]//verified in excel with =STDEV.P(data) incidentally =SQRT(VAR(data)) yeilds 1.581139 which can be achived by not backing out n-1/n when calcuating variance.
         public void HistogramStatistics_StandardDeviation(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
