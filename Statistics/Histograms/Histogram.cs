@@ -56,7 +56,7 @@ namespace Statistics.Histograms
         }
         public double Variance {
             get{
-                return _sampleVariance*((_n-1)/_n);
+                return _sampleVariance*(double)((double)(_n-1)/(double)_n);
             }
         }
         public double StandardDeviation { 
