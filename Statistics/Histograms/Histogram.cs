@@ -165,8 +165,8 @@ namespace Statistics.Histograms
                 if (observation>_actualMax) _actualMax = observation;
                 if (observation<_actualMin) _actualMin = observation;
                 _n +=1;
-                double tmpMean = _mean +((observation -_mean)/_n);
-                _sampleVariance = ((((_n-2)/(_n-1))*_sampleVariance)+(Math.Pow(observation-_mean,2))/_n);
+                double tmpMean = _mean +((observation -_mean)/(double)_n);
+                _sampleVariance = ((((double)(_n-2)/(double)(_n-1))*_sampleVariance)+(Math.Pow(observation-_mean,2))/(double)_n);
                 _mean = tmpMean;
             }
             Int64 quantityAdditionalBins = 0;

@@ -78,7 +78,7 @@ namespace StatisticsTests.Histograms
             //double err = Math.Abs((expected - actual) / expected);
             //double tol = 0.01;
             //Assert.True(err < tol);//this gives meaningless error reporting in stacktraces
-            Assert.Equal(actual,expected,3);//this gives much more meaningful error reporting
+            Assert.Equal(expected, actual,3);//this gives much more meaningful error reporting
         }
         [Theory]
         [InlineData(1, 1.58113883)]
@@ -87,7 +87,7 @@ namespace StatisticsTests.Histograms
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
             Histogram histogram = new Histogram(data, binWidth);
             double actual = histogram.StandardDeviation;
-            Assert.Equal(actual,expected,5);//this gives much more meaningful error reporting
+            Assert.Equal(expected,actual,5);//this gives much more meaningful error reporting
         }
         [Theory]
         [InlineData(1, 0.4, 2.25)]
