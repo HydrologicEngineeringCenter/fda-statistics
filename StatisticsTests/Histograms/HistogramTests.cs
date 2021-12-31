@@ -19,8 +19,7 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_Minimum(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            IData obs = new Data(data);
-            Histogram histogram = new Histogram(obs, binWidth);
+            Histogram histogram = new Histogram(data, binWidth);
             double actual = histogram.Min;
             Assert.Equal(expected, actual);
         }
@@ -30,11 +29,8 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_AddedData_Minimum(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            IData obs = new Data(data);
-            Histogram histogram = new Histogram(obs, binWidth);
-            double[] additionalData = new double[1] { 0 };
-            IData additionalObs = new Data(additionalData);
-            histogram.AddObservationsToHistogram(additionalObs);
+            Histogram histogram = new Histogram(data, binWidth);
+            histogram.AddObservationToHistogram(0);
             double actual = histogram.Min;
             Assert.Equal(expected, actual);
         }
@@ -44,8 +40,7 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_Maximum(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            IData obs = new Data(data);
-            Histogram histogram = new Histogram(obs, binWidth);
+            Histogram histogram = new Histogram(data, binWidth);
             double actual = histogram.Max;
             Assert.Equal(expected, actual);
         }
@@ -55,11 +50,8 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_AddedData_Maximum(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            IData obs = new Data(data);
-            Histogram histogram = new Histogram(obs, binWidth);
-            double[] additionalData = new double[1] { 6 };
-            IData additionalObs = new Data(additionalData);
-            histogram.AddObservationsToHistogram(additionalObs);
+            Histogram histogram = new Histogram(data, binWidth);
+            histogram.AddObservationToHistogram(6);
             double actual = histogram.Max;
             Assert.Equal(expected, actual);
         }
@@ -70,8 +62,7 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_Mean(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            IData obs = new Data(data);
-            Histogram histogram = new Histogram(obs, binWidth);
+            Histogram histogram = new Histogram(data, binWidth);
             double actual = histogram.Mean;
             Assert.Equal(expected, actual);
         }
@@ -82,8 +73,7 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_StandardDeviation(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            IData obs = new Data(data);
-            Histogram histogram = new Histogram(obs, binWidth);
+            Histogram histogram = new Histogram(data, binWidth);
             double actual = histogram.StandardDeviation;
             double err = Math.Abs((expected - actual) / expected);
             double tol = 0.01;
@@ -95,8 +85,7 @@ namespace StatisticsTests.Histograms
         public void Histogram_InvCDF(double binWidth, double prob, double expected)
         {
             double[] data = new double[14] {0,0,1,1,1,2,2,2,2,3,3,3,4,4};
-            IData obs = new Data(data);
-            Histogram histogram = new Histogram(obs, binWidth);
+            Histogram histogram = new Histogram(data, binWidth);
             double actual = histogram.InverseCDF(prob);
             double err = Math.Abs((expected - actual) / expected);
             double tol = 0.01;
@@ -108,8 +97,7 @@ namespace StatisticsTests.Histograms
         public void Histogram_CDF(double binWidth, double val, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            IData obs = new Data(data);
-            Histogram histogram = new Histogram(obs, binWidth);
+            Histogram histogram = new Histogram(data, binWidth);
             double actual = histogram.CDF(val);
             double err = Math.Abs((expected - actual) / expected);
             double tol = 0.01;
@@ -122,8 +110,7 @@ namespace StatisticsTests.Histograms
         public void Histogram_PDF(double binWidth, double val, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            IData obs = new Data(data);
-            Histogram histogram = new Histogram(obs, binWidth);
+            Histogram histogram = new Histogram(data, binWidth);
             double actual = histogram.PDF(val);
             double err = Math.Abs((expected - actual) / expected);
             double tol = 0.01;
@@ -135,11 +122,9 @@ namespace StatisticsTests.Histograms
         public void Fit_ExpandsHistogram_WithDataOutOfRange(double binWidth)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            IData obs = new Data(data);
-            Histogram histogram = new Histogram(obs, binWidth);
+            Histogram histogram = new Histogram(data, binWidth);
             double[] newData = new double[2] { 7, 9 };
-            IData newObs = new Data(newData);
-            histogram.AddObservationsToHistogram(newObs);
+            histogram.AddObservationsToHistogram(newData);
             double expected = 10;
             double actual = histogram.Max;
             Assert.Equal(expected, actual);
@@ -160,8 +145,7 @@ namespace StatisticsTests.Histograms
                 var randProb = rand.NextDouble();
                 data[i] = stdNormal.InverseCDF(randProb);
             }
-            IData obs = new Data(data);
-            histogram.AddObservationsToHistogram(obs);
+            histogram.AddObservationsToHistogram(data);
             double actual = histogram.CDF(value);
             double err = Math.Abs((expected - actual) / expected);
             double errTol = 0.01;
@@ -181,12 +165,11 @@ namespace StatisticsTests.Histograms
                 var randProb = rand.NextDouble();
                 data[i] = stdNormal.InverseCDF(randProb);
             }
-            IData obs = new Data(data);
-            histogram.AddObservationsToHistogram(obs);
+            histogram.AddObservationsToHistogram(data);
             double actualMean = histogram.Mean;
             double meanErr = Math.Abs((expectedMean - actualMean) / actualMean);
 
-            double actualMedian = histogram.Median;
+            double actualMedian = histogram.InverseCDF(.5);
             double medianErr = Math.Abs((expectedMedian - actualMedian) / actualMedian);
 
             double errTol = 0.01;
@@ -200,9 +183,7 @@ namespace StatisticsTests.Histograms
         public void IsHistogramConstructableWithNullData(double binWidth, double expected)
         {
             Histogram histogram = new Histogram(null, binWidth);
-            double[] obsToAdd = new double[1] { .05 };
-            IData data = new Data(obsToAdd);
-            histogram.AddObservationToHistogram(data);
+            histogram.AddObservationToHistogram(.05);
             double actual = histogram.BinCounts[0];
             Assert.Equal(expected, actual);
         }
