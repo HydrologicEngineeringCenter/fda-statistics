@@ -63,7 +63,7 @@ namespace StatisticsTests.Histograms
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
             Histogram histogram = new Histogram(data, binWidth);
-            double actual = histogram.Mean;
+            double actual = histogram.HistogramMean();
             Assert.Equal(expected, actual);
         }
 
@@ -74,10 +74,11 @@ namespace StatisticsTests.Histograms
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
             Histogram histogram = new Histogram(data, binWidth);
-            double actual = histogram.StandardDeviation;
-            double err = Math.Abs((expected - actual) / expected);
-            double tol = 0.01;
-            Assert.True(err < tol);
+            double actual = histogram.HistogramStandardDeviation();
+            //double err = Math.Abs((expected - actual) / expected);
+            //double tol = 0.01;
+            //Assert.True(err < tol);//this gives meaningless error reporting in stacktraces
+            Assert.Equal(actual,expected,5);//this gives much more meaningful error reporting
         }
 
         [Theory]

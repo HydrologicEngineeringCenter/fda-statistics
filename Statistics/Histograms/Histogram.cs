@@ -124,6 +124,35 @@ namespace Statistics.Histograms
             return skewness;
         }
         #region Functions
+        public double HistogramMean()
+        {           
+            double sum = 0;
+            double min = Min;
+                for (int i = 0; i < BinCounts.Length; i++)
+                {
+                    sum += (min + (i * BinWidth) + (0.5 * BinWidth)) * BinCounts[i];
+                }
+            double mean = SampleSize > 0 ? sum / SampleSize : double.NaN;
+            return mean;
+        }
+        public double HistogramVariance()
+        {
+            double deviation = 0, deviation2 = 0;
+
+            for (int i = 0; i < BinCounts.Length; i++)
+            {
+                double midpoint = Min + (i * BinWidth) + (0.5 * BinWidth);
+
+                deviation = midpoint - Mean;
+                deviation2 += deviation * deviation;
+
+            }
+            double variance = SampleSize > 1 ? deviation2 / (SampleSize - 1) : 0;
+            return variance;
+        }
+        public double HistogramStandardDeviation(){
+            return Math.Sqrt(HistogramVariance());
+        }
         public void AddObservationToHistogram(double observation)
         {   
             if (_n == 0){
