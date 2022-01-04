@@ -7,7 +7,7 @@ using Utilities;
 
 namespace Statistics.Distributions
 {
-    class Graphical : IDistribution
+    class Graphical
     {
         #region Fields
         private int _SampleSize;
@@ -111,22 +111,9 @@ namespace Statistics.Distributions
 
 
         #region Methods
-        public double CDF(double x)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public bool Equals(IDistribution distribution)
-        {
-            throw new NotImplementedException();
-        }
-
-        public double InverseCDF(double p)
-        {
-            throw new NotImplementedException();
-        }
-
-        public double PDF(double x)
         {
             throw new NotImplementedException();
         }
