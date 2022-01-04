@@ -21,7 +21,7 @@ namespace Statistics.Distributions
         /// </summary>
         private double[] _InputFlowOrStageValues;
         /// <summary>
-        /// _ExceedanceProbabilities represent the interpolated and extrapolated set of exceedance probabilities 
+        /// _ExceedanceProbabilities represent the interpolated and extrapolated set of exceedance probabilities. this should probably always be the same.  
         /// </summary>
         private double[] _ExceedanceProbabilities;
         /// <summary>
@@ -101,18 +101,87 @@ namespace Statistics.Distributions
         #region Constructor 
 
         #endregion
-        public Graphical(double[] exceedanceProbabilities, double[] flowOrStageValues, int equivalentRecordLength, bool usingFlows = false)
+        public Graphical(double[] exceedanceProbabilities, double[] flowOrStageValues, int equivalentRecordLength, bool usingFlows = false, bool flowsAreLogged = false)
         {
+            //1. Check for null data and check for monotonicity 
+            if(exceedanceProbabilities != null && flowOrStageValues != null)
+            {
+                if (!IsMonotonicallyDecreasing(exceedanceProbabilities))
+                {
+                    Array.Sort(exceedanceProbabilities);
+                }
+                if (!IsMonotonicallyIncreasing(flowOrStageValues))
+                {
+                    Array.Sort(flowOrStageValues);
+                }
+            }
+
             _SampleSize = equivalentRecordLength;
             _UsingFlows = usingFlows;
             _InputExceedanceProbabilities = exceedanceProbabilities;
-            _InputFlowOrStageValues = flowOrStageValues;
+
+            //2. Log flows if using flows 
+            if (usingFlows)
+            {
+                if (flowsAreLogged == true)
+                {
+                    _InputFlowOrStageValues = LogFlows(flowOrStageValues);
+                } else
+                {
+                    _InputFlowOrStageValues = flowOrStageValues;
+                }
+            } else
+            {
+                _InputFlowOrStageValues = flowOrStageValues;
+            }
+        }
+
+        #region Private Methods
+        public bool IsMonotonicallyIncreasing(double[] arrayOfData)
+        {
+
+            for (int i = 0; i < arrayOfData.Length - 1; i++)
+            {
+                if (arrayOfData[i] >= arrayOfData[i + 1])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public bool IsMonotonicallyDecreasing(double[] arrayOfData)
+        {
+
+            for (int i = 0; i < arrayOfData.Length - 1; i++)
+            {
+                if (arrayOfData[i] <= arrayOfData[i + 1])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        private double[] LogFlows(double[] unloggedFlows)
+        {
+            double[] loggedFlows = new double[unloggedFlows.Length];
+            double minFlow = 0.01; //for log conversion not to fail 
+            for (int i = 0; i<unloggedFlows.Length; i++)
+            {
+                if (unloggedFlows[i] < minFlow)
+                {
+                    loggedFlows[i] = Math.Log10(minFlow);
+                } else
+                {
+                    loggedFlows[i] = Math.Log10(unloggedFlows[i]);
+                }
+            }
+            return loggedFlows;
         }
 
 
-        #region Methods
+        #endregion
 
-
+        #region Public Methods
         public bool Equals(IDistribution distribution)
         {
             throw new NotImplementedException();
