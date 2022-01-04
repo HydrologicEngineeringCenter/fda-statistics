@@ -46,17 +46,21 @@ namespace Statistics
         /// </summary>
         Empirical = 9,
         /// <summary>
+        /// Graphical Distribution where uncertainty is defined using the Less Simple Method.
+        /// </summary>
+        Graphical = 10,
+        /// <summary>
         /// Specific form of a Truncated Normal Distribution with density above or below truncation value(s) reassigned to the truncation value(s). However, the reported measures of central tendency and dispersion continue to be those of the underlying distribution NOT the truncated copy.
         /// </summary>
-        TruncatedNormal = 10,
+        TruncatedNormal = 101,
         /// <summary>
         /// Specific form of a Truncated Uniform Distribution with density above or below truncation value(s) reassigned to the truncation value(s). However, the reported measures of central tendency and dispersion continue to be those of the underlying distribution NOT the truncated copy.
         /// </summary>
-        TruncatedUniform = 20,
+        TruncatedUniform = 102,
         /// <summary>
         /// Specific form of a Truncated Triangular Distribution with density above or below truncation value(s) (e.g. typical upper and lower bounds) reassigned to the truncation value(s). However, the reported measures of central tendency and dispersion continue to be those of the underlying distribution NOT the truncated copy.
         /// </summary>
-        TruncatedTriangular = 40,
+        TruncatedTriangular = 103,
         /// <summary>
         /// Specific form of a Truncated Histogram with density above or below truncation value(s) (e.g. typical upper and lower bounds) reassigned to the truncation value(s). However, the reported measures of central tendency and dispersion continue to be those of the underlying distribution NOT the truncated copy.
         /// </summary>
