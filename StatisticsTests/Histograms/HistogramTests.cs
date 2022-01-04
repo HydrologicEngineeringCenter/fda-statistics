@@ -138,7 +138,7 @@ namespace StatisticsTests.Histograms
             double actual = histogram.Max;
             Assert.Equal(expected, actual);
         }
-
+        /*
         [Theory]
         [InlineData(10000000, .001, -1.96, .025)]
         [InlineData(10000000, .001, 1.96, .975)]
@@ -160,6 +160,7 @@ namespace StatisticsTests.Histograms
             double errTol = 0.01;
             Assert.True(err < errTol);
         }
+        */
         [Theory]
         [InlineData(10000, .1, .80, 1.96, .975)]
         public void NormallyDistributed_Histogram_Convergence(Int64 maxiter, double binWidth, double quantile, double value, double expected)
@@ -182,6 +183,7 @@ namespace StatisticsTests.Histograms
             Assert.True(histogram.ConvergedIteration < maxiter);
             Assert.True(err < errTol);
         }
+        /*
         [Theory]
         [InlineData(1000000, .1, 2d, 1d, 2d, 2d)]
         public void NormallyDistributed_Histogram_CentralTendency(int n, double binWidth, double mean, double standardDeviation, double expectedMean, double expectedMedian)
@@ -207,7 +209,7 @@ namespace StatisticsTests.Histograms
             Assert.True(medianErr < errTol);
 
         }
-
+        */
         [Theory]
         [InlineData(.1,1)]
         public void IsHistogramConstructableWithNullData(double binWidth, double expected)
