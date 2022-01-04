@@ -387,7 +387,7 @@ namespace Statistics.Histograms
         {
             if (_Converged) { return true; }
             if (_N< _ConvergenceCriteria.MinIterations) { return false; }
-            if (_N < _ConvergenceCriteria.MaxIterations) {
+            if (_N >= _ConvergenceCriteria.MaxIterations) {
                 _Converged = true;
                 _ConvergedIterations = _N;
                 _ConvergedOnMax = true;
@@ -397,15 +397,22 @@ namespace Statistics.Histograms
             double qslope = PDF(lowerq);
             double variance = (lowerq * (1 - lowerq)) / (((double)_N) * qslope * qslope);
             bool lower = false;
-            if (Math.Abs(_ConvergenceCriteria.ZAlpha * Math.Sqrt(variance) / qval) <= (_ConvergenceCriteria.Tolerance / 2.0d)){ lower = true; }
+            double lower_comparison = Math.Abs(_ConvergenceCriteria.ZAlpha * Math.Sqrt(variance) / qval);
+            if (lower_comparison <= (_ConvergenceCriteria.Tolerance *.5)){ lower = true; }
             qval = InverseCDF(upperq);
             qslope = PDF(upperq);
             variance = (upperq * (1 - upperq)) / (((double)_N) * qslope * qslope);
             bool upper = false;
-            if (Math.Abs(_ConvergenceCriteria.ZAlpha * Math.Sqrt(variance) / qval) <= (_ConvergenceCriteria.Tolerance / 2.0d)) { upper = true; }
-            _Converged = lower && upper;
-            if (_Converged)
+            double upper_comparison = Math.Abs(_ConvergenceCriteria.ZAlpha * Math.Sqrt(variance) / qval);
+            if ( upper_comparison <= (_ConvergenceCriteria.Tolerance *.5)) { upper = true; }
+            if (lower)
             {
+                _Converged = true;
+                _ConvergedIterations = _N;
+            }
+            if (upper)
+            {
+                _Converged = true;
                 _ConvergedIterations = _N;
             }
             return _Converged;
