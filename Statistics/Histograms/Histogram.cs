@@ -20,6 +20,27 @@ namespace Statistics.Histograms
         private double _actualMax;
         private Int64 _n;
         private double _binWidth;
+        private bool _converged = false;
+        private long _convergedIterations = Int64.MinValue;
+        private bool _convergedOnMax = false;
+        private long _minobservations = 1000;
+        private long _maxobservations = 1000000;
+        private double _zalphaforconvergence = 1.96039491692543; // a default value for a 95% CI;
+        private double _tolerance = .01; //default value
+        public bool IsConverged
+        {
+            get
+            {
+                return _converged;
+            }
+        }
+        public Int64 ConvergedIteration
+        {
+            get
+            {
+                return _convergedIterations;
+            }
+        }
         public double BinWidth{
             get{
                 return _binWidth;
@@ -351,6 +372,33 @@ namespace Statistics.Histograms
   
             return histogram;
 
+        }
+        public bool TestForConvergence(double upperq, double lowerq)
+        {
+            if (_converged) { return true; }
+            if (_n<_minobservations) { return false; }
+            if (_n < _maxobservations) {
+                _converged = true;
+                _convergedIterations = _n;
+                _convergedOnMax = true;
+                return true;
+            }
+            double qval = InverseCDF(lowerq);
+            double qslope = PDF(lowerq);
+            double variance = (lowerq * (1 - lowerq)) / (((double)_n) * qslope * qslope);
+            bool lower = false;
+            if (Math.Abs(_zalphaforconvergence * Math.Sqrt(variance) / qval) <= (_tolerance / 2.0d)){ lower = true; }
+            qval = InverseCDF(upperq);
+            qslope = PDF(upperq);
+            variance = (upperq * (1 - upperq)) / (((double)_n) * qslope * qslope);
+            bool upper = false;
+            if (Math.Abs(_zalphaforconvergence * Math.Sqrt(variance) / qval) <= (_tolerance / 2.0d)) { upper = true; }
+            _converged = lower && upper;
+            if (_converged)
+            {
+                _convergedIterations = _n;
+            }
+            return _converged;
         }
         #endregion
     }
