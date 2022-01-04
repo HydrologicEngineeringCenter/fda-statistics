@@ -161,7 +161,7 @@ namespace StatisticsTests.Histograms
             Assert.True(err < errTol);
         }
         [Theory]
-        [InlineData(10000, .01, .80, 1.96, .975)]
+        [InlineData(10000, .1, .80, 1.96, .975)]
         public void NormallyDistributed_Histogram_Convergence(Int64 maxiter, double binWidth, double quantile, double value, double expected)
         {
             IDistribution stdNormal = new Statistics.Distributions.Normal(0, 1);
