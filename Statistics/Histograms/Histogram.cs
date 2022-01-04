@@ -98,7 +98,7 @@ namespace Statistics.Histograms
         public Histogram(double min, double binWidth)
         {
             _BinWidth = binWidth;
-            Min = 0;
+            Min = min;
             Max = Min + _BinWidth;
             Int64 numberOfBins = 1;
             _BinCounts = new Int32[numberOfBins];
@@ -107,7 +107,7 @@ namespace Statistics.Histograms
         public Histogram(double min, double binWidth, ConvergenceCriteria _c)
         {
             _BinWidth = binWidth;
-            Min = 0;
+            Min = min;
             Max = Min + _BinWidth;
             Int64 numberOfBins = 1;
             _BinCounts = new Int32[numberOfBins];
