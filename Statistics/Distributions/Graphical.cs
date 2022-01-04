@@ -11,9 +11,24 @@ namespace Statistics.Distributions
     {
         #region Fields
         private int _SampleSize;
-        private double _Mean;
-        private double _StandardDeviation;
         private bool _Truncated;
+        /// <summary>
+        /// _InputExceedanceProbabilities represents the 8 or so exceedance probabilities passed into the constructor 
+        /// </summary>
+        private double[] _InputExceedanceProbabilities; 
+        /// <summary>
+        /// _InputFlowOrStageValues represent the 8 or so flow or stage values passed into the constructor 
+        /// </summary>
+        private double[] _InputFlowOrStageValues;
+        /// <summary>
+        /// _ExceedanceProbabilities represent the interpolated and extrapolated set of exceedance probabilities 
+        /// </summary>
+        private double[] _ExceedanceProbabilities;
+        /// <summary>
+        /// _FlowOrStageDistributions represet the set of normal distributions with mean and standard deviation computed using the less simple method
+        /// </summary>
+        private IDistribution[] _FlowOrStageDistributions;
+        private bool _UsingFlows;
         #endregion
 
         #region Properties
@@ -30,30 +45,6 @@ namespace Statistics.Distributions
                 _SampleSize = value;
             }
         }
-        [Stored(Name = "Mean", type = typeof(double))]
-        public double Mean
-        {
-            get
-            {
-                return _Mean;
-            }
-            set
-            {
-                _Mean = value;
-            }
-        }
-        [Stored(Name = "Standard Deviation", type = typeof(double))]
-        public double StandardDeviation
-        {
-            get
-            {
-                return _StandardDeviation;
-            }
-            set
-            {
-                _StandardDeviation = value;
-            }
-        }
         [Stored(Name = "Truncated", type = typeof(bool))]
         public bool Truncated
         {
@@ -66,6 +57,42 @@ namespace Statistics.Distributions
                 _Truncated = value;
             }
         }
+        [Stored(Name = "ExceedanceProbabilities", type = typeof(double[]))]
+        public double[] ExceedanceProbabilities
+        {
+            get
+            {
+                return _ExceedanceProbabilities;
+            }
+            set
+            {
+                _ExceedanceProbabilities = value;
+            }
+        }
+        [Stored(Name = "FlowOrStageDistributions", type = typeof(IDistribution[]))]
+        public IDistribution[] FlowOrStageDistributions
+        {
+            get
+            {
+                return _FlowOrStageDistributions;
+            }
+            set
+            {
+                _FlowOrStageDistributions = value;
+            }
+        }
+        [Stored(Name = "UsingFlows", type = typeof(bool))]
+        public bool UsingFlows
+        {
+            get
+            {
+                return _UsingFlows;
+            }
+            set
+            {
+                _UsingFlows = value;
+            }
+        }
         public IMessageLevels State { get; private set; }
 
         public IEnumerable<IMessage> Messages { get; private set; }
@@ -74,7 +101,13 @@ namespace Statistics.Distributions
         #region Constructor 
 
         #endregion
-
+        public Graphical(double[] exceedanceProbabilities, double[] flowOrStageValues, int equivalentRecordLength, bool usingFlows = false)
+        {
+            _SampleSize = equivalentRecordLength;
+            _UsingFlows = usingFlows;
+            _InputExceedanceProbabilities = exceedanceProbabilities;
+            _InputFlowOrStageValues = flowOrStageValues;
+        }
 
 
         #region Methods
