@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Statistics.Graphical;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -148,7 +149,63 @@ namespace Statistics.Distributions
         public void ComputeGraphicalConfidenceLimits(bool useConstantStandardError, double probStdErrHighConst, double probStdErrLowConst)
         {
             ExtendFrequencyCurveBasedOnNormalProbabilityPaper();
-            //and then.....
+
+            //TODO: I am still very foggy on what the code does from here until Interpolate Quantiles 
+            //_take pfreq and standard probablities and iclude them. EVSET
+            List<double> finalProbabilities = new List<double>();
+            int totalCount = _InputExceedanceProbabilities.Length + _RequiredExceedanceProbabilities.Length;
+            int required = 0;
+            int provided = 0;
+            for (int i = 0; i < totalCount; i++)
+            {
+                if (required >= _RequiredExceedanceProbabilities.Length)
+                {
+                    if (_RequiredExceedanceProbabilities[required - 1] < _InputExceedanceProbabilities[provided])
+                    {
+                        provided++;
+                    }
+                    else
+                    {
+                        finalProbabilities.Add(_InputExceedanceProbabilities[provided]);
+                        provided++;
+                    }
+                    continue;
+                }
+                if (provided >= _InputExceedanceProbabilities.Count())
+                {
+                    if (_RequiredExceedanceProbabilities[required] > _InputExceedanceProbabilities[provided - 1])
+                    {
+                        finalProbabilities.Add(_RequiredExceedanceProbabilities[required]);
+                        required++;
+                    }
+                    else
+                    {
+                        required++;
+                    }
+                    continue;
+                }
+                if (Math.Abs(_RequiredExceedanceProbabilities[required] - _InputExceedanceProbabilities[provided]) < .000001)
+                {
+                    finalProbabilities.Add(_InputExceedanceProbabilities[provided]);
+                    provided++;
+                    required++;
+                    i++;//skip one
+                }
+                else if (_RequiredExceedanceProbabilities[required] > _InputExceedanceProbabilities[provided])
+                {
+                    finalProbabilities.Add(_RequiredExceedanceProbabilities[required]);
+                    required++;
+                }
+                else
+                {
+                    finalProbabilities.Add(_InputExceedanceProbabilities[provided]);
+                    provided++;
+                }
+            }
+            InterpolateQuantiles interpolatedQuantiles = new InterpolateQuantiles(_InputFlowOrStageValues, _InputExceedanceProbabilities);
+            double[] finalValues = interpolatedQuantiles.ComputeQuantiles(finalProbabilities.ToArray());
+
+            //and then.............
         }
         private bool IsMonotonicallyIncreasing(double[] arrayOfData)
         {
