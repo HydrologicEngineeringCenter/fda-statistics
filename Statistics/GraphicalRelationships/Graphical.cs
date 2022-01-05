@@ -16,6 +16,9 @@ namespace Statistics.Distributions
         private double _Tolerance = 0.0001;
         private int _SampleSize;
         private bool _Truncated;
+        private double[] _ExpandedFlowOrStageValues;
+        private double[] _FlowOrStageStandardErrorsComputed;
+        private double[] _FinalProbabilities;
         /// <summary>
         /// _InputExceedanceProbabilities represents the 8 or so exceedance probabilities passed into the constructor 
         /// </summary>
@@ -147,66 +150,19 @@ namespace Statistics.Distributions
 
         #region Methods
         public void ComputeGraphicalConfidenceLimits(bool useConstantStandardError, double probStdErrHighConst, double probStdErrLowConst)
-        {
+        {   
+
             ExtendFrequencyCurveBasedOnNormalProbabilityPaper();
-
-            //TODO: I am still very foggy on what the code does from here until Interpolate Quantiles 
-            //_take pfreq and standard probablities and iclude them. EVSET
-            List<double> finalProbabilities = new List<double>();
-            int totalCount = _InputExceedanceProbabilities.Length + _RequiredExceedanceProbabilities.Length;
-            int required = 0;
-            int provided = 0;
-            for (int i = 0; i < totalCount; i++)
-            {
-                if (required >= _RequiredExceedanceProbabilities.Length)
-                {
-                    if (_RequiredExceedanceProbabilities[required - 1] < _InputExceedanceProbabilities[provided])
-                    {
-                        provided++;
-                    }
-                    else
-                    {
-                        finalProbabilities.Add(_InputExceedanceProbabilities[provided]);
-                        provided++;
-                    }
-                    continue;
-                }
-                if (provided >= _InputExceedanceProbabilities.Count())
-                {
-                    if (_RequiredExceedanceProbabilities[required] > _InputExceedanceProbabilities[provided - 1])
-                    {
-                        finalProbabilities.Add(_RequiredExceedanceProbabilities[required]);
-                        required++;
-                    }
-                    else
-                    {
-                        required++;
-                    }
-                    continue;
-                }
-                if (Math.Abs(_RequiredExceedanceProbabilities[required] - _InputExceedanceProbabilities[provided]) < .000001)
-                {
-                    finalProbabilities.Add(_InputExceedanceProbabilities[provided]);
-                    provided++;
-                    required++;
-                    i++;//skip one
-                }
-                else if (_RequiredExceedanceProbabilities[required] > _InputExceedanceProbabilities[provided])
-                {
-                    finalProbabilities.Add(_RequiredExceedanceProbabilities[required]);
-                    required++;
-                }
-                else
-                {
-                    finalProbabilities.Add(_InputExceedanceProbabilities[provided]);
-                    provided++;
-                }
-            }
+            List<double> finalProbabilities = GetFinalProbabilities();
             InterpolateQuantiles interpolatedQuantiles = new InterpolateQuantiles(_InputFlowOrStageValues, _InputExceedanceProbabilities);
-            double[] finalValues = interpolatedQuantiles.ComputeQuantiles(finalProbabilities.ToArray());
+            _ExpandedFlowOrStageValues = interpolatedQuantiles.ComputeQuantiles(finalProbabilities.ToArray());
+            _FinalProbabilities = finalProbabilities.ToArray();
 
-            //and then.............
+            //Do step 1 here using final probabilities and final values 
+            
+  
         }
+      
         private bool IsMonotonicallyIncreasing(double[] arrayOfData)
         {
 
@@ -305,7 +261,64 @@ namespace Statistics.Distributions
             _InputFlowOrStageValues = xvals.ToArray();
             _InputExceedanceProbabilities = yvals.ToArray();
         }
-        
+
+        private List<double> GetFinalProbabilities()
+        {
+            //TODO: I am still very foggy on what the code does from here until Interpolate Quantiles 
+            //_take pfreq and standard probablities and iclude them. EVSET
+
+            List<double> finalProbabilities = new List<double>();
+            int totalCount = _InputExceedanceProbabilities.Length + _RequiredExceedanceProbabilities.Length;
+            int required = 0;
+            int provided = 0;
+            for (int i = 0; i < totalCount; i++)
+            {
+                if (required >= _RequiredExceedanceProbabilities.Length)
+                {
+                    if (_RequiredExceedanceProbabilities[required - 1] < _InputExceedanceProbabilities[provided])
+                    {
+                        provided++;
+                    }
+                    else
+                    {
+                        finalProbabilities.Add(_InputExceedanceProbabilities[provided]);
+                        provided++;
+                    }
+                    continue;
+                }
+                if (provided >= _InputExceedanceProbabilities.Count())
+                {
+                    if (_RequiredExceedanceProbabilities[required] > _InputExceedanceProbabilities[provided - 1])
+                    {
+                        finalProbabilities.Add(_RequiredExceedanceProbabilities[required]);
+                        required++;
+                    }
+                    else
+                    {
+                        required++;
+                    }
+                    continue;
+                }
+                if (Math.Abs(_RequiredExceedanceProbabilities[required] - _InputExceedanceProbabilities[provided]) < .000001)
+                {
+                    finalProbabilities.Add(_InputExceedanceProbabilities[provided]);
+                    provided++;
+                    required++;
+                    i++;//skip one
+                }
+                else if (_RequiredExceedanceProbabilities[required] > _InputExceedanceProbabilities[provided])
+                {
+                    finalProbabilities.Add(_RequiredExceedanceProbabilities[required]);
+                    required++;
+                }
+                else
+                {
+                    finalProbabilities.Add(_InputExceedanceProbabilities[provided]);
+                    provided++;
+                }
+            }
+            return finalProbabilities;
+        }
 
         public bool Equals(IDistribution distribution)
         {
