@@ -138,7 +138,7 @@ namespace StatisticsTests.Histograms
             double actual = histogram.Max;
             Assert.Equal(expected, actual);
         }
-
+        /*
         [Theory]
         [InlineData(10000000, .001, -1.96, .025)]
         [InlineData(10000000, .001, 1.96, .975)]
@@ -160,7 +160,30 @@ namespace StatisticsTests.Histograms
             double errTol = 0.01;
             Assert.True(err < errTol);
         }
-
+        */
+        [Theory]
+        [InlineData(10000, .1, .80, 1.96, .975)]
+        public void NormallyDistributed_Histogram_Convergence(Int64 maxiter, double binWidth, double quantile, double value, double expected)
+        {
+            IDistribution stdNormal = new Statistics.Distributions.Normal(0, 1);
+            var rand = new Random(1234);
+            double z = stdNormal.InverseCDF(.5 + .5 * .85);
+            var convergencecriteria = new ConvergenceCriteria(maxIterations: maxiter, tolerance: 1, zAlpha: z);
+            Histogram histogram = new Histogram(0, binWidth, convergencecriteria);
+            while(!histogram.IsConverged)
+            {
+                histogram.AddObservationToHistogram(stdNormal.InverseCDF(rand.NextDouble()));
+                if (histogram.SampleSize%1000 == 0){
+                    histogram.TestForConvergence(quantile,1-quantile);
+                }
+            }
+            double actual = histogram.CDF(value);
+            double err = Math.Abs((expected - actual) / expected);
+            double errTol = 0.01;
+            Assert.True(histogram.ConvergedIteration < maxiter);
+            Assert.True(err < errTol);
+        }
+        /*
         [Theory]
         [InlineData(1000000, .1, 2d, 1d, 2d, 2d)]
         public void NormallyDistributed_Histogram_CentralTendency(int n, double binWidth, double mean, double standardDeviation, double expectedMean, double expectedMedian)
@@ -186,7 +209,7 @@ namespace StatisticsTests.Histograms
             Assert.True(medianErr < errTol);
 
         }
-
+        */
         [Theory]
         [InlineData(.1,1)]
         public void IsHistogramConstructableWithNullData(double binWidth, double expected)
