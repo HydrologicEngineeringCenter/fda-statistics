@@ -106,7 +106,16 @@ namespace Statistics.Distributions
         #endregion
 
         #region Constructor 
-
+        /// <summary>
+        /// Steps to get a complete graphical relationship: 1. Construct Graphical, 2. Compute Confidence Limits, 3. Access Exceedance Probability and FlowOrStageDistribution Public Properties.
+        /// </summary>
+        /// <param name="exceedanceProbabilities"></param> User-provided exceedance probabilities. There should be at least 8.
+        /// <param name="flowOrStageValues"></param> User-provided flow or stage values. A value should correspond to a probability. 
+        /// <param name="equivalentRecordLength"></param> The equivalent record length in years.
+        /// <param name="maximumProbability"></param> The maximum exceedance probability used in the frequency relationship.
+        /// <param name="minimumProbability"></param> The minimum exceedance probability used in the frequency relationship. 
+        /// <param name="usingFlows"></param> True if the frequency relationship is a flow-frequency relationship.
+        /// <param name="flowsAreNotLogged"></param> True if the flows provided by the user have not been logged. 
       
         public Graphical(double[] exceedanceProbabilities, double[] flowOrStageValues, int equivalentRecordLength, double maximumProbability, double minimumProbability, bool usingFlows = false, bool flowsAreNotLogged = false)
         {
@@ -149,6 +158,12 @@ namespace Statistics.Distributions
 
 
         #region Methods
+        /// <summary>
+        /// This method implements the less simple method to compute confidence limits about a graphical frequency relationship. 
+        /// </summary>
+        /// <param name="useConstantStandardError"></param> True if user wishes to use constant standard error. 
+        /// <param name="probStdErrHighConst"></param> TODO
+        /// <param name="probStdErrLowConst"></param> TODO
         public void ComputeGraphicalConfidenceLimits(bool useConstantStandardError, double probStdErrHighConst, double probStdErrLowConst)
         {   
 
