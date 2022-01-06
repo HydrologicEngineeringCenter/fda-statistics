@@ -85,7 +85,7 @@ namespace Statistics.GraphicalRelationships
 
         private Empirical[] ComputeCDFs()
         {
-            //compute CDFs using equation 1 here 
+            
         }
 
         private double ComputeBinomialPDF(int quantityTrials, int quantitySuccesses, double probabilityOfSuccess)
@@ -95,6 +95,8 @@ namespace Statistics.GraphicalRelationships
             double combination = ComputeCombination(quantityTrials, quantitySuccesses);
             double probabilityOfSuccesses = Math.Pow(probabilityOfSuccess, quantitySuccesses);
             double probabilityOfFailures = Math.Pow(probabilityOfFailure, quantityFailure);
+            double pdf = combination * probabilityOfSuccesses * probabilityOfFailures;
+            return pdf;
         }
 
         private double ComputeCombination(int quantityTrials, int quantitySuccesses)
