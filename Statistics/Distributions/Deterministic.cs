@@ -37,11 +37,15 @@ namespace Statistics.Distributions
         public IEnumerable<IMessage> Messages => throw new NotImplementedException();
         #endregion
         [Stored(Name = "Value", type = typeof(double))]
-        public double Value { get; }
+        public double Value { get; set; }
         #region constructor
         public Deterministic(double x)
         {
             Value = x;
+        }
+        public Deterministic()
+        {
+
         }
         #endregion
 
