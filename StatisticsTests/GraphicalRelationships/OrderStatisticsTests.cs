@@ -85,15 +85,19 @@ namespace StatisticsTests.Graphical
         }
 
         [Theory]
-        [InlineData(2.167)]
-        public void ComputeStandardDeviation(double expected)
-        {
+        [InlineData(new double[] {0.678,1.16,1.646,1.967,2.126,2.167,2.139,2.076,1.994,1.9,1.8,1.706,1.628,1.580,1.567,1.58,1.591,1.552,1.415,1.15,.924,.836,.79,.766 })]
+        public void ComputeStandardDeviation(double[] expected) //Table 2.5
+        {//this test worked with one sd but not many? 
             OrderStatistics orderStatistics = new OrderStatistics(exceedanceProbabilities, stageQuantiles);
             orderStatistics.ComputeOrderStatisticsCDFs();
-            double actual = orderStatistics.StandardDeviations[5];
-            double error = (actual - expected) / expected;
-            double tolerance = 0.01;
-            Assert.True(error < tolerance);
+            for (int i = 0; i < expected.Length; i++)
+            {
+                double actual = orderStatistics.StandardDeviations[i];
+                double error = (actual - expected[i]) / expected[i];
+                double tolerance = 0.01;
+                Assert.True(error < tolerance);
+            }
+ 
         }
         
     }
