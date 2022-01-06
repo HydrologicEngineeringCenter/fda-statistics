@@ -7,7 +7,7 @@ using Statistics.Distributions;
 
 namespace Statistics.GraphicalRelationships
 {
-    class OrderStatistics
+    public class OrderStatistics
     {
         #region Fields
         private double[] _ExceedanceProbabilities;
@@ -55,6 +55,9 @@ namespace Statistics.GraphicalRelationships
         #endregion
 
         #region Constructor
+        public OrderStatistics()
+        {
+        }
         public OrderStatistics(double[] exceedanceProbabilities, double[] flowOrStageValues)
         {
             _ExceedanceProbabilities = exceedanceProbabilities;
@@ -65,7 +68,7 @@ namespace Statistics.GraphicalRelationships
         #endregion
 
         #region Functions
-        private double[] ExceedanceToNonExceedance(double[] exceedanceProbabilities)
+        public static double[] ExceedanceToNonExceedance(double[] exceedanceProbabilities)
         {
             double[] nonExceedanceProbabilities = new double[exceedanceProbabilities.Length];
             for (int i = 0; i < exceedanceProbabilities.Length; i++)
@@ -85,7 +88,7 @@ namespace Statistics.GraphicalRelationships
             }
         }
 
-        private double[] ComputeCDF(int index)
+        public double[] ComputeCDF(int index)
         {
             int quantityTrials = _NonExceedanceProbabilities.Length;
             double probabilityOfSuccess = _NonExceedanceProbabilities[index];
@@ -108,7 +111,7 @@ namespace Statistics.GraphicalRelationships
             return cdf;
         }
 
-        private double ComputeBinomialProbability(int quantityTrials, int quantitySuccesses, double probabilityOfSuccess)
+        public static double ComputeBinomialProbability(int quantityTrials, int quantitySuccesses, double probabilityOfSuccess)
         {
             double probabilityOfFailure = 1 - probabilityOfSuccess;
             int quantityFailure = quantityTrials - quantitySuccesses;
@@ -119,7 +122,7 @@ namespace Statistics.GraphicalRelationships
             return pdf;
         }
 
-        private double ComputeCombination(int quantityTrials, int quantitySuccesses)
+        public static double ComputeCombination(int quantityTrials, int quantitySuccesses)
         {
             int trialsFactorial = ComputeFactorial(quantityTrials);
             int successesFactorial = ComputeFactorial(quantitySuccesses);
@@ -128,17 +131,17 @@ namespace Statistics.GraphicalRelationships
             return combination;
         }
 
-        private int ComputeFactorial(int value)
+        public static int ComputeFactorial(int value)
         {
             int product = 1;
-            for (int i = 1; i < value; i++)
+            for (int i = 1; i < value+1; i++)
             {
-                product *= i;
+                product = product * i;
             }
             return product;
         }
 
-        private double ComputeMean(double[] cdf)
+        public double ComputeMean(double[] cdf)
         {
             double sum = 0;
             for (int i = 1; i < cdf.Length; i++)
@@ -150,7 +153,7 @@ namespace Statistics.GraphicalRelationships
             return sum;
         }
 
-        private double ComputeStandardDeviation(double[] cdf, double mean)
+        public double ComputeStandardDeviation(double[] cdf, double mean)
         {
             double sum = 0;
             for (int i = 1; i < cdf.Length; i++)
