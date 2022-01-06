@@ -20,5 +20,13 @@ namespace StatisticsTests.Graphical
             Assert.Equal(expected, actual);
 
         }
+
+        [Theory]
+        [InlineData(6,10,210)]
+        public void ComputeCombination_Test(int successes, int trials, int expected)
+        {
+            double actual = OrderStatistics.ComputeCombination(trials, successes);
+            Assert.Equal(expected, actual);
+        }
     }
 }
