@@ -279,7 +279,8 @@ namespace Statistics.Distributions
 
         private List<double> GetFinalProbabilities()
         {
-            //TODO: I am still very foggy on what the code does from here until Interpolate Quantiles 
+            //TODO: I am still very foggy on what the code does. 
+            //I think this code gets the final probabilities used in the graphical frequency relationship 
             //_take pfreq and standard probablities and iclude them. EVSET
 
             List<double> finalProbabilities = new List<double>();
