@@ -30,15 +30,26 @@ namespace Statistics.GraphicalRelationships
                 _ExceedanceProbabilities = value;
             }
         }
-        public Empirical[] OrderStatisticsCDFs
+        public double[] Means
         {
             get
             {
-                return _OrderStatisticsCDFs;
+                return _Means;
             }
             set
             {
-                _OrderStatisticsCDFs = value;
+                _Means = value;
+            }
+        }
+        public double[] StandardDeviations
+        {
+            get
+            {
+                return _StandardDeviations;
+            }
+            set
+            {
+                _StandardDeviations = value;
             }
         }
         #endregion
@@ -62,6 +73,29 @@ namespace Statistics.GraphicalRelationships
                 nonExceedanceProbabilities[i] = 1 - exceedanceProbabilities[i];
             }
             return nonExceedanceProbabilities;
+        }
+
+        public void ComputeOrderStatisticsCDFs()
+        {
+            Empirical[] cdfs = ComputeCDFs();
+            _Means = ComputeMeans(cdfs);
+            _StandardDeviations = ComputeStandardDeviations(cdfs);
+
+        }
+
+        private Empirical[] ComputeCDFs()
+        {
+            //compute CDFs using equation 1 here 
+        }
+
+        private double[] ComputeMeans(Empirical[] cdfs)
+        {
+            //compute means here
+        }
+
+        private double[] ComputeStandardDeviations(Empirical[] cdfs)
+        {
+            //compute standard deviations here 
         }
     }
 }
