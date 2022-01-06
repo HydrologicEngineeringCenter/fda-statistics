@@ -12,6 +12,39 @@ namespace StatisticsTests.Graphical
 {
     public class OrderStatisticsTests
     {
+        /// <summary>
+        /// Example data obtained from Table 2.5, "Uncertainty Estimates for Graphical (Non-Analytic) Frequency Curves - 
+        /// HEC-FDA Technical Reference" CPD-72a.
+        /// </summary>
+        private static double[] exceedanceProbabilities = new double[] { .99, .95, .9, .85, .80, .75, .7, .65, .6, .55, .5, .45, .4, .35, .3, .25, .2, .15, .1, .05, .02, .01, .005, .0025 };
+        private static double[] stageQuantiles = new double[] { 6.6, 7.4, 8.55, 9.95, 11.5, 12.7, 13.85, 14.7, 15.8, 16.7, 17.5, 18.25, 19, 19.7, 20.3, 21.1, 21.95, 23, 24.2, 25.7, 27.4, 28.4, 29.1, 29.4 };
+
+        /// <summary>
+        /// Example data obtained from Table 2.1, "Uncertainty Estimates for Graphical (Non-Analytic) Frequency Curves - 
+        /// HEC-FDA Technical Reference" CPD-72a.
+        /// </summary>
+        private static double[] observations = new double[] { 1, 2, 3, 4, 5 };
+        private static double[] weibullPlottingPositionNonExceedanceProbabilities = new double[] { .166667, .33333, .5, .666667, .833333 };
+
+        [Theory]
+        [InlineData(.965)] // This test is based on Table 2.1 
+        public void ComputeCDFOfQuantile_Test(double expected)
+        {
+            double[] exceedanceProbabilitiesExample21 = new double[weibullPlottingPositionNonExceedanceProbabilities.Length];
+            for (int i = 0; i < weibullPlottingPositionNonExceedanceProbabilities.Length; i++)
+            {
+                exceedanceProbabilitiesExample21[i] = 1 - weibullPlottingPositionNonExceedanceProbabilities[i];
+            }
+            OrderStatistics orderStatistics = new OrderStatistics(exceedanceProbabilitiesExample21, observations);
+            int indexOfFifthObservation = 4;
+            double[] cdf = orderStatistics.ComputeCDFOfQuantile(indexOfFifthObservation);
+            int indexOfThirdProbability = 2;
+            double actual = cdf[indexOfThirdProbability];
+            double error = (actual - expected) / expected;
+            double tolerance = 0.01;
+            Assert.True(error < tolerance);
+        }
+
         [Theory]
         [InlineData(4,24)]
         public void ComputeFactorial_Test(int value, int expected)
@@ -28,5 +61,28 @@ namespace StatisticsTests.Graphical
             double actual = OrderStatistics.ComputeCombination(trials, successes);
             Assert.Equal(expected, actual);
         }
+
+        [Theory]
+        [InlineData(6,10,.6, 0.250822656)]
+        public void ComputeBinomial_Test(int successes,int trials,double probabilityOfSuccess, double expected)
+        {
+            double actual = OrderStatistics.ComputeBinomialProbability(trials, successes, probabilityOfSuccess);
+            double error = (actual - expected) / expected;
+            double tolerance = 0.01;
+            Assert.True(error < tolerance);
+        }
+        /*
+        [Theory] TODO: DEBUG AFTER DEBUGGING CDF
+        [InlineData(12.79)]
+        public void ComputeMean(double expected)
+        {//before debugging this need to debug CDF
+            OrderStatistics orderStatistics = new OrderStatistics(exceedanceProbabilities, stageQuantiles);
+            orderStatistics.ComputeOrderStatisticsCDFs();
+            double actual = orderStatistics.Means[5];
+            double error = (actual - expected) / expected;
+            double tolerance = 0.01;
+            Assert.True(error < tolerance);
+        }
+        */
     }
 }

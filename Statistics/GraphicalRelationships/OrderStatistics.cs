@@ -68,7 +68,7 @@ namespace Statistics.GraphicalRelationships
         #endregion
 
         #region Functions
-        public static double[] ExceedanceToNonExceedance(double[] exceedanceProbabilities)
+        private static double[] ExceedanceToNonExceedance(double[] exceedanceProbabilities)
         {
             double[] nonExceedanceProbabilities = new double[exceedanceProbabilities.Length];
             for (int i = 0; i < exceedanceProbabilities.Length; i++)
@@ -82,13 +82,13 @@ namespace Statistics.GraphicalRelationships
         {
             for (int i = 0; i < _NonExceedanceProbabilities.Length; i ++)
             {
-                double[] cdf = ComputeCDF(i);
+                double[] cdf = ComputeCDFOfQuantile(i);
                 _Means[i] = ComputeMean(cdf);
                 _StandardDeviations[i] = ComputeStandardDeviation(cdf, _Means[i]);
             }
         }
 
-        public double[] ComputeCDF(int index)
+        public double[] ComputeCDFOfQuantile(int index)
         {
             int quantityTrials = _NonExceedanceProbabilities.Length;
             double probabilityOfSuccess = _NonExceedanceProbabilities[index];
