@@ -152,7 +152,16 @@ namespace Statistics.GraphicalRelationships
 
         private double ComputeStandardDeviation(double[] cdf, double mean)
         {
-            //compute standard deviations here 
+            double sum = 0;
+            for (int i = 1; i < cdf.Length; i++)
+            {
+                double averageOfDeviationsSquared = 0.5 * (Math.Pow(_FlowOrStageValues[i - 1] - mean, 2) + Math.Pow(_FlowOrStageValues[i] - mean, 2));
+                double probabilityBetweenValues = (cdf[i - 1] - cdf[i]) / (cdf[0] - cdf[cdf.Length - 1]);
+                sum += averageOfDeviationsSquared * probabilityBetweenValues;
+            }
+            double standardDeviation = Math.Pow(sum, 0.5);
+            return standardDeviation;
         }
+        #endregion
     }
 }
