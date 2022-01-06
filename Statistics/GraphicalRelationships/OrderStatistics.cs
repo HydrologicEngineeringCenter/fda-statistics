@@ -77,18 +77,30 @@ namespace Statistics.GraphicalRelationships
 
         public void ComputeOrderStatisticsCDFs()
         {
-            Empirical[] cdfs = ComputeCDFs();
-            _Means = ComputeMeans(cdfs);
-            _StandardDeviations = ComputeStandardDeviations(cdfs);
-
+            for (int i = 0; i < _NonExceedanceProbabilities.Length; i ++)
+            {
+                double[] pdf = ComputePDF(i);
+                _Means[i] = ComputeMean(pdf);
+                _StandardDeviations[i] = ComputeStandardDeviation(pdf, _Means[i]);
+            }
         }
 
-        private Empirical[] ComputeCDFs()
+        private double[] ComputePDF(int index)
         {
-            
+            int quantityTrials = _NonExceedanceProbabilities.Length;
+            double probabilityOfSuccess = _NonExceedanceProbabilities[index];
+            double probabilityOfFailure = _ExceedanceProbabilities[index];
+
+            double[] pdf = new double[quantityTrials];
+
+            for (int i = 0; i < quantityTrials; i++)
+            {
+                pdf[i] = ComputeBinomialProbability(quantityTrials, i, probabilityOfSuccess);
+            }
+            return pdf;
         }
 
-        private double ComputeBinomialPDF(int quantityTrials, int quantitySuccesses, double probabilityOfSuccess)
+        private double ComputeBinomialProbability(int quantityTrials, int quantitySuccesses, double probabilityOfSuccess)
         {
             double probabilityOfFailure = 1 - probabilityOfSuccess;
             int quantityFailure = quantityTrials - quantitySuccesses;
@@ -118,12 +130,12 @@ namespace Statistics.GraphicalRelationships
             return product;
         }
 
-        private double[] ComputeMeans(Empirical[] cdfs)
+        private double ComputeMean(double[] pdf)
         {
             //compute means here
         }
 
-        private double[] ComputeStandardDeviations(Empirical[] cdfs)
+        private double ComputeStandardDeviation(double[] pdf, double mean)
         {
             //compute standard deviations here 
         }
