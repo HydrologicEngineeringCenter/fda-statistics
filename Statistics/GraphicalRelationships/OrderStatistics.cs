@@ -80,12 +80,16 @@ namespace Statistics.GraphicalRelationships
 
         public void ComputeOrderStatisticsCDFs()
         {
+            double[] means = new double[_NonExceedanceProbabilities.Length];
+            double[] standardDeviations = new double[_NonExceedanceProbabilities.Length];
             for (int i = 0; i < _NonExceedanceProbabilities.Length; i ++)
             {
                 double[] cdf = ComputeCDFOfQuantile(i);
-                _Means[i] = ComputeMean(cdf);
-                _StandardDeviations[i] = ComputeStandardDeviation(cdf, _Means[i]);
+                means[i] = ComputeMean(cdf);
+                standardDeviations[i] = ComputeStandardDeviation(cdf, means[i]);
             }
+            _Means = means;
+            _StandardDeviations = standardDeviations;
         }
 
         public double[] ComputeCDFOfQuantile(int index)

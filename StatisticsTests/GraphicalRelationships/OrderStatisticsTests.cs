@@ -71,11 +71,11 @@ namespace StatisticsTests.Graphical
             double tolerance = 0.01;
             Assert.True(error < tolerance);
         }
-        /*
-        [Theory] TODO: DEBUG AFTER DEBUGGING CDF
+        
+        [Theory] 
         [InlineData(12.79)]
         public void ComputeMean(double expected)
-        {//before debugging this need to debug CDF
+        {
             OrderStatistics orderStatistics = new OrderStatistics(exceedanceProbabilities, stageQuantiles);
             orderStatistics.ComputeOrderStatisticsCDFs();
             double actual = orderStatistics.Means[5];
@@ -83,6 +83,18 @@ namespace StatisticsTests.Graphical
             double tolerance = 0.01;
             Assert.True(error < tolerance);
         }
-        */
+
+        [Theory]
+        [InlineData(2.167)]
+        public void ComputeStandardDeviation(double expected)
+        {
+            OrderStatistics orderStatistics = new OrderStatistics(exceedanceProbabilities, stageQuantiles);
+            orderStatistics.ComputeOrderStatisticsCDFs();
+            double actual = orderStatistics.StandardDeviations[5];
+            double error = (actual - expected) / expected;
+            double tolerance = 0.01;
+            Assert.True(error < tolerance);
+        }
+        
     }
 }
