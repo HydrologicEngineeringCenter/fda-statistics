@@ -46,7 +46,7 @@ namespace StatisticsTests.Graphical
         }
 
         [Theory]
-        [InlineData(4,24)]
+        [InlineData(4, 24)]
         public void ComputeFactorial_Test(int value, int expected)
         {
             double actual = OrderStatistics.ComputeFactorial(value);
@@ -55,7 +55,7 @@ namespace StatisticsTests.Graphical
         }
 
         [Theory]
-        [InlineData(6,10,210)]
+        [InlineData(6, 10, 210)]
         public void ComputeCombination_Test(int successes, int trials, int expected)
         {
             double actual = OrderStatistics.ComputeCombination(trials, successes);
@@ -63,25 +63,29 @@ namespace StatisticsTests.Graphical
         }
 
         [Theory]
-        [InlineData(6,10,.6, 0.250822656)]
-        public void ComputeBinomial_Test(int successes,int trials,double probabilityOfSuccess, double expected)
+        [InlineData(6, 10, .6, 0.250822656)]
+        public void ComputeBinomial_Test(int successes, int trials, double probabilityOfSuccess, double expected)
         {
             double actual = OrderStatistics.ComputeBinomialProbability(trials, successes, probabilityOfSuccess);
             double error = (actual - expected) / expected;
             double tolerance = 0.01;
             Assert.True(error < tolerance);
         }
-        
-        [Theory] 
-        [InlineData(12.79)]
-        public void ComputeMean(double expected)
+
+        [Theory]
+        [InlineData( new double[] {8.04, 8.61, 9.53, 10.59, 11.7, 12.79, 13.82, 14.8, 15.71, 16.56, 17.37, 18.13, 18.86, 19.58, 20.30, 21.06, 21.86, 22.7, 23.55, 24.36, 24.79, 24.93, 24.99, 25.02})]
+        public void ComputeMean(double[] expected)
         {
             OrderStatistics orderStatistics = new OrderStatistics(exceedanceProbabilities, stageQuantiles);
             orderStatistics.ComputeOrderStatisticsCDFs();
-            double actual = orderStatistics.Means[5];
-            double error = (actual - expected) / expected;
-            double tolerance = 0.01;
-            Assert.True(error < tolerance);
+            for (int i = 0; i<expected.Length; i++)
+            {
+                double actual = orderStatistics.Means[i];
+                double error = (actual - expected[i]) / expected[i];
+                double tolerance = 0.01;
+                Assert.True(error < tolerance);
+            }
+
         }
 
         [Theory]
