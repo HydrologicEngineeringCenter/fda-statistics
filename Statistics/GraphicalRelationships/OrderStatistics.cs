@@ -79,25 +79,33 @@ namespace Statistics.GraphicalRelationships
         {
             for (int i = 0; i < _NonExceedanceProbabilities.Length; i ++)
             {
-                double[] pdf = ComputePDF(i);
-                _Means[i] = ComputeMean(pdf);
-                _StandardDeviations[i] = ComputeStandardDeviation(pdf, _Means[i]);
+                double[] cdf = ComputeCDF(i);
+                _Means[i] = ComputeMean(cdf);
+                _StandardDeviations[i] = ComputeStandardDeviation(cdf, _Means[i]);
             }
         }
 
-        private double[] ComputePDF(int index)
+        private double[] ComputeCDF(int index)
         {
             int quantityTrials = _NonExceedanceProbabilities.Length;
             double probabilityOfSuccess = _NonExceedanceProbabilities[index];
             double probabilityOfFailure = _ExceedanceProbabilities[index];
 
             double[] pdf = new double[quantityTrials];
-
+            double[] cdf = new double[quantityTrials];
+            // at least i observations are less than the quantile 
             for (int i = 0; i < quantityTrials; i++)
-            {
-                pdf[i] = ComputeBinomialProbability(quantityTrials, i, probabilityOfSuccess);
+            {   
+                pdf[i] = ComputeBinomialProbability(quantityTrials, i+1, probabilityOfSuccess);
             }
-            return pdf;
+            for (int j = 0; j < quantityTrials; j++)
+            {
+                for (int k = quantityTrials-1; k >= j; k--)
+                {
+                    cdf[j] += pdf[k];
+                }
+            }
+            return cdf;
         }
 
         private double ComputeBinomialProbability(int quantityTrials, int quantitySuccesses, double probabilityOfSuccess)
@@ -130,12 +138,19 @@ namespace Statistics.GraphicalRelationships
             return product;
         }
 
-        private double ComputeMean(double[] pdf)
+        private double ComputeMean(double[] cdf)
         {
-            //compute means here
+            double sum = 0;
+            for (int i = 1; i < cdf.Length; i++)
+            {
+                double valueAverage = 0.5 * (_FlowOrStageValues[i - 1] + _FlowOrStageValues[i]);
+                double probabilityBetweenValues = (cdf[i - 1] - cdf[i]) / (cdf[0] - cdf[cdf.Length - 1]);
+                sum += valueAverage * probabilityBetweenValues;
+            }
+            return sum;
         }
 
-        private double ComputeStandardDeviation(double[] pdf, double mean)
+        private double ComputeStandardDeviation(double[] cdf, double mean)
         {
             //compute standard deviations here 
         }
