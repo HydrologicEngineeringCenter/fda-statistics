@@ -88,6 +88,34 @@ namespace Statistics.GraphicalRelationships
             //compute CDFs using equation 1 here 
         }
 
+        private double ComputeBinomialPDF(int quantityTrials, int quantitySuccesses, double probabilityOfSuccess)
+        {
+            double probabilityOfFailure = 1 - probabilityOfSuccess;
+            int quantityFailure = quantityTrials - quantitySuccesses;
+            double combination = ComputeCombination(quantityTrials, quantitySuccesses);
+            double probabilityOfSuccesses = Math.Pow(probabilityOfSuccess, quantitySuccesses);
+            double probabilityOfFailures = Math.Pow(probabilityOfFailure, quantityFailure);
+        }
+
+        private double ComputeCombination(int quantityTrials, int quantitySuccesses)
+        {
+            int trialsFactorial = ComputeFactorial(quantityTrials);
+            int successesFactorial = ComputeFactorial(quantitySuccesses);
+            int trialsLessSuccessesFactorial = ComputeFactorial(quantityTrials - quantitySuccesses);
+            double combination = trialsFactorial / (successesFactorial * trialsLessSuccessesFactorial);
+            return combination;
+        }
+
+        private int ComputeFactorial(int value)
+        {
+            int product = 1;
+            for (int i = 1; i < value; i++)
+            {
+                product *= i;
+            }
+            return product;
+        }
+
         private double[] ComputeMeans(Empirical[] cdfs)
         {
             //compute means here
