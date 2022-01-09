@@ -6,7 +6,7 @@ using Utilities;
 
 namespace Statistics.Validation
 {
-    class SummaryStatisticsValidator: IValidator<ISampleStatistics>
+    public class SummaryStatisticsValidator: IValidator<ISampleStatistics>
     {
         public SummaryStatisticsValidator()
         {

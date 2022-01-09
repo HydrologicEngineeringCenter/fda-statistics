@@ -8,7 +8,7 @@ using Utilities;
 
 namespace Statistics.Distributions
 {
-    class Empirical : IDistribution
+    public class Empirical : IDistribution
     {
         #region Fields 
         private bool _ProbabilitiesWereAcceptedAsExceedance;

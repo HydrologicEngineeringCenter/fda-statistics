@@ -9,11 +9,12 @@ using Statistics.Distributions;
 
 namespace Statistics.Validation
 {
-    internal class EmpiricalValidator: IValidator<Distributions.Empirical>
+    public class EmpiricalValidator: IValidator<Distributions.Empirical>
     {
-        internal EmpiricalValidator()
+        public EmpiricalValidator()
         {
         }
+        //TODO: Fix these functions. Not fixing now due to higher priorities. -RN
         public IMessageLevels IsValid(Distributions.Empirical entity, out IEnumerable<IMessage> msgs)
         {
             msgs = ReportErrors(entity);
