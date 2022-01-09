@@ -6,7 +6,7 @@ using Statistics.Distributions;
 
 namespace Statistics.Validation
 {
-    internal class UniformValidator: IValidator<Uniform>
+    public class UniformValidator: IValidator<Uniform>
     {
         public UniformValidator()
         {

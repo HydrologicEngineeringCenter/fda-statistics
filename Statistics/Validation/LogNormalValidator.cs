@@ -7,9 +7,9 @@ using Utilities;
 
 namespace Statistics.Validation
 {
-    internal class LogNormalValidator: IValidator<Distributions.LogNormal>
+    public class LogNormalValidator: IValidator<Distributions.LogNormal>
     {
-        internal LogNormalValidator()
+        public LogNormalValidator()
         {
         }
 
