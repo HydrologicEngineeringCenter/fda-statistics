@@ -7,7 +7,7 @@ using Utilities;
 
 namespace Statistics
 {
-    internal class Data : IData, IValidate<Data>
+    public class Data : IData, IValidate<Data>
     {
         #region Properties
         public IRange<double> Range { get; }

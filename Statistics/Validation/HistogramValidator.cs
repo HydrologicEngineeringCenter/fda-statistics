@@ -9,9 +9,9 @@ using Statistics.Distributions;
 
 namespace Statistics.Validation
 {
-    class HistogramValidator : IValidator<Histograms.Histogram>
+    public class HistogramValidator : IValidator<Histograms.Histogram>
     {
-        internal HistogramValidator()
+        public HistogramValidator()
         {
         }
         public IMessageLevels IsValid(Histograms.Histogram entity, out IEnumerable<IMessage> msgs)
