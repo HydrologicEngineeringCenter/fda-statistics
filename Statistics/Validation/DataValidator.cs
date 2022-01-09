@@ -7,7 +7,7 @@ using Utilities;
 
 namespace Statistics.Validation
 {
-    internal class DataValidator : IValidator<Data>
+    public class DataValidator : IValidator<Data>
     {
         public IMessageLevels IsValid(Data entity, out IEnumerable<IMessage> msgs)
         {

@@ -5,7 +5,7 @@ using Utilities;
 
 namespace Statistics.Validation
 {
-    internal class SampleStatisticsValidator: Utilities.IValidator<ISampleStatistics>
+    public class SampleStatisticsValidator: Utilities.IValidator<ISampleStatistics>
     {
         internal SampleStatisticsValidator()
         {

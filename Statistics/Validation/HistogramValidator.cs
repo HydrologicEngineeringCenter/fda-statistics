@@ -9,7 +9,7 @@ using Statistics.Distributions;
 
 namespace Statistics.Validation
 {
-    class HistogramValidator : IValidator<Histograms.Histogram>
+    public class HistogramValidator : IValidator<Histograms.Histogram>
     {
         internal HistogramValidator()
         {

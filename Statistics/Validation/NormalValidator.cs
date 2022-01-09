@@ -9,7 +9,7 @@ using Statistics.Distributions;
 
 namespace Statistics.Validation
 {
-    internal class NormalValidator: IValidator<Distributions.Normal>
+    public class NormalValidator: IValidator<Distributions.Normal>
     {
         internal NormalValidator()
         {

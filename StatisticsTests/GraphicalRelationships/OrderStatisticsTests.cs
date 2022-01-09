@@ -73,9 +73,24 @@ namespace StatisticsTests.Graphical
         }
 
         [Theory]
+        [InlineData(19.48)]
+        public void ComputeAMean(double expected)
+        {//this test worked with one sd but not many? 
+            //how is it that I get some of the means correct but not others, if we're using the same freaking code????
+            OrderStatistics orderStatistics = new OrderStatistics(exceedanceProbabilities, stageQuantiles);
+            orderStatistics.ComputeOrderStatisticsCDFs();
+            int index = 11;
+                double actual = orderStatistics.Means[index];
+                double error = (actual - expected) / expected;
+                double tolerance = 0.01;
+                Assert.True(error < tolerance);
+            
+        }
+
+        [Theory]
         [InlineData( new double[] {8.04, 8.61, 9.53, 10.59, 11.7, 12.79, 13.82, 14.8, 15.71, 16.56, 17.37, 18.13, 18.86, 19.58, 20.30, 21.06, 21.86, 22.7, 23.55, 24.36, 24.79, 24.93, 24.99, 25.02})]
         public void ComputeMean(double[] expected)
-        {
+        {//this test worked with one sd but not many? 
             OrderStatistics orderStatistics = new OrderStatistics(exceedanceProbabilities, stageQuantiles);
             orderStatistics.ComputeOrderStatisticsCDFs();
             for (int i = 0; i<expected.Length; i++)
@@ -103,6 +118,7 @@ namespace StatisticsTests.Graphical
             }
  
         }
+        
         
     }
 }

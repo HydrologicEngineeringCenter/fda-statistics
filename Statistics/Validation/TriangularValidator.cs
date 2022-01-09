@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Statistics.Validation
 {
-    internal class TriangularValidator: IValidator<Triangular>
+    public class TriangularValidator: IValidator<Triangular>
     {
         internal TriangularValidator()
         {

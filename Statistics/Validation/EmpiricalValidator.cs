@@ -9,7 +9,7 @@ using Statistics.Distributions;
 
 namespace Statistics.Validation
 {
-    internal class EmpiricalValidator: IValidator<Distributions.Empirical>
+    public class EmpiricalValidator: IValidator<Distributions.Empirical>
     {
         internal EmpiricalValidator()
         {

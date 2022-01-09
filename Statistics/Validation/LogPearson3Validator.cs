@@ -7,7 +7,7 @@ using Statistics.Distributions;
 
 namespace Statistics.Validation
 {
-    internal class LogPearson3Validator: IValidator<LogPearson3>
+    public class LogPearson3Validator: IValidator<LogPearson3>
     {
         internal LogPearson3Validator()
         {
