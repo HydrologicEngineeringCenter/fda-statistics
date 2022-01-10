@@ -354,31 +354,42 @@ namespace Statistics.GraphicalRelationships
             double p2;
             double slope;
             double stdErrSq;
+
+
             int j = 0;
             double px;
             double[] scurveUnAdj = new double[_FinalProbabilities.Count()];
             double[] _scurve = new double[_FinalProbabilities.Count()];
+            
+            //First point and last point should be held constant 
+
+            //Second through second to last points
             for (int i = 1; i < _FinalProbabilities.Count() - 1; i++)
             {
                 p = 1 - _FinalProbabilities[i];
                 p2 = 1 - _FinalProbabilities[i + 1];
                 p1 = 1 - _FinalProbabilities[i - 1];
                 slope = (_ExpandedFlowOrStageValues[i + 1] - _ExpandedFlowOrStageValues[i - 1]) / (p2 - p1);
-                stdErrSq = (p * (1 - p))/ (Math.Pow(slope, 2.0D) * _SampleSize);
+                stdErrSq = (p * (1 - p))/ (Math.Pow(1/slope, 2.0D) * _SampleSize);
                 _scurve[i] = Math.Sqrt(stdErrSq);
+
+
                 scurveUnAdj[i] = _scurve[i];
 
-                //    !first and last points
-                if (i == 2 | i == _FinalProbabilities.Count())
-                {
-                    if (i == 2) j = 1;
-                    if (i == _FinalProbabilities.Count() - 1) j = _FinalProbabilities.Count();
-                    px = 1 - _FinalProbabilities[j];
-                    //Equation 6 in the technical reference 
-                    _scurve[j] = Math.Sqrt((px * (1 - px)) /( Math.Pow(slope, 2.0D) * _SampleSize));
-                    scurveUnAdj[j] = _scurve[j];
-                }
+                ////    !first and last points
+                //if (i == 2 | i == _FinalProbabilities.Count())
+                //{
+                //    if (i == 2) j = 1;
+                //    if (i == _FinalProbabilities.Count() - 1) j = _FinalProbabilities.Count();
+                //    px = 1 - _FinalProbabilities[j];
+                //    //Equation 6 in the technical reference 
+                //    _scurve[j] = Math.Sqrt((px * (1 - px)) /( Math.Pow(slope, 2.0D) * _SampleSize));
+                //    scurveUnAdj[j] = _scurve[j];
+                //}
             }
+            //Last point 
+
+
 
             //            !Hold standard Error Constant
             if (useConstantStandardError)
