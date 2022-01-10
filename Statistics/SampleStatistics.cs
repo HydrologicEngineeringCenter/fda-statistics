@@ -94,6 +94,10 @@ namespace Statistics
             {
                 noRounding = true;
             }
+            else
+            {
+                midpoint = System.Math.Floor(midpoint);
+            }
             Array.Sort(observations.ToArray());
             int val = 0;
             bool firstpass = true;
