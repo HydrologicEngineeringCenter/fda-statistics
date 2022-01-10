@@ -4,18 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Statistics.Distributions;
 using Utilities;
 
-namespace Statistics.Distributions
+namespace Statistics.GraphicalRelationships
 {
-    class Graphical
+    public class Graphical
     {
         #region Fields
         private double _pMax; //the maximum exceedance probability possible in the frequency curve
         private double _pMin; //the minimum exceedanace probability possible in the frequency curve
         private double _Tolerance = 0.0001;
         private int _SampleSize;
-        private bool _Truncated;
         private double[] _ExpandedFlowOrStageValues;
         private double[] _FlowOrStageStandardErrorsComputed;
         private double[] _FinalProbabilities;
@@ -34,7 +34,7 @@ namespace Statistics.Distributions
         /// <summary>
         /// _FlowOrStageDistributions represet the set of normal distributions with mean and standard deviation computed using the less simple method
         /// </summary>
-        private IDistribution[] _FlowOrStageDistributions;
+        private Normal[] _FlowOrStageDistributions;
         private bool _UsingFlows;
         #endregion
 
@@ -64,7 +64,7 @@ namespace Statistics.Distributions
             }
         }
         [Stored(Name = "FlowOrStageDistributions", type = typeof(IDistribution[]))]
-        public IDistribution[] FlowOrStageDistributions
+        public Normal[] FlowOrStageDistributions
         {
             get
             {
@@ -96,6 +96,7 @@ namespace Statistics.Distributions
         #region Constructor 
         /// <summary>
         /// Steps to get a complete graphical relationship: 1. Construct Graphical, 2. Compute Confidence Limits, 3. Access Exceedance Probability and FlowOrStageDistribution Public Properties.
+        /// ExceedanceProbabilities array and FlowOrStageDistribution IDistribution array can then be used to construct an uncertain paired data object. 
         /// </summary>
         /// <param name="exceedanceProbabilities"></param> User-provided exceedance probabilities. There should be at least 8.
         /// <param name="flowOrStageValues"></param> User-provided flow or stage values. A value should correspond to a probability. 
@@ -105,7 +106,7 @@ namespace Statistics.Distributions
         /// <param name="usingFlows"></param> True if the frequency relationship is a flow-frequency relationship.
         /// <param name="flowsAreNotLogged"></param> True if the flows provided by the user have not been logged. 
       
-        public Graphical(double[] exceedanceProbabilities, double[] flowOrStageValues, int equivalentRecordLength, double maximumProbability, double minimumProbability, bool usingFlows = false, bool flowsAreNotLogged = false)
+        public Graphical(double[] exceedanceProbabilities, double[] flowOrStageValues, int equivalentRecordLength, double maximumProbability = 0.9999, double minimumProbability = 0.0001, bool usingFlows = false, bool flowsAreNotLogged = false)
         {
             //1. Check for null data and check for monotonicity 
             if(exceedanceProbabilities != null && flowOrStageValues != null)
@@ -150,8 +151,8 @@ namespace Statistics.Distributions
         /// This method implements the less simple method to compute confidence limits about a graphical frequency relationship. 
         /// </summary>
         /// <param name="useConstantStandardError"></param> True if user wishes to use constant standard error. 
-        /// <param name="probStdErrHighConst"></param> TODO
-        /// <param name="probStdErrLowConst"></param> TODO
+        /// <param name="probStdErrHighConst"></param> Frequent end of frequency curve after which to hold standard error constant. Default is 0.99.
+        /// <param name="probStdErrLowConst"></param> Infrequent end of frequency curve after which to hold standard error constant. Default is 0.01.
         public void ComputeGraphicalConfidenceLimits(bool useConstantStandardError = true, double probStdErrHighConst = 0.99, double probStdErrLowConst = 0.01)
         {   
             ExtendFrequencyCurveBasedOnNormalProbabilityPaper();
@@ -264,8 +265,7 @@ namespace Statistics.Distributions
 
         private List<double> GetFinalProbabilities()
         {
-            //TODO: I am still very foggy on what the code does. 
-            //I think this code gets the final probabilities used in the graphical frequency relationship 
+            //TODO: I think this code gets the final probabilities used in the graphical frequency relationship? 
             //_take pfreq and standard probablities and iclude them. EVSET
 
             List<double> finalProbabilities = new List<double>();
@@ -327,7 +327,7 @@ namespace Statistics.Distributions
             int ixSlopeLoConst = -1;
 
 
-            //  !Find locations of constant slope
+            //  the index at which begin to hold standard error constant 
             double maxDiffHi = 1.0e30;
             double maxDiffLo = 1.0e30;
             double diffHi = 0;
@@ -374,6 +374,7 @@ namespace Statistics.Distributions
                     if (i == 2) j = 1;
                     if (i == _FinalProbabilities.Count() - 1) j = _FinalProbabilities.Count();
                     px = 1 - _FinalProbabilities[j];
+                    //Equation 6 in the technical reference 
                     _scurve[j] = Math.Sqrt((px * (1 - px) * Math.Pow(slope, 2.0D)) / _SampleSize);
                     scurveUnAdj[j] = _scurve[j];
                 }
@@ -394,9 +395,9 @@ namespace Statistics.Distributions
 
             return _scurve;
         }
-        private IDistribution[] ConstructNormalDistributions()
+        private Normal[] ConstructNormalDistributions()
         {
-            IDistribution[] distributionArray = new IDistribution[_FlowOrStageStandardErrorsComputed.Length];
+            Normal[] distributionArray = new Normal[_FlowOrStageStandardErrorsComputed.Length];
             for (int i = 0; i < _FlowOrStageStandardErrorsComputed.Length; i++)
             {
                 distributionArray[i] = new Distributions.Normal(_ExpandedFlowOrStageValues[i], _FlowOrStageStandardErrorsComputed[i]);
@@ -404,19 +405,16 @@ namespace Statistics.Distributions
             return distributionArray;
         }
 
-        public bool Equals(IDistribution distribution)
+        public bool Equals(double[] probabilities, IDistribution[] distributionOfFlowsOrStages)
         {
-            throw new NotImplementedException();
-        }
-
-        public string Print(bool round = false)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string Requirements(bool printNotes)
-        {
-            throw new NotImplementedException();
+            if (_FinalProbabilities == probabilities)
+            {
+                if (_FlowOrStageDistributions == distributionOfFlowsOrStages)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         #endregion
     }
