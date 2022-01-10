@@ -364,7 +364,7 @@ namespace Statistics.GraphicalRelationships
                 p2 = 1 - _FinalProbabilities[i + 1];
                 p1 = 1 - _FinalProbabilities[i - 1];
                 slope = (_ExpandedFlowOrStageValues[i + 1] - _ExpandedFlowOrStageValues[i - 1]) / (p2 - p1);
-                stdErrSq = (p * (1 - p) * Math.Pow(slope, 2.0D)) / _SampleSize;
+                stdErrSq = (p * (1 - p))/ (Math.Pow(slope, 2.0D) * _SampleSize);
                 _scurve[i] = Math.Sqrt(stdErrSq);
                 scurveUnAdj[i] = _scurve[i];
 
@@ -375,7 +375,7 @@ namespace Statistics.GraphicalRelationships
                     if (i == _FinalProbabilities.Count() - 1) j = _FinalProbabilities.Count();
                     px = 1 - _FinalProbabilities[j];
                     //Equation 6 in the technical reference 
-                    _scurve[j] = Math.Sqrt((px * (1 - px) * Math.Pow(slope, 2.0D)) / _SampleSize);
+                    _scurve[j] = Math.Sqrt((px * (1 - px)) /( Math.Pow(slope, 2.0D) * _SampleSize));
                     scurveUnAdj[j] = _scurve[j];
                 }
             }
