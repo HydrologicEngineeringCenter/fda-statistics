@@ -39,7 +39,6 @@ namespace Statistics.Distributions
         #endregion
 
         #region Properties
-        public IDistributionEnum Type => IDistributionEnum.Graphical;
         [Stored(Name = "Sample Size", type = typeof(int))]
         public int SampleSize
         {
@@ -50,18 +49,6 @@ namespace Statistics.Distributions
             set
             {
                 _SampleSize = value;
-            }
-        }
-        [Stored(Name = "Truncated", type = typeof(bool))]
-        public bool Truncated
-        {
-            get
-            {
-                return _Truncated;
-            }
-            set
-            {
-                _Truncated = value;
             }
         }
         [Stored(Name = "ExceedanceProbabilities", type = typeof(double[]))]
@@ -100,6 +87,7 @@ namespace Statistics.Distributions
                 _UsingFlows = value;
             }
         }
+        //TODO: Add validation and set these properties 
         public IMessageLevels State { get; private set; }
 
         public IEnumerable<IMessage> Messages { get; private set; }
@@ -164,18 +152,15 @@ namespace Statistics.Distributions
         /// <param name="useConstantStandardError"></param> True if user wishes to use constant standard error. 
         /// <param name="probStdErrHighConst"></param> TODO
         /// <param name="probStdErrLowConst"></param> TODO
-        public void ComputeGraphicalConfidenceLimits(bool useConstantStandardError, double probStdErrHighConst, double probStdErrLowConst)
+        public void ComputeGraphicalConfidenceLimits(bool useConstantStandardError = true, double probStdErrHighConst = 0.99, double probStdErrLowConst = 0.01)
         {   
-
             ExtendFrequencyCurveBasedOnNormalProbabilityPaper();
             List<double> finalProbabilities = GetFinalProbabilities();
             InterpolateQuantiles interpolatedQuantiles = new InterpolateQuantiles(_InputFlowOrStageValues, _InputExceedanceProbabilities);
             _ExpandedFlowOrStageValues = interpolatedQuantiles.ComputeQuantiles(finalProbabilities.ToArray());
             _FinalProbabilities = finalProbabilities.ToArray();
-
-            //Do step 1 here using final probabilities and final values 
-            
-  
+            _FlowOrStageStandardErrorsComputed = ComputeStandardDeviations(useConstantStandardError, probStdErrHighConst, probStdErrLowConst);
+            _FlowOrStageDistributions = ConstructNormalDistributions();
         }
       
         private bool IsMonotonicallyIncreasing(double[] arrayOfData)
@@ -334,6 +319,89 @@ namespace Statistics.Distributions
                 }
             }
             return finalProbabilities;
+        }
+
+        private double[] ComputeStandardDeviations(bool useConstantStandardError, double probStdErrHighConst, double probStdErrLowConst)
+        {
+            int ixSlopeHiConst = -1;
+            int ixSlopeLoConst = -1;
+
+
+            //  !Find locations of constant slope
+            double maxDiffHi = 1.0e30;
+            double maxDiffLo = 1.0e30;
+            double diffHi = 0;
+            double diffLo = 0;
+            double p;
+            for (int i = 0; i < _FinalProbabilities.Count(); i++)
+            {
+                p = _FinalProbabilities[i];
+                diffHi = Math.Abs(p - probStdErrHighConst);
+                diffLo = Math.Abs(p - probStdErrLowConst);
+
+                if (diffHi < maxDiffHi)
+                {
+                    ixSlopeHiConst = i;
+                    maxDiffHi = diffHi;
+                }
+                if (diffLo < maxDiffLo)
+                {
+                    ixSlopeLoConst = i;
+                    maxDiffLo = diffLo;
+                }
+            }
+            double p1;
+            double p2;
+            double slope;
+            double stdErrSq;
+            int j = 0;
+            double px;
+            double[] scurveUnAdj = new double[_FinalProbabilities.Count()];
+            double[] _scurve = new double[_FinalProbabilities.Count()];
+            for (int i = 1; i < _FinalProbabilities.Count() - 1; i++)
+            {
+                p = 1 - _FinalProbabilities[i];
+                p2 = 1 - _FinalProbabilities[i + 1];
+                p1 = 1 - _FinalProbabilities[i - 1];
+                slope = (_ExpandedFlowOrStageValues[i + 1] - _ExpandedFlowOrStageValues[i - 1]) / (p2 - p1);
+                stdErrSq = (p * (1 - p) * Math.Pow(slope, 2.0D)) / _SampleSize;
+                _scurve[i] = Math.Sqrt(stdErrSq);
+                scurveUnAdj[i] = _scurve[i];
+
+                //    !first and last points
+                if (i == 2 | i == _FinalProbabilities.Count())
+                {
+                    if (i == 2) j = 1;
+                    if (i == _FinalProbabilities.Count() - 1) j = _FinalProbabilities.Count();
+                    px = 1 - _FinalProbabilities[j];
+                    _scurve[j] = Math.Sqrt((px * (1 - px) * Math.Pow(slope, 2.0D)) / _SampleSize);
+                    scurveUnAdj[j] = _scurve[j];
+                }
+            }
+
+            //            !Hold standard Error Constant
+            if (useConstantStandardError)
+            {
+                for (int i = ixSlopeHiConst; i < _FinalProbabilities.Count(); i++)
+                {
+                    _scurve[i] = _scurve[ixSlopeHiConst];
+                }
+                for (int i = 0; i < ixSlopeLoConst; i++)
+                {
+                    _scurve[i] = _scurve[ixSlopeLoConst];
+                }
+            }
+
+            return _scurve;
+        }
+        private IDistribution[] ConstructNormalDistributions()
+        {
+            IDistribution[] distributionArray = new IDistribution[_FlowOrStageStandardErrorsComputed.Length];
+            for (int i = 0; i < _FlowOrStageStandardErrorsComputed.Length; i++)
+            {
+                distributionArray[i] = new Distributions.Normal(_ExpandedFlowOrStageValues[i], _FlowOrStageStandardErrorsComputed[i]);
+            }
+            return distributionArray;
         }
 
         public bool Equals(IDistribution distribution)
