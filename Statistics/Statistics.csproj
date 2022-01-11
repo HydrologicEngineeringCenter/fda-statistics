@@ -16,7 +16,6 @@
 	</PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
 	<PackageReference Include="USACE.HEC.FDA.Utilities" Version="1.0" />
   </ItemGroup>
 
