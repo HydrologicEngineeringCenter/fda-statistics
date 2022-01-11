@@ -111,8 +111,10 @@ namespace StatisticsTests
                 2.00190, 2.00200, 2.00200, 2.00210, 2.00220, 2.00230, 2.00240, 2.00250, 2.00270, 2.00260, 2.00260, 2.00260,
                 2.00270, 2.00260, 2.00250, 2.00240};
             SampleStatistics s = new SampleStatistics(new Data(data));
-            Assert.Equal(2.00185600000000,s.Mean);
-            Assert.Equal(0.000429123454003053, s.StandardDeviation);
+            Assert.Equal(2.00185600000000,s.Mean,7);
+            Assert.Equal(0.000429123454003053, s.StandardDeviation,7);
+            Assert.Equal(0.64492948110838, s.Skewness, 7);//from excel
+            Assert.Equal(-0.820523796773878, s.Kurtosis, 7);//from excel
 
         }
     }
