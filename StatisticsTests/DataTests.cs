@@ -114,7 +114,8 @@ namespace StatisticsTests
             Assert.Equal(2.00185600000000,s.Mean,7);
             Assert.Equal(0.000429123454003053, s.StandardDeviation,4);
             Assert.True(Math.Abs(0.64492948110838 - s.Skewness)<.03);//from excel
-            Assert.Equal(-0.820523796773878, s.Kurtosis, 7);//from excel
+            Assert.True(Math.Abs(-0.820523796773878 - s.Kurtosis)<.2);//from excel
+            Assert.Equal(2.0018, s.Median,5);
 
         }
     }
