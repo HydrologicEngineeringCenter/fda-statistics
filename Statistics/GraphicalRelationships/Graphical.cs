@@ -28,9 +28,9 @@ namespace Statistics.GraphicalRelationships
         /// </summary>
         private double[] _InputFlowOrStageValues;
         /// <summary>
-        /// _ExceedanceProbabilities represent the interpolated and extrapolated set of exceedance probabilities. this should probably always be the same.  
+        /// _ExceedanceProbabilities represent the interpolated and extrapolated set of exceedance probabilities. These are the compute points in HEC-FDA Version 1.4.3
         /// </summary>
-        private double[] _RequiredExceedanceProbabilities = { .999, .99, .95, .90, .80, .70, .60, .50, .475, .45, .425, .40, .375, .35, .325, .30, .275, .25, .225, .20, .175, .15, .125, .10, .075, .05, .04, .025, .02, .015, .01, 0.009, 0.008, 0.007, 0.006, 0.005, 0.004, .002, .001 };
+        private double[] _RequiredExceedanceProbabilities = { 0.99900, 0.99000, 0.95000, 0.90000, 0.85000, 0.80000, 0.75000, 0.70000, 0.65000, 0.60000, 0.55000, 0.50000, 0.47500, 0.45000, 0.42500, 0.40000, 0.37500, 0.35000, 0.32500, 0.30000, 0.29000, 0.28000, 0.27000, 0.26000, 0.25000, 0.24000, 0.23000, 0.22000, 0.21000, 0.20000, 0.19500, 0.19000, 0.18500, 0.18000, 0.17500, 0.17000, 0.16500, 0.16000, 0.15500, 0.15000, 0.14500, 0.14000, 0.13500, 0.13000, 0.12500, 0.12000, 0.11500, 0.11000, 0.10500, 0.10000, 0.09500, 0.09000, 0.08500, 0.08000, 0.07500, 0.07000, 0.06500, 0.06000, 0.05900, 0.05800, 0.05700, 0.05600, 0.05500, 0.05400, 0.05300, 0.05200, 0.05100, 0.05000, 0.04900, 0.04800, 0.04700, 0.04600, 0.04500, 0.04400, 0.04300, 0.04200, 0.04100, 0.04000, 0.03900, 0.03800, 0.03700, 0.03600, 0.03500, 0.03400, 0.03300, 0.03200, 0.03100, 0.03000, 0.02900, 0.02800, 0.02700, 0.02600, 0.02500, 0.02400, 0.02300, 0.02200, 0.02100, 0.02000, 0.01950, 0.01900, 0.01850, 0.01800, 0.01750, 0.01700, 0.01650, 0.01600, 0.01550, 0.01500, 0.01450, 0.01400, 0.01350, 0.01300, 0.01250, 0.01200, 0.01150, 0.01100, 0.01050, 0.01000, 0.00950, 0.00900, 0.00850, 0.00800, 0.00750, 0.00700, 0.00650, 0.00600, 0.00550, 0.00500, 0.00490, 0.00450, 0.00400, 0.00350, 0.00300, 0.00250, 0.00200, 0.00195, 0.00190, 0.00185, 0.00180, 0.00175, 0.00170, 0.00165, 0.00160, 0.00155, 0.00150, 0.00145, 0.00140, 0.00135, 0.00130, 0.00125, 0.00120, 0.00115, 0.00110, 0.00105, 0.00100, 0.00095, 0.00090, 0.00085, 0.00080, 0.00075, 0.00070, 0.00065, 0.00060, 0.00055, 0.00050, 0.00045, 0.00040, 0.00035, 0.00030, 0.00025, 0.00020, 0.00015, 0.00010 };
         /// <summary>
         /// _FlowOrStageDistributions represet the set of normal distributions with mean and standard deviation computed using the less simple method
         /// </summary>
@@ -151,17 +151,17 @@ namespace Statistics.GraphicalRelationships
         /// This method implements the less simple method to compute confidence limits about a graphical frequency relationship. 
         /// </summary>
         /// <param name="useConstantStandardError"></param> True if user wishes to use constant standard error. 
-        /// <param name="probStdErrHighConst"></param> Frequent end of frequency curve after which to hold standard error constant. Default is 0.99.
-        /// <param name="probStdErrLowConst"></param> Infrequent end of frequency curve after which to hold standard error constant. Default is 0.01.
-        public void ComputeGraphicalConfidenceLimits(bool useConstantStandardError = true, double probStdErrHighConst = 0.99, double probStdErrLowConst = 0.01)
+        /// <param name="lowerExceedanceProbabilityHoldStandardErrorConstant"></param> Less frequent end of frequency curve after which to hold standard error constant. Default is 0.99.
+        /// <param name="higherExceedanceProbabilityHoldStandardErrorConstant"></param> Infrequent end of frequency curve after which to hold standard error constant. Default is 0.01.
+        public void ComputeGraphicalConfidenceLimits(bool useConstantStandardError = true, double lowerExceedanceProbabilityHoldStandardErrorConstant = 0.01, double higherExceedanceProbabilityHoldStandardErrorConstant = 0.99)
         {   
             ExtendFrequencyCurveBasedOnNormalProbabilityPaper();
             List<double> finalProbabilities = GetFinalProbabilities();
             InterpolateQuantiles interpolatedQuantiles = new InterpolateQuantiles(_InputFlowOrStageValues, _InputExceedanceProbabilities);
             _ExpandedFlowOrStageValues = interpolatedQuantiles.ComputeQuantiles(finalProbabilities.ToArray());
             _FinalProbabilities = finalProbabilities.ToArray();
-            _FlowOrStageStandardErrorsComputed = ComputeStandardDeviations(useConstantStandardError, probStdErrHighConst, probStdErrLowConst);
-            _FlowOrStageDistributions = ConstructNormalDistributions();
+            _FlowOrStageStandardErrorsComputed = ComputeStandardDeviations(useConstantStandardError, lowerExceedanceProbabilityHoldStandardErrorConstant, higherExceedanceProbabilityHoldStandardErrorConstant);
+            _FlowOrStageDistributions = MakeDistributionsMonotonic(ConstructNormalDistributions());
         }
       
         private bool IsMonotonicallyIncreasing(double[] arrayOfData)
@@ -321,7 +321,7 @@ namespace Statistics.GraphicalRelationships
             return finalProbabilities;
         }
 
-        private double[] ComputeStandardDeviations(bool useConstantStandardError, double probStdErrHighConst, double probStdErrLowConst)
+        private double[] ComputeStandardDeviations(bool useConstantStandardError, double lowerExceedanceProbabilityHoldStandardErrorConstant, double higherExceedanceProbabilityHoldStandardErrorConstant)
         {
             int ixSlopeHiConst = -1;
             int ixSlopeLoConst = -1;
@@ -336,8 +336,8 @@ namespace Statistics.GraphicalRelationships
             for (int i = 0; i < _FinalProbabilities.Count(); i++)
             {
                 p = _FinalProbabilities[i];
-                diffHi = Math.Abs(p - probStdErrHighConst);
-                diffLo = Math.Abs(p - probStdErrLowConst);
+                diffHi = Math.Abs(p - lowerExceedanceProbabilityHoldStandardErrorConstant);
+                diffLo = Math.Abs(p - higherExceedanceProbabilityHoldStandardErrorConstant);
 
                 if (diffHi < maxDiffHi)
                 {
@@ -350,47 +350,40 @@ namespace Statistics.GraphicalRelationships
                     maxDiffLo = diffLo;
                 }
             }
+
+
             double p1;
             double p2;
             double slope;
-            double stdErrSq;
-
-
-            int j = 0;
-            double px;
-            double[] scurveUnAdj = new double[_FinalProbabilities.Count()];
+            double standardErrorSquared;
             double[] _scurve = new double[_FinalProbabilities.Count()];
             
-            //First point and last point should be held constant 
-
-            //Second through second to last points
             for (int i = 1; i < _FinalProbabilities.Count() - 1; i++)
             {
                 p = 1 - _FinalProbabilities[i];
                 p2 = 1 - _FinalProbabilities[i + 1];
                 p1 = 1 - _FinalProbabilities[i - 1];
                 slope = (_ExpandedFlowOrStageValues[i + 1] - _ExpandedFlowOrStageValues[i - 1]) / (p2 - p1);
-                stdErrSq = (p * (1 - p))/ (Math.Pow(1/slope, 2.0D) * _SampleSize);
-                _scurve[i] = Math.Sqrt(stdErrSq);
+                standardErrorSquared = (p * (1 - p))/ (Math.Pow(1/slope, 2.0D) * _SampleSize);
+                _scurve[i] = Math.Sqrt(standardErrorSquared);
 
+                //hold slope constant and calculate standard error for the first coordinate
+                if (i == 1)
+                { 
+                    p = 1 - _FinalProbabilities[i - 1];
+                    standardErrorSquared = (p * (1 - p)) / (Math.Pow(1 / slope, 2.0D) * _SampleSize);
+                    _scurve[i-1] = Math.Sqrt(standardErrorSquared);
 
-                scurveUnAdj[i] = _scurve[i];
+                }
+                //hold slope constant and calculate standard error for the last coordinate
+                if (i == _FinalProbabilities.Count() -2 )
+                {
+                    p = 1 - _FinalProbabilities[i + 1];
+                    standardErrorSquared = (p * (1 - p)) / (Math.Pow(1 / slope, 2.0D) * _SampleSize);
+                    _scurve[i +1 ] = Math.Sqrt(standardErrorSquared);
+                }
 
-                ////    !first and last points
-                //if (i == 2 | i == _FinalProbabilities.Count())
-                //{
-                //    if (i == 2) j = 1;
-                //    if (i == _FinalProbabilities.Count() - 1) j = _FinalProbabilities.Count();
-                //    px = 1 - _FinalProbabilities[j];
-                //    //Equation 6 in the technical reference 
-                //    _scurve[j] = Math.Sqrt((px * (1 - px)) /( Math.Pow(slope, 2.0D) * _SampleSize));
-                //    scurveUnAdj[j] = _scurve[j];
-                //}
             }
-            //Last point 
-
-
-
             //            !Hold standard Error Constant
             if (useConstantStandardError)
             {
@@ -414,6 +407,14 @@ namespace Statistics.GraphicalRelationships
                 distributionArray[i] = new Distributions.Normal(_ExpandedFlowOrStageValues[i], _FlowOrStageStandardErrorsComputed[i]);
             }
             return distributionArray;
+        }
+
+        private Normal[] MakeDistributionsMonotonic(Normal[] normalDistributions)
+        {
+            Normal[] monotonicNormalDistributions = new Normal[normalDistributions.Length];
+            monotonicNormalDistributions = MakeDistributionsMonotonic(normalDistributions);
+            return monotonicNormalDistributions;
+
         }
 
         public bool Equals(double[] probabilities, IDistribution[] distributionOfFlowsOrStages)
