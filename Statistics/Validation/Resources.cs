@@ -5,7 +5,7 @@ using Utilities;
 
 namespace Statistics.Validation
 {
-    internal static class Resources
+    public static class Resources
     {
         /// <summary>
         /// A string for invalid parameterization errors.

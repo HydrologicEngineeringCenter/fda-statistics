@@ -55,6 +55,8 @@ namespace Statistics.Distributions
             Min = double.NegativeInfinity;
             Max = double.PositiveInfinity;
             BuildFromProperties();
+            //IsConstructed = true;
+            //_ProbabilityRange = IRangeFactory.Factory(0,1);
         }
         public LogPearson3(double mean, double standardDeviation, double skew, int sampleSize = int.MaxValue)
         {
@@ -65,6 +67,8 @@ namespace Statistics.Distributions
             Min = double.NegativeInfinity;
             Max = double.PositiveInfinity;
             BuildFromProperties();
+            //IsConstructed = true;
+            //_ProbabilityRange = IRangeFactory.Factory(0,1);
         }
         public LogPearson3(double mean, double standardDeviation, double skew, double min, double max, int sampleSize = int.MaxValue)
         {
@@ -101,7 +105,7 @@ namespace Statistics.Distributions
         }
 
         private void SetProbabilityRangeAndMinAndMax(double min, double max)
-        {
+        {//TODO: need to set the probability range before we get here if LP3 is not constructed 
             double pmin = 0;
             double epsilon = 1 / 1000000000d;
             double pmax = 1 - pmin;
@@ -130,6 +134,7 @@ namespace Statistics.Distributions
             Max = max;
             Min = min;
             _ProbabilityRange = IRangeFactory.Factory(pmin, pmax);
+            //IsConstructed = true;
         }
         #region IDistribution Functions
         public double PDF(double x)
@@ -144,6 +149,8 @@ namespace Statistics.Distributions
         }
         public double CDF(double x)
         {
+            //check if constructed
+            //if not, skip probability min and max pieces 
             if (x < Min) return 0;
             if (x == Min) return _ProbabilityRange.Min;
             if (x == Max) return _ProbabilityRange.Max;
@@ -157,6 +164,9 @@ namespace Statistics.Distributions
         }
         public double InverseCDF(double p)
         {
+                        //check if constructed
+            //if not, skip probability min and max pieces
+
             if (Truncated && _Constructed)
             {
                 p = _ProbabilityRange.Min + (p) * (_ProbabilityRange.Max - _ProbabilityRange.Min);
