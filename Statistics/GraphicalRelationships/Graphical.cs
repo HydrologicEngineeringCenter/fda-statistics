@@ -411,17 +411,6 @@ namespace Statistics.GraphicalRelationships
             return distributionArray;
         }
 
-        public bool Equals(double[] probabilities, IDistribution[] distributionOfFlowsOrStages)
-        {
-            if (_FinalProbabilities == probabilities)
-            {
-                if (_FlowOrStageDistributions == distributionOfFlowsOrStages)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
         #endregion
     }
 }
