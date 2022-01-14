@@ -355,7 +355,6 @@ namespace Statistics.GraphicalRelationships
             double p1;
             double p2;
             double slope;
-            double[] slopeArray = new double[_FinalProbabilities.Count()];
             double standardErrorSquared;
             double[] _scurve = new double[_FinalProbabilities.Count()];
             
@@ -365,16 +364,13 @@ namespace Statistics.GraphicalRelationships
                 p2 = 1 - _FinalProbabilities[i + 1];
                 p1 = 1 - _FinalProbabilities[i - 1];
                 slope = (_ExpandedFlowOrStageValues[i + 1] - _ExpandedFlowOrStageValues[i - 1]) / (p2 - p1);
-                slopeArray[i] = slope;
-                standardErrorSquared = (p * (1 - p))/ (Math.Pow(1/slope, 2.0D) * _SampleSize);
-                _scurve[i] = Math.Sqrt(standardErrorSquared);
+                _scurve[i] = Equation6StandardError(p, slope);
 
                 //hold slope constant and calculate standard error for the first coordinate
                 if (i == 1)
                 { 
                     p = 1 - _FinalProbabilities[i - 1];
-                    standardErrorSquared = (p * (1 - p)) / (Math.Pow(1 / slope, 2.0D) * _SampleSize);
-                    _scurve[i-1] = Math.Sqrt(standardErrorSquared);
+                    _scurve[i - 1] = Equation6StandardError(p, slope);
 
                 }
                 //hold slope constant and calculate standard error for the last coordinate
@@ -410,7 +406,18 @@ namespace Statistics.GraphicalRelationships
             }
             return distributionArray;
         }
-
+        /// <summary>
+        /// This is Equation 6 from CPD-72a HEC-FDA Technical Reference 
+        /// </summary>
+        /// <param name="nonExceedanceProbability"></param>
+        /// <param name="slope"></param>
+        /// <returns></returns>
+        private double Equation6StandardError(double nonExceedanceProbability, double slope)
+        {
+            double standardErrorSquared = (nonExceedanceProbability * (1 - nonExceedanceProbability)) / (Math.Pow(1 / slope, 2.0D) * _SampleSize);
+            double standardError = Math.Pow(standardErrorSquared, 0.5);
+            return standardError;
+        }
         #endregion
     }
 }
