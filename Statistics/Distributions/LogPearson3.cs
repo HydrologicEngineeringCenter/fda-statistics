@@ -54,9 +54,9 @@ namespace Statistics.Distributions
             SampleSize = 1;
             Min = double.NegativeInfinity;
             Max = double.PositiveInfinity;
+            _ProbabilityRange = IRangeFactory.Factory(0D,1D);
             BuildFromProperties();
-            //IsConstructed = true;
-            //_ProbabilityRange = IRangeFactory.Factory(0,1);
+            _Constructed = true;
         }
         public LogPearson3(double mean, double standardDeviation, double skew, int sampleSize = int.MaxValue)
         {
@@ -66,9 +66,9 @@ namespace Statistics.Distributions
             SampleSize = sampleSize;
             Min = double.NegativeInfinity;
             Max = double.PositiveInfinity;
+            _ProbabilityRange = IRangeFactory.Factory(0D, 1D); //why do we need this 
             BuildFromProperties();
-            //IsConstructed = true;
-            //_ProbabilityRange = IRangeFactory.Factory(0,1);
+            _Constructed = true;
         }
         public LogPearson3(double mean, double standardDeviation, double skew, double min, double max, int sampleSize = int.MaxValue)
         {
@@ -149,11 +149,14 @@ namespace Statistics.Distributions
         }
         public double CDF(double x)
         {
-            //check if constructed
-            //if not, skip probability min and max pieces 
+
+            if(_Constructed)
+            {
+                if (x == Min) return _ProbabilityRange.Min;
+                if (x == Max) return _ProbabilityRange.Max;
+            }
+
             if (x < Min) return 0;
-            if (x == Min) return _ProbabilityRange.Min;
-            if (x == Max) return _ProbabilityRange.Max;
             if (x > Max) return 1;
             if (x > 0)
             {
