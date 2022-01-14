@@ -355,6 +355,7 @@ namespace Statistics.GraphicalRelationships
             double p1;
             double p2;
             double slope;
+            double[] slopeArray = new double[_FinalProbabilities.Count()];
             double standardErrorSquared;
             double[] _scurve = new double[_FinalProbabilities.Count()];
             
@@ -364,6 +365,7 @@ namespace Statistics.GraphicalRelationships
                 p2 = 1 - _FinalProbabilities[i + 1];
                 p1 = 1 - _FinalProbabilities[i - 1];
                 slope = (_ExpandedFlowOrStageValues[i + 1] - _ExpandedFlowOrStageValues[i - 1]) / (p2 - p1);
+                slopeArray[i] = slope;
                 standardErrorSquared = (p * (1 - p))/ (Math.Pow(1/slope, 2.0D) * _SampleSize);
                 _scurve[i] = Math.Sqrt(standardErrorSquared);
 
