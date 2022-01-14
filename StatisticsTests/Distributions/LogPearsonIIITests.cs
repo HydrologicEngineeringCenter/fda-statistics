@@ -245,6 +245,15 @@ namespace StatisticsTests.Distributions
             double result = testObj.Skewness;
             Assert.Equal(skew, result, 9);
         }
+        
+        [Theory]
+        [InlineData(4.354, .119, .646, 13601.5, 37152.0, .4, 20350.4)]
+        public void LPIII_Truncated(double mean, double standardDeviation, double skew, double min, double max, double probability, double expected)
+        {
+            var testObject = new Statistics.Distributions.LogPearson3(mean, standardDeviation, skew, min, max);
+            double actual = testObject.InverseCDF(probability);
+            Assert.Equal(expected, actual, 1);
+        }
 
 
     }

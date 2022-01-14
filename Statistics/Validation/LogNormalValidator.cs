@@ -22,6 +22,7 @@ namespace Statistics.Validation
         {
             List<IMessage> msgs = new List<IMessage>();
             if (obj.IsNull()) throw new ArgumentNullException(nameof(obj), "The normal distribution could not be validated because it is null.");
+            if (obj.StandardDeviation == 0) throw new ArgumentNullException(nameof(obj), "The Log Normal distribution does not accept a standard deviation of zero. Instead, use a deterministic distribution (constant value)");
             if (!(obj.SampleSize > 0)) msgs.Add(IMessageFactory.Factory(IMessageLevels.Error, $"{Resources.InvalidParameterizationNotice(obj.Print(true))} {obj.Requirements(false)} {Resources.SampleSizeSuggestion()}."));
             //if (!obj.Range.IsFinite()) msgs.Add(IMessageFactory.Factory(IMessageLevels.Error, $"{Resources.NonFiniteRangeNotice(obj)}"));
             //else msgs.Add(IMessageFactory.Factory(IMessageLevels.Message, $"The normal distribution has been restricted to the finite range: {obj.Range.Print(true)} which spans the probability range: {obj._ProbabilityRange.Print(true)}."));
