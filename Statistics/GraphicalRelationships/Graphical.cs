@@ -161,7 +161,7 @@ namespace Statistics.GraphicalRelationships
             _ExpandedFlowOrStageValues = interpolatedQuantiles.ComputeQuantiles(finalProbabilities.ToArray());
             _FinalProbabilities = finalProbabilities.ToArray();
             _FlowOrStageStandardErrorsComputed = ComputeStandardDeviations(useConstantStandardError, lowerExceedanceProbabilityHoldStandardErrorConstant, higherExceedanceProbabilityHoldStandardErrorConstant);
-            _FlowOrStageDistributions = MakeDistributionsMonotonic(ConstructNormalDistributions());
+            _FlowOrStageDistributions = MakeMeMonotonic.IAmNormalMakeMeMonotonic(ConstructNormalDistributions());
         }
       
         private bool IsMonotonicallyIncreasing(double[] arrayOfData)
@@ -407,14 +407,6 @@ namespace Statistics.GraphicalRelationships
                 distributionArray[i] = new Distributions.Normal(_ExpandedFlowOrStageValues[i], _FlowOrStageStandardErrorsComputed[i]);
             }
             return distributionArray;
-        }
-
-        private Normal[] MakeDistributionsMonotonic(Normal[] normalDistributions)
-        {
-            Normal[] monotonicNormalDistributions = new Normal[normalDistributions.Length];
-            monotonicNormalDistributions = MakeDistributionsMonotonic(normalDistributions);
-            return monotonicNormalDistributions;
-
         }
 
         public bool Equals(double[] probabilities, IDistribution[] distributionOfFlowsOrStages)
