@@ -22,6 +22,7 @@ namespace Statistics.Validation
         {
             List<IMessage> msgs = new List<IMessage>();
             if (obj.IsNull()) throw new ArgumentNullException(nameof(obj), "The log Pearson III distribution could not be validated because it is null.");
+            if (obj.StandardDeviation < 0) throw new ArgumentException(nameof(obj), "The log pearson III distribution could not be constructed because standard deviation must be positive");
             if (!(obj.SampleSize > 0)) msgs.Add(IMessageFactory.Factory(IMessageLevels.Error, $"{Resources.InvalidParameterizationNotice(obj.Print(true))} {obj.Requirements(false)} {Resources.SampleSizeSuggestion()}."));
             msgs.Add(IMessageFactory.Factory(IMessageLevels.Message, $"The log Pearson III distribution has been restricted to a finite range which spans the probability range: {obj._ProbabilityRange.Print(false)}."));
             return msgs;
