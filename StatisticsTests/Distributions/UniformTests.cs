@@ -18,6 +18,25 @@ namespace StatisticsTests.Distributions
             Assert.Equal(max, testObj.Max, 2);
         }
         [Theory]
+        [InlineData(0d, -1d, 1)]
+        [InlineData(-1d, -2d, 1)]
+        [InlineData(-1d, 1d, -1)]
+        public void BadValidation(double min, double max, int n)
+        {
+            Statistics.Distributions.Uniform dist = new Statistics.Distributions.Uniform(min, max, n);
+            dist.Validate();
+            Assert.True(dist.HasErrors);
+        }
+        [Theory]
+        [InlineData(0d, 1d, 1)]
+        [InlineData(-1d, 2d, 1)]
+        public void GoodValidation(double min, double max, int n)
+        {
+            Statistics.Distributions.Uniform dist = new Statistics.Distributions.Uniform(min, max, n);
+            dist.Validate();
+            Assert.False(dist.HasErrors);
+        }
+        [Theory]
         [InlineData(0d, 1d, 0.5, 0.5)]
         [InlineData(0d, 1d, 0.25, 0.25)]
         [InlineData(0d, 1d, 0.75, 0.75)]

@@ -46,32 +46,32 @@ namespace Statistics.Distributions
             Max = max;
             SampleSize = sampleSize;
             MostLikely = mode;
-            if (!Validation.TriangularValidator.IsConstructable(MostLikely, min, max, out string error)) throw new InvalidConstructorArgumentsException(error);
+            //if (!Validation.TriangularValidator.IsConstructable(MostLikely, min, max, out string error)) throw new InvalidConstructorArgumentsException(error);
             addRules();
         }
         private void addRules()
         {
             AddSinglePropertyRule(nameof(Min),
                 new Rule(() => {
-                    return Min > Max;
+                    return Min < Max;
                 },
                 "Min must be smaller than Max.",
                 ErrorLevel.Fatal));
             AddSinglePropertyRule(nameof(Min),
                 new Rule(() => {
-                    return Min > MostLikely;
+                    return Min < MostLikely;
                 },
                 "Min must be smaller than MostLikely.",
                 ErrorLevel.Fatal));
             AddSinglePropertyRule(nameof(Max),
                 new Rule(() => {
-                    return Min == Max;
+                    return Min != Max;
                 },
                 "Max cannot equal Min.",
                 ErrorLevel.Fatal));
             AddSinglePropertyRule(nameof(Max),
                 new Rule(() => {
-                    return MostLikely > Max;
+                    return MostLikely < Max;
                 },
                 "MostLikely must be smaller than Max.",
                 ErrorLevel.Fatal));

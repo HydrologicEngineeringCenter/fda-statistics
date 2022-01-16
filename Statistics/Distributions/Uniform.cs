@@ -48,13 +48,13 @@ namespace Statistics.Distributions
         {
             AddSinglePropertyRule(nameof(Min),
                 new Rule(() => {
-                    return Min > Max;
+                    return Min < Max;
                 },
                 "Min must be smaller than Max.",
                 ErrorLevel.Fatal));
             AddSinglePropertyRule(nameof(Max),
                 new Rule(() => {
-                    return Min == Max;
+                    return Min != Max;
                 },
                 "Max cannot equal Min.",
                 ErrorLevel.Fatal));
