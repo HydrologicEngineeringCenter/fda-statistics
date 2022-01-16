@@ -8,7 +8,7 @@ using Utilities;
 
 namespace Statistics.Distributions
 {
-    public class Empirical : IDistribution
+    public class Empirical : ContinuousDistribution
     {
         #region Fields 
         private bool _ProbabilitiesWereAcceptedAsExceedance;
@@ -25,7 +25,7 @@ namespace Statistics.Distributions
         #endregion
 
         #region IDistributionProperties
-        public IDistributionEnum Type => IDistributionEnum.Empirical;
+        public override IDistributionEnum Type => IDistributionEnum.Empirical;
       
         public double Mean { get; set; }
         public double Median { get; set; }
@@ -38,11 +38,11 @@ namespace Statistics.Distributions
         
         public double Skewness { get; set; }
 
-        public int SampleSize { get; set; }
+        public override int SampleSize { get; }
         public IRange<double> Range { get; set; }
-        public IMessageLevels State { get; private set; }
-        public IEnumerable<IMessage> Messages { get; private set; }
-        public bool Truncated { get; set; }
+        public override IMessageLevels State { get; }
+        public override IEnumerable<IMessage> Messages { get; }
+        public override bool Truncated { get;}
         #endregion
 
         #region Constructor
@@ -323,7 +323,7 @@ namespace Statistics.Distributions
         #endregion
         #region IDistributionFunctions
 
-        public double CDF(double x)
+        public override double CDF(double x)
         {
             int index = Array.BinarySearch(ObservationValues,x);
             if (index >= 0)
@@ -351,7 +351,7 @@ namespace Statistics.Distributions
             }
         }
 
-        public bool Equals(IDistribution distribution)
+        public override bool Equals(IDistribution distribution)
         {
 
             if (distribution.Type == IDistributionEnum.Empirical)
@@ -372,7 +372,7 @@ namespace Statistics.Distributions
             }
         }
 
-        public double InverseCDF(double p)
+        public override double InverseCDF(double p)
         {
             if (Truncated && _Constructed)
             {
@@ -418,7 +418,7 @@ namespace Statistics.Distributions
 
         }
 
-        public double PDF(double x)
+        public override double PDF(double x)
         {
             int index = ObservationValues.ToList().IndexOf(x);
             if (index >= 0)
@@ -475,9 +475,9 @@ namespace Statistics.Distributions
             }
             return returnString;
         }
-        public string Print(bool round = false) => round ? Print(ObservationValues,CumulativeProbabilities) : $"Empirical(Observation Values: {ObservationValues}, Cumulative Probabilities {CumulativeProbabilities})";
+        public override string Print(bool round = false) => round ? Print(ObservationValues,CumulativeProbabilities) : $"Empirical(Observation Values: {ObservationValues}, Cumulative Probabilities {CumulativeProbabilities})";
 
-        public string Requirements(bool printNotes)
+        public override string Requirements(bool printNotes)
         {
             return RequiredParameterization(printNotes);
         }
