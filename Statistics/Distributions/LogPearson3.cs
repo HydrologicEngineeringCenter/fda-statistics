@@ -54,9 +54,10 @@ namespace Statistics.Distributions
             Min = double.NegativeInfinity;
             Max = double.PositiveInfinity;
             _ProbabilityRange = IRangeFactory.Factory(0D,1D);
+            addRules();
             BuildFromProperties();
             _Constructed = true;
-            addRules();
+            
         }
         public LogPearson3(double mean, double standardDeviation, double skew, int sampleSize = int.MaxValue)
         {
@@ -66,10 +67,11 @@ namespace Statistics.Distributions
             SampleSize = sampleSize;
             Min = double.NegativeInfinity;
             Max = double.PositiveInfinity;
-            _ProbabilityRange = IRangeFactory.Factory(0D, 1D); //why do we need this 
+            _ProbabilityRange = IRangeFactory.Factory(0D, 1D); //why do we need this
+            addRules();
             BuildFromProperties();
             _Constructed = true;
-            addRules();
+            
         }
         public LogPearson3(double mean, double standardDeviation, double skew, double min, double max, int sampleSize = int.MaxValue)
         {
@@ -80,20 +82,23 @@ namespace Statistics.Distributions
             Min = min;
             Max = max;
             Truncated = true;
-            
-            BuildFromProperties();
             addRules();
+            BuildFromProperties();
         }
 
         public void BuildFromProperties()
         {
-            if (!Validation.LogPearson3Validator.IsConstructable(Mean, StandardDeviation, Skewness, SampleSize, out string error)) throw new Utilities.InvalidConstructorArgumentsException(error);
-            else
+            Validate();
+            if(!HasErrors)
             {
-               SetProbabilityRangeAndMinAndMax(Min, Max);
+                SetProbabilityRangeAndMinAndMax(Min, Max);
                 State = Validate(new Validation.LogPearson3Validator(), out IEnumerable<Utilities.IMessage> msgs);
                 Messages = msgs;
             }
+            //else
+            //{
+              //  if (!Validation.LogPearson3Validator.IsConstructable(Mean, StandardDeviation, Skewness, SampleSize, out string error)) throw new Utilities.InvalidConstructorArgumentsException(error);
+            //}
             _Constructed = true;
         }
         private void addRules()
