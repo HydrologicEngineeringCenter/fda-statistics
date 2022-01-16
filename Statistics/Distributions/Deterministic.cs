@@ -1,11 +1,7 @@
-﻿using System;
+﻿using Base.Implementations;
+using Base.Enumerations;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using Utilities;
-using Utilities.Serialization;
 
 namespace Statistics.Distributions
 {
@@ -27,10 +23,20 @@ namespace Statistics.Distributions
         public Deterministic(double x)
         {
             Value = x;
+            addRules();
         }
         public Deterministic()
         {
-
+            addRules();
+        }
+        private void addRules()
+        {
+            AddSinglePropertyRule(nameof(Value),
+                new Rule(() => {
+                    return !Value.IsNull();
+                },
+                "On Deterministic Distributions Value cannot be Null.",
+                ErrorLevel.Fatal));
         }
         #endregion
 
