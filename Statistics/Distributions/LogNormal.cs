@@ -117,7 +117,7 @@ namespace Statistics.Distributions
         }
         public override string Print(bool round = false) => round ? Print(Mean, StandardDeviation, SampleSize) : $"LogNormal(mean: {Mean}, sd: {StandardDeviation}, sample size: {SampleSize})";
         public override string Requirements(bool printNotes) => RequiredParameterization(printNotes);
-        public override bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print()) == 0 ? true : false;
+        public override bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print()) == 0;
         #endregion
 
         internal static string Print(double mean, double sd, int n) => $"LogNormal(mean: {mean.Print()}, sd: {sd.Print()}, sample size: {n.Print()})";

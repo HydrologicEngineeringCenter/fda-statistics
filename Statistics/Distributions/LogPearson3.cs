@@ -8,14 +8,14 @@ using Utilities.Serialization;
 
 namespace Statistics.Distributions
 {
-    public class LogPearson3: IDistribution, IValidate<LogPearson3> 
+    public class LogPearson3: ContinuousDistribution, IValidate<LogPearson3> 
     {
         
         internal IRange<double> _ProbabilityRange;
         private bool _Constructed;
 
         #region Properties
-        public IDistributionEnum Type => IDistributionEnum.LogPearsonIII;
+        public override IDistributionEnum Type => IDistributionEnum.LogPearsonIII;
         [Stored(Name = "Mean", type = typeof(double))]
         public double Mean { get; set; }
         [Stored(Name = "St_Dev", type = typeof(double))]
@@ -33,14 +33,14 @@ namespace Statistics.Distributions
             get; set;
         }
         [Stored(Name = "Truncated", type = typeof(bool))]
-        public bool Truncated
+        public override bool Truncated
         {
-            get; set;
+            get; protected set;
         }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
-        public int SampleSize { get; set; }
-        public IMessageLevels State { get; private set; }
-        public IEnumerable<Utilities.IMessage> Messages { get; private set; }
+        public override int SampleSize { get; protected set; }
+        public override IMessageLevels State { get; protected set; }
+        public override IEnumerable<Utilities.IMessage> Messages { get; protected set; }
 
         #endregion
 
@@ -137,7 +137,7 @@ namespace Statistics.Distributions
             //IsConstructed = true;
         }
         #region IDistribution Functions
-        public double PDF(double x)
+        public override double PDF(double x)
         {
             if (x < Min || x > Max) return double.Epsilon;
             else
@@ -147,7 +147,7 @@ namespace Statistics.Distributions
 
             }          
         }
-        public double CDF(double x)
+        public override double CDF(double x)
         {
 
             if(_Constructed)
@@ -165,7 +165,7 @@ namespace Statistics.Distributions
             }
             else return 0;
         }
-        public double InverseCDF(double p)
+        public override double InverseCDF(double p)
         {
                         //check if constructed
             //if not, skip probability min and max pieces
@@ -189,9 +189,9 @@ namespace Statistics.Distributions
             PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
             return Math.Pow(10, d.InverseCDF(p));
         }
-        public string Print(bool round = false) => round ? Print(Mean, StandardDeviation, Skewness, SampleSize) : $"log PearsonIII(mean: {Mean}, sd: {StandardDeviation}, skew: {Skewness}, sample size: {SampleSize})";
-        public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
-        public bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print(), StringComparison.InvariantCultureIgnoreCase) == 0 ? true : false;
+        public override string Print(bool round = false) => round ? Print(Mean, StandardDeviation, Skewness, SampleSize) : $"log PearsonIII(mean: {Mean}, sd: {StandardDeviation}, skew: {Skewness}, sample size: {SampleSize})";
+        public override string Requirements(bool printNotes) => RequiredParameterization(printNotes);
+        public override bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print(), StringComparison.InvariantCultureIgnoreCase) == 0 ? true : false;
         #endregion
 
         internal static string Print(double mean, double sd, double skew, int n) => $"log PearsonIII(mean: {mean.Print()}, sd: {sd.Print()}, skew: {skew.Print()}, sample size: {n.Print()})";
@@ -215,20 +215,6 @@ namespace Statistics.Distributions
             if (!(data.State < IMessageLevels.Error) || data.Elements.Count() < 3) throw new ArgumentException($"The {nameof(sample)} is invalid because it contains an insufficient number of finite, numeric values (3 are required but only {data.Elements.Count()} were provided).");
             ISampleStatistics stats = ISampleStatisticsFactory.Factory(data);
             return new LogPearson3(stats.Mean, stats.StandardDeviation, stats.Skewness, sampleSize == -404 ? stats.SampleSize : sampleSize);
-        }
-
-        public XElement WriteToXML()
-        {
-            XElement ordinateElem = new XElement(SerializationConstants.LOG_PEARSON3);
-            //mean
-            ordinateElem.SetAttributeValue(SerializationConstants.MEAN, Mean);
-            //st dev
-            ordinateElem.SetAttributeValue(SerializationConstants.ST_DEV, StandardDeviation);
-            //skew
-            ordinateElem.SetAttributeValue("Skew", Skewness);
-            //sample size
-            ordinateElem.SetAttributeValue(SerializationConstants.SAMPLE_SIZE, SampleSize);
-            return ordinateElem;
         }
         #endregion
     }
