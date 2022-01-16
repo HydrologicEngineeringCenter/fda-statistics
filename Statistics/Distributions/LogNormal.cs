@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Base.Implementations;
+using Base.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 using Utilities;
 
 namespace Statistics.Distributions
@@ -49,6 +49,7 @@ namespace Statistics.Distributions
             Max = InverseCDF(1-0.0000000000001);
             State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
+            addRules();
         }
         public LogNormal(double mean, double sd, int sampleSize = int.MaxValue)
         {
@@ -60,7 +61,7 @@ namespace Statistics.Distributions
             Max = InverseCDF(1-0.0000000000001);
             State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
-
+            addRules();
         }
         public LogNormal(double mean, double sd, double minValue, double maxValue, int sampleSize = int.MaxValue)
         {
@@ -73,9 +74,30 @@ namespace Statistics.Distributions
             _ProbabilityRange = FiniteRange(Min, Max);
             State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
             Messages = msgs;
+            addRules();
             
         }
-
+        private void addRules()
+        {
+            AddSinglePropertyRule(nameof(StandardDeviation),
+                new Rule(() => {
+                    return StandardDeviation > 0;
+                },
+                "Standard Deviation must be greater than 0.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(Mean),
+                new Rule(() => {
+                    return Mean > 0;
+                },
+                "Mean must be greater than 0.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(SampleSize),
+                new Rule(() => {
+                    return SampleSize > 0;
+                },
+                "SampleSize must be greater than 0.",
+                ErrorLevel.Fatal));
+        }
         #endregion
 
         #region Functions
