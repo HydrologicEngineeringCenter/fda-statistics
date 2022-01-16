@@ -31,13 +31,13 @@ namespace Statistics.Distributions
         [Stored(Name = "Max", type = typeof(double))]
         public double Max { get{return _max;} set{_max = value;} }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
-        public override int SampleSize { get;}
+        public override int SampleSize { get; protected set; }
         [Stored(Name = "Truncated", type = typeof(bool))]
-        public override bool Truncated { get; }
+        public override bool Truncated { get; protected set; }
         #endregion
         #region IMessagePublisher Properties
-        public override IMessageLevels State { get; }
-        public override IEnumerable<Utilities.IMessage> Messages { get; }
+        public override IMessageLevels State { get; protected set; }
+        public override IEnumerable<Utilities.IMessage> Messages { get; protected set; }
         #endregion
 
         #endregion

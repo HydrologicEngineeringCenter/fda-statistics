@@ -13,10 +13,10 @@ namespace Statistics
     public abstract class ContinuousDistribution : Base.Implementations.Validation, IDistribution
     {   
         public abstract IDistributionEnum Type { get; }
-        public abstract int SampleSize { get; }
-        public abstract bool Truncated { get; }
-        public abstract IMessageLevels State { get; }
-        public abstract IEnumerable<IMessage> Messages { get; }
+        public abstract int SampleSize { get; protected set; }
+        public abstract bool Truncated { get; protected set; }
+        public abstract IMessageLevels State { get; protected set; }
+        public abstract IEnumerable<IMessage> Messages { get; protected set; }
         public abstract double CDF(double x);
         public abstract bool Equals(IDistribution distribution);
         public abstract double InverseCDF(double p);

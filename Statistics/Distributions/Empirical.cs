@@ -38,11 +38,11 @@ namespace Statistics.Distributions
         
         public double Skewness { get; set; }
 
-        public override int SampleSize { get; }
+        public override int SampleSize { get; protected set; }
         public IRange<double> Range { get; set; }
-        public override IMessageLevels State { get; }
-        public override IEnumerable<IMessage> Messages { get; }
-        public override bool Truncated { get;}
+        public override IMessageLevels State { get; protected set; }
+        public override IEnumerable<IMessage> Messages { get; protected set; }
+        public override bool Truncated { get; protected set; }
         #endregion
 
         #region Constructor

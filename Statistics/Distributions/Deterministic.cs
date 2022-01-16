@@ -15,11 +15,11 @@ namespace Statistics.Distributions
         public override IDistributionEnum Type => IDistributionEnum.Deterministic;
         public IRange<double> Range { get; set; }
 
-        public override int SampleSize { get; }
-        public override bool Truncated { get; }
-        public override IMessageLevels State => throw new NotImplementedException();
+        public override int SampleSize { get; protected set; }
+        public override bool Truncated { get; protected set; }
+        public override IMessageLevels State { get; protected set; }
 
-        public override IEnumerable<IMessage> Messages => throw new NotImplementedException();
+        public override IEnumerable<IMessage> Messages { get; protected set; }
         #endregion
         [Stored(Name = "Value", type = typeof(double))]
         public double Value { get; set; }
