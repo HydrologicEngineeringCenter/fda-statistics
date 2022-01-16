@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Base.Implementations;
+using Base.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Utilities;
 
@@ -66,6 +66,7 @@ namespace Statistics.Distributions
             Min = ObservationValues[0];
             Max = ObservationValues[ObservationValues.Length - 1];
             BuildFromProperties();
+            addRules();
         }
         public Empirical(double[] probabilities, double[] observationValues, double min, double max, bool probsAreExceedance = false)
         {
@@ -86,6 +87,7 @@ namespace Statistics.Distributions
             Max = max;
             Truncated = true;
             BuildFromProperties();
+            addRules();
         }
         public void BuildFromProperties()
         {
@@ -117,6 +119,15 @@ namespace Statistics.Distributions
             Messages = msgs;
             _Constructed = true;
             
+        }
+        private void addRules()
+        {
+            AddSinglePropertyRule(nameof(SampleSize),
+                new Rule(() => {
+                    return SampleSize > 0;
+                },
+                "SampleSize must be greater than 0.",
+                ErrorLevel.Fatal));
         }
         #endregion
 
