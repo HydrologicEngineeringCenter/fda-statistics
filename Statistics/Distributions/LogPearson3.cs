@@ -31,13 +31,6 @@ namespace Statistics.Distributions
         {
             get; set;
         }
-        [Stored(Name = "Truncated", type = typeof(bool))]
-        public override bool Truncated
-        {
-            get; protected set;
-        }
-        [Stored(Name = "SampleSize", type = typeof(Int32))]
-        public override int SampleSize { get; protected set; }
         #endregion
 
         #region Constructor

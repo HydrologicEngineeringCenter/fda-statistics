@@ -1,10 +1,8 @@
-﻿using System;
+﻿using Statistics.Distributions;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Utilities;
 
@@ -13,8 +11,10 @@ namespace Statistics
     public abstract class ContinuousDistribution : Base.Implementations.Validation, IDistribution
     {   
         public abstract IDistributionEnum Type { get; }
-        public abstract int SampleSize { get; protected set; }
-        public abstract bool Truncated { get; protected set; }
+        [Stored(Name = "SampleSize", type = typeof(Int32))]
+        public int SampleSize { get; protected set; }
+        [Stored(Name = "Truncated", type = typeof(bool))]
+        public bool Truncated { get; protected set; }
         public IMessageLevels State { get; protected set; }
         public IEnumerable<IMessage> Messages { get; protected set; }
         public abstract double CDF(double x);

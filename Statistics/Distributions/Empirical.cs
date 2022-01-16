@@ -37,10 +37,7 @@ namespace Statistics.Distributions
         public double Max { get; set; }
         
         public double Skewness { get; set; }
-
-        public override int SampleSize { get; protected set; }
         public IRange<double> Range { get; set; }
-        public override bool Truncated { get; protected set; }
         #endregion
 
         #region Constructor

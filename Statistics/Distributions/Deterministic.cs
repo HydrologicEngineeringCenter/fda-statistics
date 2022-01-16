@@ -10,9 +10,6 @@ namespace Statistics.Distributions
         #region IDistribution Properties
         public override IDistributionEnum Type => IDistributionEnum.Deterministic;
         public IRange<double> Range { get; set; }
-
-        public override int SampleSize { get; protected set; }
-        public override bool Truncated { get; protected set; }
         #endregion
         [Stored(Name = "Value", type = typeof(double))]
         public double Value { get; set; }

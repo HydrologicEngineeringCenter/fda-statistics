@@ -27,10 +27,6 @@ namespace Statistics.Distributions
         public double Min { get{return _min;} set{_min = value;} }
         [Stored(Name = "Max", type = typeof(double))]
         public double Max { get{return _max;} set{_max = value;} }
-        [Stored(Name = "SampleSize", type = typeof(Int32))]
-        public override int SampleSize { get; protected set; }
-        [Stored(Name = "Truncated", type = typeof(bool))]
-        public override bool Truncated { get; protected set; }
         #endregion
 
         #endregion
