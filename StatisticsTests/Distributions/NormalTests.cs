@@ -21,6 +21,15 @@ namespace StatisticsTests.Distributions
             Assert.Throws<Utilities.InvalidConstructorArgumentsException>(() => new Statistics.Distributions.Normal(mean, sd, n));
         }
         [Theory]
+        [InlineData(0d, -1d, 1)]
+        [InlineData(0d, -2d, 1)]
+        public void BadValidation(double mean, double sd, int n)
+        {
+            Statistics.Distributions.Normal dist = new Statistics.Distributions.Normal(mean, sd, n);
+            dist.Validate();
+            Assert.True(dist.HasErrors);
+        }
+        [Theory]
         [InlineData(0, 1, 0)]
         [InlineData(0, 1, -1)]
         public void NotPositiveSampleSize_Returns_IsValid_Equals_False(double mean, double sd, int n)
