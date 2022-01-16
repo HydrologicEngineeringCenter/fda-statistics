@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Statistics.Distributions
 {
-    public class Uniform: IDistribution, IValidate<Uniform>
+    public class Uniform: ContinuousDistribution, IValidate<Uniform>
     {
         //TODO: Validation
         #region Fields and Properties
@@ -16,17 +16,17 @@ namespace Statistics.Distributions
         private double _max;
 
         #region IDistribution Properties
-        public IDistributionEnum Type => IDistributionEnum.Uniform;
+        public override IDistributionEnum Type => IDistributionEnum.Uniform;
         [Stored(Name = "Min", type =typeof(double))]
         public double Min { get{return _min;} set{_min = value;} }
         [Stored(Name = "Max", type = typeof(double))]
         public double Max { get{return _max;} set{_max = value;} }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
-        public int SampleSize { get; set; }
-        public bool Truncated { get; set; }
+        public override int SampleSize { get; protected set; }
+        public override bool Truncated { get; protected set; }
         #endregion
-        public IMessageLevels State { get; private set; }
-        public IEnumerable<IMessage> Messages { get; private set; }
+        public override IMessageLevels State { get; protected set; }
+        public override IEnumerable<IMessage> Messages { get; protected set; }
         #endregion
 
         #region Constructor
@@ -53,7 +53,7 @@ namespace Statistics.Distributions
         }
         
         #region IDistribution Functions
-        public double PDF(double x){
+        public override double PDF(double x){
             if(x<Min){
                 return 0;
             }else if(x<= Max){
@@ -62,7 +62,7 @@ namespace Statistics.Distributions
                 return 0;
             }
         }
-        public double CDF(double x){
+        public override double CDF(double x){
             if(x<Min){
                 return 0;
             }else if(x<= Max){
@@ -71,14 +71,14 @@ namespace Statistics.Distributions
                 return 0;
             }
         }
-        public double InverseCDF(double p){
+        public override double InverseCDF(double p){
             return Min +((Max-Min)*p);
         }
-        public string Print(bool round = false) {
+        public override string Print(bool round = false) {
            return "Uniform(range: {Min:"+Min+", Max:"+Max+"})";
         }
-        public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
-        public bool Equals(IDistribution distribution){
+        public override string Requirements(bool printNotes) => RequiredParameterization(printNotes);
+        public override bool Equals(IDistribution distribution){
             if (Type==distribution.Type){
                 Uniform dist = (Uniform)distribution;
                 if (Min == dist.Min)
