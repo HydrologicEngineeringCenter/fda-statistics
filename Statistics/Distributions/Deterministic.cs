@@ -9,32 +9,17 @@ using Utilities.Serialization;
 
 namespace Statistics.Distributions
 {
-    public class Deterministic : IDistribution
+    public class Deterministic : ContinuousDistribution
     {
         #region IDistribution Properties
-        public IDistributionEnum Type => IDistributionEnum.Deterministic;
-
-        public double Mean { get; set;  }
-
-        public double Median { get; set; }
-
-        public double Mode { get; set; }
-
-        public double Min { get; set; }
-        public double Max { get; set; }
-        public double Variance { get; set; }
-
-        public double StandardDeviation { get; set; }
-
-        public double Skewness { get; set; }
-
+        public override IDistributionEnum Type => IDistributionEnum.Deterministic;
         public IRange<double> Range { get; set; }
 
-        public int SampleSize { get; set; }
-        public bool Truncated { get; set; }
-        public IMessageLevels State => throw new NotImplementedException();
+        public override int SampleSize { get; }
+        public override bool Truncated { get; }
+        public override IMessageLevels State => throw new NotImplementedException();
 
-        public IEnumerable<IMessage> Messages => throw new NotImplementedException();
+        public override IEnumerable<IMessage> Messages => throw new NotImplementedException();
         #endregion
         [Stored(Name = "Value", type = typeof(double))]
         public double Value { get; set; }
@@ -50,7 +35,7 @@ namespace Statistics.Distributions
         #endregion
 
         #region functions
-        public double CDF(double x)
+        public override double CDF(double x)
         {
             if (x >= Value)
             {
@@ -62,7 +47,7 @@ namespace Statistics.Distributions
             }
         }
 
-        public bool Equals(IDistribution distribution)
+        public override bool Equals(IDistribution distribution)
         {
             if (Type==distribution.Type){
                 Deterministic dist = (Deterministic)distribution;
@@ -74,12 +59,12 @@ namespace Statistics.Distributions
             return false;
         }
 
-        public double InverseCDF(double p)
+        public override double InverseCDF(double p)
         {
             return Value;
         }
 
-        public double PDF(double x)
+        public override double PDF(double x)
         {
             if (x == Value)
             {
@@ -91,20 +76,14 @@ namespace Statistics.Distributions
             }
         }
 
-        public string Print(bool round = false)
+        public override string Print(bool round = false)
         {
             return $"The Value is {Value}";
         }
 
-        public string Requirements(bool printNotes)
+        public override string Requirements(bool printNotes)
         {
             return "A value is required";
-        }
-
-        public String WriteToXML()
-        {
-            return $"{Value}";
-
         }
         #endregion
     }

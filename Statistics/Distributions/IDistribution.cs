@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Statistics
 {
@@ -61,6 +62,7 @@ namespace Statistics
         /// <param name="distribution"> The distribution to be compared to the instance distribution. </param>
         /// <returns> True if the two distributions are equivalent, false otherwise. </returns>
         bool Equals(IDistribution distribution);
+        XElement ToXML();
         #endregion
 
     }

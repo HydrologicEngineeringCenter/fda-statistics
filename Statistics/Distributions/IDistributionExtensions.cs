@@ -45,6 +45,7 @@ namespace Statistics
                 return true;
             }
         }
+        /*
         public static XElement ToXML(this IDistribution dist)
         {
             XElement ele = new XElement(dist.GetType().Name);
@@ -115,5 +116,6 @@ namespace Statistics
             }
             return dist;
         }
+        */
     }
 }
