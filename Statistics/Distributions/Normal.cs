@@ -7,7 +7,7 @@ using Base.Enumerations;
 
 namespace Statistics.Distributions
 {
-    public class Normal : ContinuousDistribution, Utilities.IValidate<Normal> //IOrdinate<IDistribution>
+    public class Normal : ContinuousDistribution
     {
         //TODO: Sample
         #region Fields and Propertiesj
@@ -32,10 +32,6 @@ namespace Statistics.Distributions
         [Stored(Name = "Truncated", type = typeof(bool))]
         public override bool Truncated { get; protected set; }
         #endregion
-        #region IMessagePublisher Properties
-        public override IMessageLevels State { get; protected set; }
-        public override IEnumerable<Utilities.IMessage> Messages { get; protected set; }
-        #endregion
 
         #endregion
 
@@ -46,12 +42,12 @@ namespace Statistics.Distributions
             Mean = 0;
             StandardDeviation = 1.0;
 
-            if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            //if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
             Min = InverseCDF(0.0000000000001);
             Max = InverseCDF(1-0.0000000000001);
-            State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
+            //State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            //Messages = msgs;
             addRules();
         }
         public Normal(double mean, double sd, int sampleSize = int.MaxValue)
@@ -59,12 +55,12 @@ namespace Statistics.Distributions
             Mean = mean;
             StandardDeviation = sd;
             SampleSize = sampleSize;
-            if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            //if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
             Min = InverseCDF(0.0000000000001);
             Max = InverseCDF(1-0.0000000000001);
-            State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
+            //State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            //Messages = msgs;
             addRules();
 
         }
@@ -76,10 +72,10 @@ namespace Statistics.Distributions
             Min = minValue;
             Max = maxValue;
             Truncated = true;
-            if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            //if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             _ProbabilityRange = FiniteRange(Min, Max);
-            State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
+           // State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            //Messages = msgs;
             addRules();
         }
         private void addRules()

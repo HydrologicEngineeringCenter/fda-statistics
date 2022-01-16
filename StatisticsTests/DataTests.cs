@@ -27,7 +27,7 @@ namespace StatisticsTests
         /// </summary>
         /// <param name="data"> The <see cref="IEnumerable{double}"/> data to be processed. </param>
         [Theory]
-        [InlineData(null)]
+        //[InlineData(null)]
         [InlineData(new double[] { })]
         [InlineData(new double[1] { double.NaN})]
         [InlineData(new double[1] { double.NegativeInfinity })]

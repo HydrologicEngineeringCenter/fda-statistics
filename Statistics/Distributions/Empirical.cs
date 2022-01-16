@@ -40,8 +40,6 @@ namespace Statistics.Distributions
 
         public override int SampleSize { get; protected set; }
         public IRange<double> Range { get; set; }
-        public override IMessageLevels State { get; protected set; }
-        public override IEnumerable<IMessage> Messages { get; protected set; }
         public override bool Truncated { get; protected set; }
         #endregion
 
@@ -49,7 +47,7 @@ namespace Statistics.Distributions
 
         public Empirical(double[] probabilities, double[] observationValues, bool probsAreExceedance = false)
         {
-            if (!Validation.EmpiricalValidator.IsConstructable(probabilities, observationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            //if (!Validation.EmpiricalValidator.IsConstructable(probabilities, observationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             _ProbabilitiesWereAcceptedAsExceedance = probsAreExceedance;
             double[] probabilityArray = new double[probabilities.Length];
             if (_ProbabilitiesWereAcceptedAsExceedance == true)
@@ -70,7 +68,7 @@ namespace Statistics.Distributions
         }
         public Empirical(double[] probabilities, double[] observationValues, double min, double max, bool probsAreExceedance = false)
         {
-            if (!Validation.EmpiricalValidator.IsConstructable(probabilities, observationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            //if (!Validation.EmpiricalValidator.IsConstructable(probabilities, observationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             _ProbabilitiesWereAcceptedAsExceedance = probsAreExceedance;
             double[] probabilityArray = new double[probabilities.Length];
             if (_ProbabilitiesWereAcceptedAsExceedance == true)
@@ -91,7 +89,7 @@ namespace Statistics.Distributions
         }
         public void BuildFromProperties()
         {
-            if (!Validation.EmpiricalValidator.IsConstructable(CumulativeProbabilities, ObservationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            //if (!Validation.EmpiricalValidator.IsConstructable(CumulativeProbabilities, ObservationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             if (_ProbabilitiesWereAcceptedAsExceedance == true)
             {
                CumulativeProbabilities = ConvertExceedanceToNonExceedance(CumulativeProbabilities);
@@ -115,8 +113,8 @@ namespace Statistics.Distributions
             StandardDeviation = ComputeStandardDeviation();
             Variance = Math.Pow(StandardDeviation, 2);
             Skewness = ComputeSkewness();
-            State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
+            //State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            //Messages = msgs;
             _Constructed = true;
             
         }

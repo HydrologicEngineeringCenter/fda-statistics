@@ -37,7 +37,7 @@ namespace StatisticsTests.Distributions
             {
                 randomNumberArray[i] = random.NextDouble();
             }
-            IDistribution testBootstrapDistribution = ((ContinuousDistribution)distributionLP3).Sample(randomNumberArray);
+            IDistribution testBootstrapDistribution = distributionLP3.Sample(randomNumberArray);
             Statistics.Distributions.LogPearson3 tbd = (Statistics.Distributions.LogPearson3)testBootstrapDistribution;
             double actual = tbd.Mean;
             double difference = expected - actual;

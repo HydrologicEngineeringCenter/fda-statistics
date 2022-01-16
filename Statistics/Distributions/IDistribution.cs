@@ -63,6 +63,7 @@ namespace Statistics
         /// <returns> True if the two distributions are equivalent, false otherwise. </returns>
         bool Equals(IDistribution distribution);
         XElement ToXML();
+        IDistribution Sample(double[] randomPacket);
         #endregion
 
     }

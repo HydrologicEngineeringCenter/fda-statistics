@@ -10,20 +10,10 @@ namespace StatisticsTests.Distributions
     public class NormalTests
     {
         [Theory]
-        [InlineData(double.NaN, 1d, 1)]
-        [InlineData(0d, double.NaN, 1)]
-        [InlineData(double.NegativeInfinity, 1d, 1)]
-        [InlineData(0d, double.NegativeInfinity, 1)]
-        [InlineData(double.PositiveInfinity, 1d, 1)]
-        [InlineData(0d, double.PositiveInfinity, 1)]
-        public void InvalidParameters_Throw_InvalidConstructorArguments(double mean, double sd, int n)
-        {
-            Assert.Throws<Utilities.InvalidConstructorArgumentsException>(() => new Statistics.Distributions.Normal(mean, sd, n));
-        }
-        [Theory]
         [InlineData(0d, -1d, 1)]
         [InlineData(-1d, -2d, 1)]
         [InlineData(-1d, 1d, -1)]
+        [InlineData(1d, 1d, 0)]
         public void BadValidation(double mean, double sd, int n)
         {
             Statistics.Distributions.Normal dist = new Statistics.Distributions.Normal(mean, sd, n);
@@ -38,14 +28,6 @@ namespace StatisticsTests.Distributions
             Statistics.Distributions.Normal dist = new Statistics.Distributions.Normal(mean, sd, n);
             dist.Validate();
             Assert.False(dist.HasErrors);
-        }
-        [Theory]
-        [InlineData(0, 1, 0)]
-        [InlineData(0, 1, -1)]
-        public void NotPositiveSampleSize_Returns_IsValid_Equals_False(double mean, double sd, int n)
-        {
-            var testObj = new Statistics.Distributions.Normal(mean, sd, n);
-            Assert.True(testObj.State == Utilities.IMessageLevels.Error);
         }
         //https://en.wikipedia.org/wiki/Standard_normal_table
         [Theory]

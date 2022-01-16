@@ -7,7 +7,7 @@ using Utilities;
 
 namespace Statistics.Distributions
 {
-    public class LogPearson3: ContinuousDistribution, IValidate<LogPearson3> 
+    public class LogPearson3: ContinuousDistribution
     {
         
         internal IRange<double> _ProbabilityRange;
@@ -38,9 +38,6 @@ namespace Statistics.Distributions
         }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
         public override int SampleSize { get; protected set; }
-        public override IMessageLevels State { get; protected set; }
-        public override IEnumerable<Utilities.IMessage> Messages { get; protected set; }
-
         #endregion
 
         #region Constructor
@@ -92,8 +89,8 @@ namespace Statistics.Distributions
             if(!HasErrors)
             {
                 SetProbabilityRangeAndMinAndMax(Min, Max);
-                State = Validate(new Validation.LogPearson3Validator(), out IEnumerable<Utilities.IMessage> msgs);
-                Messages = msgs;
+                //State = Validate(new Validation.LogPearson3Validator(), out IEnumerable<Utilities.IMessage> msgs);
+                //Messages = msgs;
             }
             //else
             //{

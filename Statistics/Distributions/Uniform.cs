@@ -7,7 +7,7 @@ using Base.Enumerations;
 
 namespace Statistics.Distributions
 {
-    public class Uniform: ContinuousDistribution, IValidate<Uniform>
+    public class Uniform: ContinuousDistribution
     {
         //TODO: Validation
         #region Fields and Properties
@@ -24,8 +24,7 @@ namespace Statistics.Distributions
         public override int SampleSize { get; protected set; }
         public override bool Truncated { get; protected set; }
         #endregion
-        public override IMessageLevels State { get; protected set; }
-        public override IEnumerable<IMessage> Messages { get; protected set; }
+
         #endregion
 
         #region Constructor
@@ -117,7 +116,7 @@ namespace Statistics.Distributions
 
         internal static string Print(IRange<double> range) => $"Uniform(range: {range.Print(true)})";
         internal static string RequiredParameterization(bool printNotes = false) => $"The Uniform distribution requires the following parameterization: {Parameterization()}.";
-        internal static string Parameterization() => $"Uniform({Validation.Resources.DoubleRangeRequirements()})";
+        internal static string Parameterization() => $"Uniform()";
 
         public static Uniform Fit(IEnumerable<double> sample)
         {

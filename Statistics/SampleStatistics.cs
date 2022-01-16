@@ -59,8 +59,8 @@ namespace Statistics
         {
             InitalizeStats(data.Elements);
             Range = Utilities.IRangeFactory.Factory(_min, _max);
-            State = Validate(new Validation.SummaryStatisticsValidator(), out IEnumerable<IMessage> msgs);
-            Messages = msgs;
+            //State = Validate(new Validation.SummaryStatisticsValidator(), out IEnumerable<IMessage> msgs);
+            //Messages = msgs;
         }
         internal void InitalizeStats(IOrderedEnumerable<double> observations)
         {

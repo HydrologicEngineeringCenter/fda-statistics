@@ -13,9 +13,6 @@ namespace Statistics.Distributions
 
         public override int SampleSize { get; protected set; }
         public override bool Truncated { get; protected set; }
-        public override IMessageLevels State { get; protected set; }
-
-        public override IEnumerable<IMessage> Messages { get; protected set; }
         #endregion
         [Stored(Name = "Value", type = typeof(double))]
         public double Value { get; set; }

@@ -7,7 +7,7 @@ using Utilities;
 
 namespace Statistics.Distributions
 {
-    public class Triangular: ContinuousDistribution, IValidate<Triangular> 
+    public class Triangular: ContinuousDistribution
     {
         //TODO: Sample
         #region Fields and Properties
@@ -23,8 +23,6 @@ namespace Statistics.Distributions
         [Stored(Name = "SampleSize", type = typeof(Int32))]
         public override int SampleSize { get; protected set; }
         public override bool Truncated { get; protected set; }
-        public override IMessageLevels State { get; protected set; }
-        public override IEnumerable<IMessage> Messages { get; protected set; }
         [Stored(Name = "MostLikely", type = typeof(double))]
         public double MostLikely{ get{return _mostlikely;} set{_mostlikely = value;} }
         #endregion
@@ -96,7 +94,7 @@ namespace Statistics.Distributions
             if (printNotes) s += RequirementNotes();
             return s;
         }
-        internal static string Parameterization() => $"Triangular(mode: range minimum \u2264 mode \u2264 range maximum, {Validation.Resources.DoubleRangeRequirements()}, sample size: > 0)";
+        internal static string Parameterization() => $"Triangular(mode: range minimum \u2264 mode \u2264 range maximum, sample size: > 0)";
         internal static string RequirementNotes() => "The mode parameter is also sometimes referred to as the most likely value.";
         
         #region IDistribution Functions

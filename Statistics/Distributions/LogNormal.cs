@@ -7,7 +7,7 @@ using Utilities;
 
 namespace Statistics.Distributions
 {
-    public class LogNormal : ContinuousDistribution, Utilities.IValidate<LogNormal>
+    public class LogNormal : ContinuousDistribution
     {      
         #region Fields and Properties
         private double _mean;
@@ -31,10 +31,7 @@ namespace Statistics.Distributions
         [Stored(Name = "Truncated", type = typeof(bool))]
         public override bool Truncated { get; protected set; }
         #endregion
-        #region IMessagePublisher Properties
-        public override IMessageLevels State { get; protected set; }
-        public override IEnumerable<Utilities.IMessage> Messages { get; protected set; }
-        #endregion
+
 
         #endregion
 
@@ -47,8 +44,8 @@ namespace Statistics.Distributions
             _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
             Min = InverseCDF(0.0000000000001);
             Max = InverseCDF(1-0.0000000000001);
-            State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
+            //State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            //Messages = msgs;
             addRules();
         }
         public LogNormal(double mean, double sd, int sampleSize = int.MaxValue)
@@ -59,8 +56,8 @@ namespace Statistics.Distributions
             _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
             Min = InverseCDF(0.0000000000001);
             Max = InverseCDF(1-0.0000000000001);
-            State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
+            //State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            //Messages = msgs;
             addRules();
         }
         public LogNormal(double mean, double sd, double minValue, double maxValue, int sampleSize = int.MaxValue)
@@ -72,8 +69,8 @@ namespace Statistics.Distributions
             Max = maxValue;
             Truncated = true;
             _ProbabilityRange = FiniteRange(Min, Max);
-            State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
+            //State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            //Messages = msgs;
             addRules();
             
         }
