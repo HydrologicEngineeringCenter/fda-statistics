@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Base.Implementations;
+using Base.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 using Utilities;
-using Utilities.Serialization;
 
 namespace Statistics.Distributions
 {
@@ -39,6 +38,7 @@ namespace Statistics.Distributions
             Max = 1;
             MostLikely = .5;
             SampleSize = 0;
+            addRules();
         }
         public Triangular(double min, double mode, double max, int sampleSize = int.MaxValue)
         {
@@ -47,6 +47,40 @@ namespace Statistics.Distributions
             SampleSize = sampleSize;
             MostLikely = mode;
             if (!Validation.TriangularValidator.IsConstructable(MostLikely, min, max, out string error)) throw new InvalidConstructorArgumentsException(error);
+            addRules();
+        }
+        private void addRules()
+        {
+            AddSinglePropertyRule(nameof(Min),
+                new Rule(() => {
+                    return Min > Max;
+                },
+                "Min must be smaller than Max.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(Min),
+                new Rule(() => {
+                    return Min > MostLikely;
+                },
+                "Min must be smaller than MostLikely.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(Max),
+                new Rule(() => {
+                    return Min == Max;
+                },
+                "Max cannot equal Min.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(Max),
+                new Rule(() => {
+                    return MostLikely > Max;
+                },
+                "MostLikely must be smaller than Max.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(SampleSize),
+                new Rule(() => {
+                    return SampleSize > 0;
+                },
+                "SampleSize must be greater than 0.",
+                ErrorLevel.Fatal));
         }
         #endregion
 
