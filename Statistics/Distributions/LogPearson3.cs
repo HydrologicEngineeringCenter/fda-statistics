@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Base.Implementations;
+using Base.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 using Utilities;
-using Utilities.Serialization;
 
 namespace Statistics.Distributions
 {
@@ -57,6 +56,7 @@ namespace Statistics.Distributions
             _ProbabilityRange = IRangeFactory.Factory(0D,1D);
             BuildFromProperties();
             _Constructed = true;
+            addRules();
         }
         public LogPearson3(double mean, double standardDeviation, double skew, int sampleSize = int.MaxValue)
         {
@@ -69,6 +69,7 @@ namespace Statistics.Distributions
             _ProbabilityRange = IRangeFactory.Factory(0D, 1D); //why do we need this 
             BuildFromProperties();
             _Constructed = true;
+            addRules();
         }
         public LogPearson3(double mean, double standardDeviation, double skew, double min, double max, int sampleSize = int.MaxValue)
         {
@@ -81,7 +82,7 @@ namespace Statistics.Distributions
             Truncated = true;
             
             BuildFromProperties();
-            
+            addRules();
         }
 
         public void BuildFromProperties()
@@ -95,7 +96,51 @@ namespace Statistics.Distributions
             }
             _Constructed = true;
         }
-        
+        private void addRules()
+        {
+            AddSinglePropertyRule(nameof(StandardDeviation),
+                new Rule(() => {
+                    return StandardDeviation > 0;
+                },
+                "Standard Deviation must be greater than 0.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(StandardDeviation),
+                new Rule(() => {
+                    return StandardDeviation < 3;
+                },
+                "Standard Deviation must be less than 3.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(Mean),
+                new Rule(() => {
+                    return Mean > 0;
+                },
+                "Mean must be greater than 0.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(Mean),
+                new Rule(() => {
+                    return Mean < 7; //log base 10 mean annual max flow in cfs of amazon river at mouth is 6.7
+                },
+                "Mean must be less than 7.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(Skewness),
+                new Rule(() => {
+                    return Skewness > -3.0;
+                },
+                "Skewness must be greater than -3.0.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(Skewness),
+                new Rule(() => {
+                    return Skewness < 3.0;
+                },
+                "Skewness must be less than 3.0.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(SampleSize),
+                new Rule(() => {
+                    return SampleSize > 0;
+                },
+                "SampleSize must be greater than 0.",
+                ErrorLevel.Fatal));
+        }
         #endregion
 
         #region Functions
