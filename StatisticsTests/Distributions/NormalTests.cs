@@ -54,7 +54,7 @@ namespace StatisticsTests.Distributions
         [InlineData(0d, 1, -2d, 2d, 0, .00135, -1.97668)]
         public void Truncated_StandardNormal_InverseCDF(double mean, double sd, double min, double max, int n, double p, double z)
         {
-            var testObj = new Statistics.Distributions.Normal(mean, sd, min, max, n);
+            var testObj = new Statistics.Distributions.TruncatedNormal(mean, sd, min, max, n);
             Assert.Equal(z, testObj.InverseCDF(p), 4);
         }
     }

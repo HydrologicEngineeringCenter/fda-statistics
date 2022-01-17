@@ -13,9 +13,6 @@ namespace Statistics.Distributions
         #region Fields and Propertiesj
         private double _mean;
         private double _standardDeviation;
-        private double _min;
-        private double _max;
-        internal IRange<double> _ProbabilityRange;
 
         #region IDistribution Properties
         public override IDistributionEnum Type => IDistributionEnum.Normal;
@@ -23,10 +20,6 @@ namespace Statistics.Distributions
          public double Mean { get{return _mean;} set{_mean = value;} }
         [Stored(Name = "Standard_Deviation", type = typeof(double))]
         public double StandardDeviation { get{return _standardDeviation;} set{_standardDeviation = value;} }
-        [Stored(Name = "Min", type =typeof(double))]
-        public double Min { get{return _min;} set{_min = value;} }
-        [Stored(Name = "Max", type = typeof(double))]
-        public double Max { get{return _max;} set{_max = value;} }
         #endregion
 
         #endregion
@@ -37,13 +30,6 @@ namespace Statistics.Distributions
             //for reflection;
             Mean = 0;
             StandardDeviation = 1.0;
-
-            //if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
-            _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
-            Min = InverseCDF(0.0000000000001);
-            Max = InverseCDF(1-0.0000000000001);
-            //State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            //Messages = msgs;
             addRules();
         }
         public Normal(double mean, double sd, int sampleSize = int.MaxValue)
@@ -51,28 +37,8 @@ namespace Statistics.Distributions
             Mean = mean;
             StandardDeviation = sd;
             SampleSize = sampleSize;
-            //if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
-            _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
-            Min = InverseCDF(0.0000000000001);
-            Max = InverseCDF(1-0.0000000000001);
-            //State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            //Messages = msgs;
             addRules();
 
-        }
-        public Normal(double mean, double sd, double minValue, double maxValue, int sampleSize = int.MaxValue)
-        {
-            Mean = mean;
-            StandardDeviation = sd;
-            SampleSize = sampleSize;
-            Min = minValue;
-            Max = maxValue;
-            Truncated = true;
-            //if (!Validation.NormalValidator.IsConstructable(Mean, StandardDeviation, SampleSize, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
-            _ProbabilityRange = FiniteRange(Min, Max);
-           // State = Validate(new Validation.NormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            //Messages = msgs;
-            addRules();
         }
         private void addRules()
         {
@@ -92,22 +58,6 @@ namespace Statistics.Distributions
         #endregion
 
         #region Functions
-        public IMessageLevels Validate(Utilities.IValidator<Normal> validator, out IEnumerable<Utilities.IMessage> msgs)
-        {
-            return validator.IsValid(this, out msgs);
-        }
-        private IRange<double> FiniteRange(double min, double max)
-        {
-            double pmin = 0;
-            double pmax = 1 - pmin;
-            if (min.IsFinite() || max.IsFinite())
-            {
-                pmin = CDF(min);
-                pmax = CDF(max);
-            }
-            return IRangeFactory.Factory(pmin, pmax);
-        }
-        
         #region IDistribution Functions
         public override double PDF(double x){
             return Math.Exp(-(x-Mean)*(x-Mean)/(2.0*StandardDeviation*StandardDeviation))/(Math.Sqrt(2.0*Math.PI)*StandardDeviation);
@@ -128,16 +78,10 @@ namespace Statistics.Distributions
         }
         public override double InverseCDF(double p)
         {
-            if (Truncated)
-            {
-                //https://en.wikipedia.org/wiki/Truncated_normal_distribution
-                p = _ProbabilityRange.Min + (p) * (_ProbabilityRange.Max - _ProbabilityRange.Min);
-            }
-            if (p <= _ProbabilityRange.Min) return Min;
-            if (p >= _ProbabilityRange.Max) return Max;
+            if (p <= 0) return Double.NegativeInfinity;
+            if (p >= 1) return Double.PositiveInfinity;
             return invCDFNewton(p, Mean, 1e-10,100);
         }
-
 
         public override string Print(bool round = false) => round ? Print(Mean, StandardDeviation, SampleSize): $"Normal(mean: {Mean}, sd: {StandardDeviation}, sample size: {SampleSize})";
         public override string Requirements(bool printNotes) => RequiredParameterization(printNotes);
@@ -147,15 +91,6 @@ namespace Statistics.Distributions
                 if(SampleSize == dist.SampleSize){
                     if(Mean==dist.Mean){
                         if(StandardDeviation==dist.StandardDeviation){
-                            if( Truncated){
-                                if (Truncated == dist.Truncated){
-                                    if (Min == dist.Min){
-                                        if(Max == dist.Max){
-                                            return true;
-                                        }
-                                    }
-                                }
-                            }
                             return true;
                         }
                     } 

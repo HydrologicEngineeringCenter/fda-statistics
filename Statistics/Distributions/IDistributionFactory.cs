@@ -37,8 +37,6 @@ namespace Statistics
                     return Distributions.Uniform.RequiredParameterization(true);
                 case IDistributionEnum.TruncatedHistogram:
                 case IDistributionEnum.TruncatedNormal:
-                case IDistributionEnum.TruncatedTriangular:
-                case IDistributionEnum.TruncatedUniform:
                     //return Distributions.TruncatedDistribution.RequiredParameterization(true);
                 case IDistributionEnum.NotSupported:
                 default:
@@ -99,7 +97,7 @@ namespace Statistics
         /// <returns> A new <see cref="IDistribution"/>. </returns>
         public static IDistribution FactoryTruncatedNormal(double mean, double stDev, double min, double max, int sampleSize = int.MaxValue)
         {
-            IDistribution normal = new Distributions.Normal(mean, stDev, min, max, sampleSize);
+            IDistribution normal = new Distributions.TruncatedNormal(mean, stDev, min, max, sampleSize);
             return normal;
         }
         /// <summary>
@@ -142,7 +140,7 @@ namespace Statistics
             if (lpIII.IsNull()) throw new ArgumentNullException(nameof(lpIII));
             if (lpIII.Type != IDistributionEnum.LogPearsonIII) throw new ArgumentException($"The {nameof(FactoryTruncatedLogPearsonIII)} factory requires a {nameof(IDistributionEnum.LogPearsonIII)} {nameof(lpIII)} parameter, instead a {nameof(lpIII.Type)} was provided.");
             Statistics.Distributions.LogPearson3 ldist = (Statistics.Distributions.LogPearson3)lpIII;
-            return new Statistics.Distributions.LogPearson3(ldist.Mean,ldist.StandardDeviation,ldist.Skewness, min, max, lpIII.SampleSize);
+            return new Statistics.Distributions.TruncatedLogPearson3(ldist.Mean,ldist.StandardDeviation,ldist.Skewness, min, max, lpIII.SampleSize);
         }
         /// <summary>
         /// Constructs a <see cref="IDistribution"/> bound on the range specified by the <paramref name="min"/> and <paramref name="max"/> values."/>

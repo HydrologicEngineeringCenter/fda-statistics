@@ -15,19 +15,6 @@ namespace StatisticsTests.Distributions
     [ExcludeFromCodeCoverage]
     public class LogPearsonIIITests
     {
-        /// <summary>
-        /// Tests that valid parameters return a finite <see cref="IRange{T}"/> through the <see cref="Statistics.Distributions.LogPearson3._ProbabilityRange"/> field which is generated to restrit the unbounded distribution to a finite range.
-        /// </summary>
-        /// <param name="mean"> <see cref="Statistics.Distributions.LogPearson3.Mean"/> parameter for the <see cref="Statistics.Distributions.LogPearson3"/> distribution, which is a log base 10 representation of a random number. Any non-positive, non-finite or non-numerical value is expected to cause an <see cref="Utilities.InvalidConstructorArgumentsException"/> to be thrown. </param>
-        /// <param name="sd"> <see cref="Statistics.Distributions.LogPearson3.StandardDeviation"/> parameter for the <see cref="Statistics.Distributions.LogPearson3"/> distribution, which is a log base 10 representation of a random number. Any non-positive, non-finite or non-numerical value is expected to cause an <see cref="Utilities.InvalidConstructorArgumentsException"/> to be thrown. </param>
-        /// <param name="skew"> <see cref="Statistics.Distributions.LogPearson3.Skewness"/> parameter for the <see cref="Statistics.Distributions.LogPearson3"/> distribution, which is a log base 10 representation of a random number. Only non-finite or non-numerical values are expected to cause an <see cref="Utilities.InvalidConstructorArgumentsException"/> to be thrown. </param>
-        [Fact]
-        public void GoodData_Returns_ValidFiniteRange()
-        {
-            var testObj = new Statistics.Distributions.LogPearson3(mean: 1, standardDeviation: 0.01, skew: -2);
-            var min = testObj.Min;
-            Assert.True(min.IsFinite());
-        }
         [Theory]
         [InlineData(0d, -1d, -2d, 1)]
         [InlineData(-1d, -2d, -3d, 1)]
@@ -52,20 +39,6 @@ namespace StatisticsTests.Distributions
             dist.Validate();
             Assert.False(dist.HasErrors);
         }
-        [Theory]
-        [InlineData(1d, 2d, 2d)]
-        [InlineData(1d, 2.99d, 2.99d)]
-        [InlineData(1d, 2d, -2d)]
-        [InlineData(1d, 2.99d, -2.99d)]
-        [InlineData(1d, 1d, 1d)]
-        [InlineData(2d, 2d, 2d)]
-        [InlineData(3d, 2.99d, 2.99d)]
-        public void GoodData_Returns_FiniteRange(double mean, double sd, double skew)
-        {
-            var testObj = new Statistics.Distributions.LogPearson3(mean, sd, skew);
-            Assert.True(testObj.Min.IsFinite());
-            Assert.True(testObj.Max.IsFinite());
-        }
         /// <summary>
         /// Tests that valid parameters return the <see cref="Statistics.Distributions.LogPearson3"/> in a non-error state. A <see cref="Statistics.Distributions.LogPearson3.State"/> should be <see cref="IMessageLevels.Message"/> since a message is added describing the finite range of the object.
         /// </summary>
@@ -86,15 +59,6 @@ namespace StatisticsTests.Distributions
             Assert.True(testObj.State < IMessageLevels.Error);
         }
 
-        [Theory]
-        [InlineData(2d, 2d, 2d)]
-        public void GoodData_Returns_FiniteRange2(double mean, double sd, double skew)
-        {
-            var testObj = new Statistics.Distributions.LogPearson3(mean, sd, skew);
-            // testObj.CDF();
-            Assert.True(testObj.Min.IsFinite());
-            Assert.True(testObj.Max.IsFinite());
-        }
         [Theory]
         [InlineData(.33d, 2d, 1d, 0.0000001d, 0.00023424651174493445)]//USGS-R SMWR
         [InlineData(.33d, 2d, 1d, .01d, 0.00142314347635817923)]//USGS-R SMWR
@@ -160,15 +124,17 @@ namespace StatisticsTests.Distributions
         [Theory]
         [InlineData(.33d, 2d, 1d, 2.071250e+20)] //USGS-R SMWR
         [InlineData(1d, .1d, .2d, 4.067518e+01)] //USGS-R SMWR
-        //[InlineData(5d, 3d, 8d, 7.163528e+136)] //USGS-R SMWR
-        //[InlineData(9d, 5d, 5d, 2.751981e+159)] //USGS-R SMWR
-        //[InlineData(9d, 5d, .5d, 3.571023e+46)] //USGS-R SMWR
+        [InlineData(5d, 3d, 8d, 7.163528e+136)] //USGS-R SMWR
+        [InlineData(9d, 5d, 5d, 2.751981e+159)] //USGS-R SMWR
+        [InlineData(9d, 5d, .5d, 3.571023e+46)] //USGS-R SMWR
         [InlineData(0.0000001d, 1d, 2d, 1.312489e+15)] //USGS-R SMWR
         public void LPIII_Maximums(double mean, double sd, double skew, double output)
         {
             //https://github.com/xunit/xunit/issues/1293
             var testObj = new Statistics.Distributions.LogPearson3(mean, sd, skew);
-            double result = testObj.Max;
+            double epsilon = 1 / 10000000d;
+            double pmax = 1 - epsilon;
+            double result = testObj.InverseCDF(pmax);
             double fraction = Math.Abs((output - result) / output);
 
             Assert.True(fraction < .01);
@@ -176,14 +142,16 @@ namespace StatisticsTests.Distributions
         [Theory]
         [InlineData(.33d, 2d, 1d, 0.00023424651174493445)] //USGS-R SMWR
         [InlineData(1d, .1d, .2d, 3.66134726526910103672)] //USGS-R SMWR
-        //[InlineData(5d, 3d, 8d, 17782.79410038922651438043)]//USGS-R SMWR
-        //[InlineData(9d, 5d, 5d, 10000000)]//USGS-R SMWR
-        //[InlineData(9d, 5d, .5d, 0.00000004890397239656)]//USGS-R SMWR
+        [InlineData(5d, 3d, 8d, 17782.79410038922651438043)]//USGS-R SMWR
+        [InlineData(9d, 5d, 5d, 10000000)]//USGS-R SMWR
+        [InlineData(9d, 5d, .5d, 0.00000004890397239656)]//USGS-R SMWR
         [InlineData(0.00000001d, 1d, 2d, 0.10000002302585474234)]//USGS-R SMWR
         public void LPIII_Minimums(double mean, double sd, double skew, double output)
         {
             var testObj = new Statistics.Distributions.LogPearson3(mean, sd, skew);
-            double result = testObj.Min;
+            double epsilon = 1 / 10000000d;
+
+            double result = testObj.InverseCDF(epsilon);
             double fraction = Math.Abs((output - result) / output);
 
             Assert.True(fraction < .001);
@@ -233,7 +201,7 @@ namespace StatisticsTests.Distributions
         [InlineData(4.354, .119, .646, 13601.5, 37152.0, .4, 20350.4)]
         public void LPIII_Truncated(double mean, double standardDeviation, double skew, double min, double max, double probability, double expected)
         {
-            var testObject = new Statistics.Distributions.LogPearson3(mean, standardDeviation, skew, min, max);
+            var testObject = new Statistics.Distributions.TruncatedLogPearson3(mean, standardDeviation, skew, min, max);
             double actual = testObject.InverseCDF(probability);
             Assert.Equal(expected, actual, 1);
         }

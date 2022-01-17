@@ -132,12 +132,6 @@ namespace Statistics
 
                 }
             }
-            if (dist.Type == IDistributionEnum.LogPearsonIII)
-            {
-                Distributions.LogPearson3 lp3 = (Distributions.LogPearson3)dist;
-                lp3.BuildFromProperties();
-                return lp3;
-            }
             return dist;
         }
     }
