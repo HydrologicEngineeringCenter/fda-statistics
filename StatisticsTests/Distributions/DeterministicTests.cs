@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
-using Utilities;
-using Xunit;
+﻿using Xunit;
 
 
 namespace StatisticsTests.Distributions

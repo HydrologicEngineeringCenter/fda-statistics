@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Base.Implementations;
+using Base.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 using Utilities;
 
 namespace Statistics.Distributions
 {
-    public class LogNormal : IDistribution, Utilities.IValidate<LogNormal>
+    public class LogNormal : ContinuousDistribution
     {      
         #region Fields and Properties
         private double _mean;
@@ -17,7 +17,7 @@ namespace Statistics.Distributions
         internal IRange<double> _ProbabilityRange;
 
         #region IDistribution Properties
-        public IDistributionEnum Type => IDistributionEnum.Normal;
+        public override IDistributionEnum Type => IDistributionEnum.Normal;
         [Stored(Name = "Mean", type = typeof(double))]
          public double Mean { get{return _mean;} set{_mean = value;} }
         [Stored(Name = "Standard_Deviation", type = typeof(double))]
@@ -26,15 +26,8 @@ namespace Statistics.Distributions
         public double Min { get{return _min;} set{_min = value;} }
         [Stored(Name = "Max", type = typeof(double))]
         public double Max { get{return _max;} set{_max = value;} }
-        [Stored(Name = "SampleSize", type = typeof(Int32))]
-        public int SampleSize { get; set; }
-        [Stored(Name = "Truncated", type = typeof(bool))]
-        public bool Truncated { get; set; }
         #endregion
-        #region IMessagePublisher Properties
-        public IMessageLevels State { get; private set; }
-        public IEnumerable<Utilities.IMessage> Messages { get; private set; }
-        #endregion
+
 
         #endregion
 
@@ -47,8 +40,9 @@ namespace Statistics.Distributions
             _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
             Min = InverseCDF(0.0000000000001);
             Max = InverseCDF(1-0.0000000000001);
-            State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
+            //State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            //Messages = msgs;
+            addRules();
         }
         public LogNormal(double mean, double sd, int sampleSize = int.MaxValue)
         {
@@ -58,9 +52,9 @@ namespace Statistics.Distributions
             _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
             Min = InverseCDF(0.0000000000001);
             Max = InverseCDF(1-0.0000000000001);
-            State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
-
+            //State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            //Messages = msgs;
+            addRules();
         }
         public LogNormal(double mean, double sd, double minValue, double maxValue, int sampleSize = int.MaxValue)
         {
@@ -71,11 +65,32 @@ namespace Statistics.Distributions
             Max = maxValue;
             Truncated = true;
             _ProbabilityRange = FiniteRange(Min, Max);
-            State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
+            //State = Validate(new Validation.LogNormalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            //Messages = msgs;
+            addRules();
             
         }
-
+        private void addRules()
+        {
+            AddSinglePropertyRule(nameof(StandardDeviation),
+                new Rule(() => {
+                    return StandardDeviation > 0;
+                },
+                "Standard Deviation must be greater than 0.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(Mean),
+                new Rule(() => {
+                    return Mean > 0;
+                },
+                "Mean must be greater than 0.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(SampleSize),
+                new Rule(() => {
+                    return SampleSize > 0;
+                },
+                "SampleSize must be greater than 0.",
+                ErrorLevel.Fatal));
+        }
         #endregion
 
         #region Functions
@@ -96,15 +111,15 @@ namespace Statistics.Distributions
         }
 
         #region IDistribution
-        public double PDF(double x){
+        public override double PDF(double x){
             Normal sn = new Normal();
             return sn.PDF(Math.Log(x));
         }
-        public double CDF(double x){
+        public override double CDF(double x){
             Normal sn = new Normal();
             return sn.CDF(Math.Log(x));
         }
-        public double InverseCDF(double p)
+        public override double InverseCDF(double p)
         {
             if (Truncated)
             {
@@ -115,9 +130,9 @@ namespace Statistics.Distributions
             Normal sn = new Normal();
             return Math.Exp(Mean+sn.InverseCDF(p)*StandardDeviation);
         }
-        public string Print(bool round = false) => round ? Print(Mean, StandardDeviation, SampleSize) : $"LogNormal(mean: {Mean}, sd: {StandardDeviation}, sample size: {SampleSize})";
-        public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
-        public bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print()) == 0 ? true : false;
+        public override string Print(bool round = false) => round ? Print(Mean, StandardDeviation, SampleSize) : $"LogNormal(mean: {Mean}, sd: {StandardDeviation}, sample size: {SampleSize})";
+        public override string Requirements(bool printNotes) => RequiredParameterization(printNotes);
+        public override bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print()) == 0;
         #endregion
 
         internal static string Print(double mean, double sd, int n) => $"LogNormal(mean: {mean.Print()}, sd: {sd.Print()}, sample size: {n.Print()})";

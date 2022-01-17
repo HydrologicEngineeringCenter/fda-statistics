@@ -1,4 +1,4 @@
-﻿using Statistics.Validation;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using Utilities;
 
 namespace Statistics
 {
-    public class Data : IData, IValidate<Data>
+    public class Data : IData
     {
         #region Properties
         public IRange<double> Range { get; }
@@ -24,7 +24,7 @@ namespace Statistics
         #region Constructor
         public Data(IEnumerable<double> data, bool finiteNumericElementsRequirement = false)
         {
-            if (!DataValidator.IsConstructable(data, out string msg)) throw new InvalidConstructorArgumentsException(msg);
+            //if (!DataValidator.IsConstructable(data, out string msg)) throw new InvalidConstructorArgumentsException(msg);
             var sets = SplitData(data);
             InvalidElements = sets.Item2;
             Elements = sets.Item1.OrderBy(i => i);
@@ -39,8 +39,8 @@ namespace Statistics
                 SampleSize = sets.Item1.Count();
                 Range = IRangeFactory.Factory(Elements.First(), Elements.Last(), true, true, false, false);
             }
-            State = Validate(new Validation.DataValidator(), out IEnumerable<IMessage> msgs);
-            Messages = msgs;
+           // State = Validate(new Validation.DataValidator(), out IEnumerable<IMessage> msgs);
+           // Messages = msgs;
         }
         #endregion
 

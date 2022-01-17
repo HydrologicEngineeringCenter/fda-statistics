@@ -18,7 +18,7 @@ namespace StatisticsTests.Distributions
         {
             IDistribution d = new Normal(mean, sd, n);
             XElement ele = d.ToXML();
-            IDistribution d2 = IDistributionExtensions.FromXML(ele);
+            IDistribution d2 = ContinuousDistribution.FromXML(ele);
             Assert.True(d.Equals(d2));
         }
         [Theory]
@@ -27,7 +27,7 @@ namespace StatisticsTests.Distributions
         {
             IDistribution d = new Normal(mean, sd, min, max, n);
             XElement ele = d.ToXML();
-            IDistribution d2 = IDistributionExtensions.FromXML(ele);
+            IDistribution d2 = ContinuousDistribution.FromXML(ele);
             Assert.True(d.Equals(d2));
         }
         [Theory]
@@ -36,7 +36,7 @@ namespace StatisticsTests.Distributions
         {
             IDistribution d = new LogNormal(mean, sd, n);
             XElement ele = d.ToXML();
-            IDistribution d2 = IDistributionExtensions.FromXML(ele);
+            IDistribution d2 = ContinuousDistribution.FromXML(ele);
             Assert.True(d.Equals(d2));
         }
         [Theory]
@@ -45,7 +45,7 @@ namespace StatisticsTests.Distributions
         {
             IDistribution d = new LogNormal(mean, sd, min, max, n);
             XElement ele = d.ToXML();
-            IDistribution d2 = IDistributionExtensions.FromXML(ele);
+            IDistribution d2 = ContinuousDistribution.FromXML(ele);
             Assert.True(d.Equals(d2));
         }
         [Theory]
@@ -54,7 +54,7 @@ namespace StatisticsTests.Distributions
         {
             IDistribution d = new LogPearson3(mean, sd, skew, n);
             XElement ele = d.ToXML();
-            IDistribution d2 = IDistributionExtensions.FromXML(ele);
+            IDistribution d2 = ContinuousDistribution.FromXML(ele);
             Assert.True(d.Equals(d2));
         }
         [Theory]
@@ -63,16 +63,16 @@ namespace StatisticsTests.Distributions
         {
             IDistribution d = new Uniform(min, max, n);
             XElement ele = d.ToXML();
-            IDistribution d2 = IDistributionExtensions.FromXML(ele);
+            IDistribution d2 = ContinuousDistribution.FromXML(ele);
             Assert.True(d.Equals(d2));
         }
         [Theory]
         [InlineData(3.4, 4.5, 5.6, 1)]
         public void SerializationRoundTrip_Triangular(double min, double mostlikely, double max, int n)
         {
-            Triangular d = new Triangular(min, mostlikely,max ,n);
+            IDistribution d = new Triangular(min, mostlikely,max ,n);
             XElement element = d.ToXML();
-            IDistribution d2 = IDistributionExtensions.FromXML(element);
+            IDistribution d2 = ContinuousDistribution.FromXML(element);
             Assert.True(d.Equals(d2));
         }
     }

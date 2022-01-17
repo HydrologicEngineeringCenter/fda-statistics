@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.94.2" />
+    <PackageReference Include="HenryGeorgist.Framework.Base" Version="1.0.0-alpha-2022.1.15.2236" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
     <PackageReference Include="xunit" Version="2.4.0" />

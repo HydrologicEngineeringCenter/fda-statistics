@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Base.Implementations;
+using Base.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Utilities;
 
 namespace Statistics.Distributions
 {
-    public class Empirical : IDistribution
+    public class Empirical : ContinuousDistribution
     {
         #region Fields 
         private bool _ProbabilitiesWereAcceptedAsExceedance;
@@ -25,7 +25,7 @@ namespace Statistics.Distributions
         #endregion
 
         #region IDistributionProperties
-        public IDistributionEnum Type => IDistributionEnum.Empirical;
+        public override IDistributionEnum Type => IDistributionEnum.Empirical;
       
         public double Mean { get; set; }
         public double Median { get; set; }
@@ -37,19 +37,14 @@ namespace Statistics.Distributions
         public double Max { get; set; }
         
         public double Skewness { get; set; }
-
-        public int SampleSize { get; set; }
         public IRange<double> Range { get; set; }
-        public IMessageLevels State { get; private set; }
-        public IEnumerable<IMessage> Messages { get; private set; }
-        public bool Truncated { get; set; }
         #endregion
 
         #region Constructor
 
         public Empirical(double[] probabilities, double[] observationValues, bool probsAreExceedance = false)
         {
-            if (!Validation.EmpiricalValidator.IsConstructable(probabilities, observationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            //if (!Validation.EmpiricalValidator.IsConstructable(probabilities, observationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             _ProbabilitiesWereAcceptedAsExceedance = probsAreExceedance;
             double[] probabilityArray = new double[probabilities.Length];
             if (_ProbabilitiesWereAcceptedAsExceedance == true)
@@ -66,10 +61,11 @@ namespace Statistics.Distributions
             Min = ObservationValues[0];
             Max = ObservationValues[ObservationValues.Length - 1];
             BuildFromProperties();
+            addRules();
         }
         public Empirical(double[] probabilities, double[] observationValues, double min, double max, bool probsAreExceedance = false)
         {
-            if (!Validation.EmpiricalValidator.IsConstructable(probabilities, observationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            //if (!Validation.EmpiricalValidator.IsConstructable(probabilities, observationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             _ProbabilitiesWereAcceptedAsExceedance = probsAreExceedance;
             double[] probabilityArray = new double[probabilities.Length];
             if (_ProbabilitiesWereAcceptedAsExceedance == true)
@@ -86,10 +82,11 @@ namespace Statistics.Distributions
             Max = max;
             Truncated = true;
             BuildFromProperties();
+            addRules();
         }
         public void BuildFromProperties()
         {
-            if (!Validation.EmpiricalValidator.IsConstructable(CumulativeProbabilities, ObservationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
+            //if (!Validation.EmpiricalValidator.IsConstructable(CumulativeProbabilities, ObservationValues, out string msg)) throw new Utilities.InvalidConstructorArgumentsException(msg);
             if (_ProbabilitiesWereAcceptedAsExceedance == true)
             {
                CumulativeProbabilities = ConvertExceedanceToNonExceedance(CumulativeProbabilities);
@@ -113,10 +110,19 @@ namespace Statistics.Distributions
             StandardDeviation = ComputeStandardDeviation();
             Variance = Math.Pow(StandardDeviation, 2);
             Skewness = ComputeSkewness();
-            State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
-            Messages = msgs;
+            //State = Validate(new Validation.EmpiricalValidator(), out IEnumerable<Utilities.IMessage> msgs);
+            //Messages = msgs;
             _Constructed = true;
             
+        }
+        private void addRules()
+        {
+            AddSinglePropertyRule(nameof(SampleSize),
+                new Rule(() => {
+                    return SampleSize > 0;
+                },
+                "SampleSize must be greater than 0.",
+                ErrorLevel.Fatal));
         }
         #endregion
 
@@ -323,7 +329,7 @@ namespace Statistics.Distributions
         #endregion
         #region IDistributionFunctions
 
-        public double CDF(double x)
+        public override double CDF(double x)
         {
             int index = Array.BinarySearch(ObservationValues,x);
             if (index >= 0)
@@ -351,7 +357,7 @@ namespace Statistics.Distributions
             }
         }
 
-        public bool Equals(IDistribution distribution)
+        public override bool Equals(IDistribution distribution)
         {
 
             if (distribution.Type == IDistributionEnum.Empirical)
@@ -372,7 +378,7 @@ namespace Statistics.Distributions
             }
         }
 
-        public double InverseCDF(double p)
+        public override double InverseCDF(double p)
         {
             if (Truncated && _Constructed)
             {
@@ -418,7 +424,7 @@ namespace Statistics.Distributions
 
         }
 
-        public double PDF(double x)
+        public override double PDF(double x)
         {
             int index = ObservationValues.ToList().IndexOf(x);
             if (index >= 0)
@@ -475,9 +481,9 @@ namespace Statistics.Distributions
             }
             return returnString;
         }
-        public string Print(bool round = false) => round ? Print(ObservationValues,CumulativeProbabilities) : $"Empirical(Observation Values: {ObservationValues}, Cumulative Probabilities {CumulativeProbabilities})";
+        public override string Print(bool round = false) => round ? Print(ObservationValues,CumulativeProbabilities) : $"Empirical(Observation Values: {ObservationValues}, Cumulative Probabilities {CumulativeProbabilities})";
 
-        public string Requirements(bool printNotes)
+        public override string Requirements(bool printNotes)
         {
             return RequiredParameterization(printNotes);
         }

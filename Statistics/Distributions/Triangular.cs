@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Base.Implementations;
+using Base.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 using Utilities;
-using Utilities.Serialization;
 
 namespace Statistics.Distributions
 {
-    public class Triangular: IDistribution, IValidate<Triangular> 
+    public class Triangular: ContinuousDistribution
     {
         //TODO: Sample
         #region Fields and Properties
@@ -16,16 +15,11 @@ namespace Statistics.Distributions
         private double _max;
         private double _mostlikely;
         #region IDistribution Properties
-        public IDistributionEnum Type => IDistributionEnum.Triangular;
+        public override IDistributionEnum Type => IDistributionEnum.Triangular;
         [Stored(Name = "Min", type =typeof(double))]
         public double Min { get{return _min;} set{_min = value;} }
         [Stored(Name = "Max", type = typeof(double))]
         public double Max { get{return _max;} set{_max = value;} }
-        [Stored(Name = "SampleSize", type = typeof(Int32))]
-        public int SampleSize { get; set; }
-        public bool Truncated { get; set; }
-        public IMessageLevels State { get; private set; }
-        public IEnumerable<IMessage> Messages { get; private set; }
         [Stored(Name = "MostLikely", type = typeof(double))]
         public double MostLikely{ get{return _mostlikely;} set{_mostlikely = value;} }
         #endregion
@@ -39,6 +33,7 @@ namespace Statistics.Distributions
             Max = 1;
             MostLikely = .5;
             SampleSize = 0;
+            addRules();
         }
         public Triangular(double min, double mode, double max, int sampleSize = int.MaxValue)
         {
@@ -46,7 +41,41 @@ namespace Statistics.Distributions
             Max = max;
             SampleSize = sampleSize;
             MostLikely = mode;
-            if (!Validation.TriangularValidator.IsConstructable(MostLikely, min, max, out string error)) throw new InvalidConstructorArgumentsException(error);
+            //if (!Validation.TriangularValidator.IsConstructable(MostLikely, min, max, out string error)) throw new InvalidConstructorArgumentsException(error);
+            addRules();
+        }
+        private void addRules()
+        {
+            AddSinglePropertyRule(nameof(Min),
+                new Rule(() => {
+                    return Min < Max;
+                },
+                "Min must be smaller than Max.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(Min),
+                new Rule(() => {
+                    return Min < MostLikely;
+                },
+                "Min must be smaller than MostLikely.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(Max),
+                new Rule(() => {
+                    return Min != Max;
+                },
+                "Max cannot equal Min.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(Max),
+                new Rule(() => {
+                    return MostLikely < Max;
+                },
+                "MostLikely must be smaller than Max.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(SampleSize),
+                new Rule(() => {
+                    return SampleSize > 0;
+                },
+                "SampleSize must be greater than 0.",
+                ErrorLevel.Fatal));
         }
         #endregion
 
@@ -62,11 +91,11 @@ namespace Statistics.Distributions
             if (printNotes) s += RequirementNotes();
             return s;
         }
-        internal static string Parameterization() => $"Triangular(mode: range minimum \u2264 mode \u2264 range maximum, {Validation.Resources.DoubleRangeRequirements()}, sample size: > 0)";
+        internal static string Parameterization() => $"Triangular(mode: range minimum \u2264 mode \u2264 range maximum, sample size: > 0)";
         internal static string RequirementNotes() => "The mode parameter is also sometimes referred to as the most likely value.";
         
         #region IDistribution Functions
-        public double PDF(double x){
+        public override double PDF(double x){
             if(x<Min){
                 return 0;
             }else if(x<=MostLikely){
@@ -77,7 +106,7 @@ namespace Statistics.Distributions
                 return 0;
             }
         }
-        public double CDF(double x){
+        public override double CDF(double x){
             if(x<Min){
                 return 0;
             }else if (x<= MostLikely){
@@ -88,7 +117,7 @@ namespace Statistics.Distributions
                 return 1;
             }
         }
-        public double InverseCDF(double p){
+        public override double InverseCDF(double p){
             double a = MostLikely - Min;
             double b = Max - MostLikely;
             if (p <= 0){
@@ -101,11 +130,11 @@ namespace Statistics.Distributions
                 return Max;
             }
         }
-        public string Print(bool round = false){
+        public override string Print(bool round = false){
            return "Tringular(parameters: {Min:"+Min+", Max:"+Max+", Mostlikely:"+MostLikely+"})";
         }
-        public string Requirements(bool printNotes) => RequiredParameterization(printNotes);
-        public bool Equals(IDistribution distribution){
+        public override string Requirements(bool printNotes) => RequiredParameterization(printNotes);
+        public override bool Equals(IDistribution distribution){
             if (Type==distribution.Type){
                 Triangular dist = (Triangular)distribution;
                 if (Min == dist.Min){

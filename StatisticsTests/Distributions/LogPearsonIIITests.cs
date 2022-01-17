@@ -16,40 +16,6 @@ namespace StatisticsTests.Distributions
     public class LogPearsonIIITests
     {
         /// <summary>
-        /// Tests that invalid parameter values cause an <see cref="Utilities.InvalidConstructorArgumentsException"/> to be thrown. The <see cref="Statistics.Distributions.LogPearson3.RequiredParameterization(bool)"/> function prints a list of the parameterization requirements.
-        /// </summary>
-        /// <param name="mean"> <see cref="Statistics.Distributions.LogPearson3.Mean"/> parameter for the <see cref="Statistics.Distributions.LogPearson3"/> distribution, which is a log base 10 representation of a random number. Any non-positive, non-finite or non-numerical value is expected to cause an <see cref="Utilities.InvalidConstructorArgumentsException"/> to be thrown. </param>
-        /// <param name="sd"> <see cref="Statistics.Distributions.LogPearson3.StandardDeviation"/> parameter for the <see cref="Statistics.Distributions.LogPearson3"/> distribution, which is a log base 10 representation of a random number. Any non-positive, non-finite or non-numerical value is expected to cause an <see cref="Utilities.InvalidConstructorArgumentsException"/> to be thrown. </param>
-        /// <param name="skew"> <see cref="Statistics.Distributions.LogPearson3.Skewness"/> parameter for the <see cref="Statistics.Distributions.LogPearson3"/> distribution, which is a log base 10 representation of a random number. Only non-finite or non-numerical values are expected to cause an <see cref="Utilities.InvalidConstructorArgumentsException"/> to be thrown. </param>
-        /// <param name="n"> <see cref="Statistics.Distributions.LogPearson3.SampleSize"/> parameter. Any non-positive value is expected to cause an <see cref="Utilities.InvalidConstructorArgumentsException"/> to be thrown. </param>
-        [Theory]
-        [InlineData(1d, 1d, 1d, 0)]
-        [InlineData(-1d, 1d, 1d, 1)]
-        [InlineData(1d, -1d, 1d, 1)]
-        [InlineData(1d, 1d, 1d, -1)]
-        [InlineData(double.NaN, 1d, 1d, 1)]
-        [InlineData(1d, double.NaN, 1d, 1)]
-        [InlineData(1d, 1d, double.NaN, 1)]
-        [InlineData(double.NegativeInfinity, 1d, 1d, 1)]
-        [InlineData(1d, double.NegativeInfinity, 1d, 1)]
-        [InlineData(1d, 1d, double.NegativeInfinity, 1)]
-        [InlineData(double.PositiveInfinity, 1d, 1d, 1)]
-        [InlineData(1d, double.PositiveInfinity, 1d, 1)]
-        [InlineData(1d, 1d, double.PositiveInfinity, 1)]
-        public void InvalidParameterValues_Throw_InvalidConstructorArgumentsException(double mean, double sd, double skew, int n)
-        {
-            Assert.Throws<Utilities.InvalidConstructorArgumentsException>(() => new Statistics.Distributions.LogPearson3(mean: mean, standardDeviation: sd, skew: skew, sampleSize: n));
-        }
-        [Theory]
-        [InlineData(11d, 1d, 1d)]
-        [InlineData(1d, 11d, 1d)]
-        [InlineData(1d, 1d, 11d)]
-        public void TooBigParameterValues_Throw_InvalidConstructorArguementsException(double mean, double sd, double skew)
-        {
-            Assert.Throws<InvalidConstructorArgumentsException>(() => new Statistics.Distributions.LogPearson3(mean, sd, skew));
-        }
-
-        /// <summary>
         /// Tests that valid parameters return a finite <see cref="IRange{T}"/> through the <see cref="Statistics.Distributions.LogPearson3._ProbabilityRange"/> field which is generated to restrit the unbounded distribution to a finite range.
         /// </summary>
         /// <param name="mean"> <see cref="Statistics.Distributions.LogPearson3.Mean"/> parameter for the <see cref="Statistics.Distributions.LogPearson3"/> distribution, which is a log base 10 representation of a random number. Any non-positive, non-finite or non-numerical value is expected to cause an <see cref="Utilities.InvalidConstructorArgumentsException"/> to be thrown. </param>
@@ -63,20 +29,37 @@ namespace StatisticsTests.Distributions
             Assert.True(min.IsFinite());
         }
         [Theory]
+        [InlineData(0d, -1d, -2d, 1)]
+        [InlineData(-1d, -2d, -3d, 1)]
+        [InlineData(-1d, 1d, -3.1d, -1)]
+        [InlineData(1d, 1d, -3.1d, 1)]
+        [InlineData(1d, 1d, 3.1d, 1)]
+        [InlineData(1d, 3.1d, -1d, 1)]
+        [InlineData(1d, -3.1d, -1d, 1)]
+        [InlineData(7.1d, 1d, -1d, 1)]
+        public void BadValidation(double mean, double sd, double skew, int n)
+        {
+            Statistics.Distributions.LogPearson3 dist = new Statistics.Distributions.LogPearson3(mean, sd, skew, n);
+            dist.Validate();
+            Assert.True(dist.HasErrors);
+        }
+        [Theory]
+        [InlineData(0d, 1d, 1)]
+        [InlineData(-1d, 2d, 1)]
+        public void GoodValidation(double mean, double sd, int n)
+        {
+            Statistics.Distributions.Normal dist = new Statistics.Distributions.Normal(mean, sd, n);
+            dist.Validate();
+            Assert.False(dist.HasErrors);
+        }
+        [Theory]
         [InlineData(1d, 2d, 2d)]
-        [InlineData(1d, 3d, 3d)]
-        [InlineData(1d, 4d, 4d)]
-        [InlineData(1d, 5d, 5d)]
+        [InlineData(1d, 2.99d, 2.99d)]
         [InlineData(1d, 2d, -2d)]
-        [InlineData(1d, 3d, -3d)]
-        [InlineData(1d, 4d, -4d)]
-        [InlineData(1d, 5d, -5d)]
+        [InlineData(1d, 2.99d, -2.99d)]
         [InlineData(1d, 1d, 1d)]
         [InlineData(2d, 2d, 2d)]
-        [InlineData(3d, 3d, 3d)]
-        [InlineData(4d, 4d, 4d)]
-        [InlineData(5d, 5d, 5d)]
-        [InlineData(6d, 6d, 6d)]
+        [InlineData(3d, 2.99d, 2.99d)]
         public void GoodData_Returns_FiniteRange(double mean, double sd, double skew)
         {
             var testObj = new Statistics.Distributions.LogPearson3(mean, sd, skew);
@@ -177,10 +160,10 @@ namespace StatisticsTests.Distributions
         [Theory]
         [InlineData(.33d, 2d, 1d, 2.071250e+20)] //USGS-R SMWR
         [InlineData(1d, .1d, .2d, 4.067518e+01)] //USGS-R SMWR
-        [InlineData(5d, 3d, 8d, 7.163528e+136)] //USGS-R SMWR
-        [InlineData(9d, 5d, 5d, 2.751981e+159)] //USGS-R SMWR
-        [InlineData(9d, 5d, .5d, 3.571023e+46)] //USGS-R SMWR
-        [InlineData(0d, 1d, 2d, 1.312489e+15)] //USGS-R SMWR
+        //[InlineData(5d, 3d, 8d, 7.163528e+136)] //USGS-R SMWR
+        //[InlineData(9d, 5d, 5d, 2.751981e+159)] //USGS-R SMWR
+        //[InlineData(9d, 5d, .5d, 3.571023e+46)] //USGS-R SMWR
+        [InlineData(0.0000001d, 1d, 2d, 1.312489e+15)] //USGS-R SMWR
         public void LPIII_Maximums(double mean, double sd, double skew, double output)
         {
             //https://github.com/xunit/xunit/issues/1293
@@ -193,10 +176,10 @@ namespace StatisticsTests.Distributions
         [Theory]
         [InlineData(.33d, 2d, 1d, 0.00023424651174493445)] //USGS-R SMWR
         [InlineData(1d, .1d, .2d, 3.66134726526910103672)] //USGS-R SMWR
-        [InlineData(5d, 3d, 8d, 17782.79410038922651438043)]//USGS-R SMWR
-        [InlineData(9d, 5d, 5d, 10000000)]//USGS-R SMWR
-        [InlineData(9d, 5d, .5d, 0.00000004890397239656)]//USGS-R SMWR
-        [InlineData(0d, 1d, 2d, 0.10000002302585474234)]//USGS-R SMWR
+        //[InlineData(5d, 3d, 8d, 17782.79410038922651438043)]//USGS-R SMWR
+        //[InlineData(9d, 5d, 5d, 10000000)]//USGS-R SMWR
+        //[InlineData(9d, 5d, .5d, 0.00000004890397239656)]//USGS-R SMWR
+        [InlineData(0.00000001d, 1d, 2d, 0.10000002302585474234)]//USGS-R SMWR
         public void LPIII_Minimums(double mean, double sd, double skew, double output)
         {
             var testObj = new Statistics.Distributions.LogPearson3(mean, sd, skew);
