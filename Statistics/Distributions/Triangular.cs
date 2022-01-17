@@ -150,11 +150,9 @@ namespace Statistics.Distributions
             return false;
         }
         #endregion
-        public static Triangular Fit(IEnumerable<double> sample)
+        public override IDistribution Fit(double[] sample)
         {
-            IData data = sample.IsNullOrEmpty() ? throw new ArgumentNullException(nameof(sample)) : IDataFactory.Factory(sample);
-            if (!(data.State < IMessageLevels.Error) || data.Elements.Count() < 3) throw new ArgumentException($"The {nameof(sample)} is invalid because it contains an insufficient number of finite, numeric values (3 are required but only {data.Elements.Count()} were provided).");
-            ISampleStatistics stats = ISampleStatisticsFactory.Factory(data);
+            ISampleStatistics stats = new SampleStatistics(sample);
             return new Triangular(stats.Range.Min, stats.Mean, stats.Range.Max, stats.SampleSize);
         }
 

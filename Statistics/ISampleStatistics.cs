@@ -7,7 +7,7 @@ namespace Statistics
     /// <summary>
     /// An interface providing sample statistics for <see cref="double"/> precision sets of finite, numeric data.
     /// </summary>
-    public interface ISampleStatistics: Utilities.IValidate<ISampleStatistics>
+    public interface ISampleStatistics
     {
         /// <summary>
         /// The arithmetic sample mean, see https://en.wikipedia.org/wiki/Sample_mean_and_covariance.

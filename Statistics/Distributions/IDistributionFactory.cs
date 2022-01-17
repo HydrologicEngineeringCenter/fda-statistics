@@ -46,33 +46,6 @@ namespace Statistics
             }
         }
 
-
-        internal static IDistribution Fit(IEnumerable<double> sample, IDistributionEnum returnType)
-        {
-            if ((int)returnType >= 10)
-            {
-                ISampleStatistics stats = ISampleStatisticsFactory.Factory(sample);
-                return Fit(sample, stats.Range.Min, stats.Range.Max, returnType);
-            }
-            else
-            {
-                switch (returnType)
-                {
-                    case IDistributionEnum.Normal:
-                        return Distributions.Normal.Fit(sample);
-                    case IDistributionEnum.Uniform:
-                        return Distributions.Uniform.Fit(sample);
-                    case IDistributionEnum.Triangular:
-                        return Distributions.Triangular.Fit(sample);
-                    case IDistributionEnum.Histogram:
-                        return (IDistribution)Fit(sample, nBins: 100);
-                    case IDistributionEnum.LogPearsonIII:
-                        return Distributions.LogPearson3.Fit(sample,sample.Count());
-                    default:
-                        throw new NotImplementedException($"An unexpected error occurred. The requested return type: {returnType} is unsupported");
-                }
-            }          
-        }
         internal static Statistics.Histograms.Histogram Fit(IEnumerable<double> sample, int nBins)
         {
             double min = sample.Min();
@@ -81,20 +54,6 @@ namespace Statistics
             Statistics.Histograms.Histogram histogram = new Statistics.Histograms.Histogram(sample.ToArray(), binWidth);
             return histogram;
         }
-        internal static IDistribution Fit(IEnumerable<double> sample, double minimum, double maximum, IDistributionEnum returnType)
-        {
-            if ((int)returnType < 10)
-            {
-                return Fit(sample, returnType);
-            }
-            else
-            {
-                throw new NotImplementedException();
-                //IDistribution distribution = (IDistribution)Fit(sample, (int)returnType / 10);//this is all sorts of broken, return type is a distribution enum, being forced into number of bins.
-                //return new Distributions.TruncatedDistribution(distribution, minimum, maximum);
-            }
-        }
-        
         /// <summary>
         /// Constructs a <see cref="IDistributionEnum.Normal"/> distribution.
         /// </summary>
@@ -154,17 +113,6 @@ namespace Statistics
         public static IDistribution FactoryLogPearsonIII(double mean, double stDev, double skew, int sampleSize = int.MaxValue)
         {
             return new Distributions.LogPearson3(mean, stDev, skew, sampleSize);
-        }
-        /// <summary>
-        /// Constructs a <see cref="IDistributionEnum.LogPearsonIII"/> <see cref="IDistribution"/>, by fitting as set of sample data to the distribution.
-        /// </summary>
-        /// <param name="sample"> The data to be fit to the Log Pearson Type III distribution. </param>
-        /// <param name="isLogSample"> An optional parameter. <see langword="true"/> if the <paramref name="sample"/> data values are logged, set to <see langword="false"/> by default. </param>
-        /// <param name="sampleSize"> An optional parameter describing the effective sample size, this value is inferred from the size of the <paramref name="sample"/> data if it is not provided. </param>
-        /// <returns> A <see cref="Statistics.Distributions.LogPearson3"/> object returned as an implementation of the  <see cref="IDistribution"/> interface. </returns>
-        public static IDistribution FactoryFitLogPearsonIII(IEnumerable<double> sample, bool isLogSample = false, int sampleSize = -404)
-        {
-            return Distributions.LogPearson3.Fit(sample, sampleSize, isLogSample);
         }
         /// <summary>
         /// Constructs a <see cref="IDistributionEnum.LogPearsonIII"/> <see cref="IDistribution"/> bound on the range specified by the <paramref name="min"/> and <paramref name="max"/> values."/>

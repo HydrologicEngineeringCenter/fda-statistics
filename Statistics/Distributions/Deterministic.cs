@@ -85,6 +85,11 @@ namespace Statistics.Distributions
         {
             return "A value is required";
         }
+        public override IDistribution Fit(double[] data)
+        {
+            ISampleStatistics stats = new SampleStatistics(data);
+            return new Deterministic(stats.Mean);
+        }
         #endregion
     }
 }

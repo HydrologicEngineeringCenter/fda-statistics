@@ -115,11 +115,9 @@ namespace Statistics.Distributions
         internal static string RequiredParameterization(bool printNotes = false) => $"The Uniform distribution requires the following parameterization: {Parameterization()}.";
         internal static string Parameterization() => $"Uniform()";
 
-        public static Uniform Fit(IEnumerable<double> sample)
+        public override IDistribution Fit(double[] sample)
         {
-            IData data = sample.IsNullOrEmpty() ? throw new ArgumentNullException(nameof(sample)) : IDataFactory.Factory(sample);
-            if (!(data.State < IMessageLevels.Error) || data.Elements.Count() < 3) throw new ArgumentException($"The {nameof(sample)} is invalid because it contains an insufficient number of finite, numeric values (3 are required but only {data.Elements.Count()} were provided).");
-            ISampleStatistics stats = ISampleStatisticsFactory.Factory(data);
+            ISampleStatistics stats = new SampleStatistics(sample);
             return new Uniform(stats.Range.Min, stats.Range.Max, stats.SampleSize);
         }
         #endregion
