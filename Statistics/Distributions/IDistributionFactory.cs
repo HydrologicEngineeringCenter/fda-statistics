@@ -37,8 +37,6 @@ namespace Statistics
                     return Distributions.Uniform.RequiredParameterization(true);
                 case IDistributionEnum.TruncatedHistogram:
                 case IDistributionEnum.TruncatedNormal:
-                case IDistributionEnum.TruncatedTriangular:
-                case IDistributionEnum.TruncatedUniform:
                     //return Distributions.TruncatedDistribution.RequiredParameterization(true);
                 case IDistributionEnum.NotSupported:
                 default:
@@ -99,7 +97,7 @@ namespace Statistics
         /// <returns> A new <see cref="IDistribution"/>. </returns>
         public static IDistribution FactoryTruncatedNormal(double mean, double stDev, double min, double max, int sampleSize = int.MaxValue)
         {
-            IDistribution normal = new Distributions.Normal(mean, stDev, min, max, sampleSize);
+            IDistribution normal = new Distributions.TruncatedNormal(mean, stDev, min, max, sampleSize);
             return normal;
         }
         /// <summary>

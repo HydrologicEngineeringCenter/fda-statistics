@@ -41,25 +41,25 @@ namespace Statistics.GraphicalRelationships
 
                     if (distributionArray[i].Truncated)
                     {
-                        double firstMin = (distributionArray[i - 1]).Min;
-                        double secondMin = (distributionArray[i]).Min;
-                        double firstMax = (distributionArray[i - 1]).Max;
-                        double secondMax = (distributionArray[i]).Max;
+                        double firstMin = ((TruncatedNormal)(distributionArray[i - 1])).Min;
+                        double secondMin = ((TruncatedNormal)(distributionArray[i])).Min;
+                        double firstMax = ((TruncatedNormal)(distributionArray[i - 1])).Max;
+                        double secondMax = ((TruncatedNormal)(distributionArray[i])).Max;
                         bool minIsDecreasing = secondMin < firstMin;
                         bool maxIsDecreasing = secondMax < firstMax;
                         double epsilon = .0001;
 
                         if (minIsDecreasing && !maxIsDecreasing)
                         {
-                            monotonicDistributionArray[i] = new Normal(meanSecondDistribution, standardDeviationFirstDistribution, firstMin + epsilon, secondMax, sampleSizeSecondDistribution);
+                            monotonicDistributionArray[i] = new TruncatedNormal(meanSecondDistribution, standardDeviationFirstDistribution, firstMin + epsilon, secondMax, sampleSizeSecondDistribution);
                         }
                         else if (!minIsDecreasing && maxIsDecreasing)
                         {
-                            monotonicDistributionArray[i] = new Normal(meanSecondDistribution, standardDeviationFirstDistribution, secondMin, firstMax + epsilon, sampleSizeSecondDistribution);
+                            monotonicDistributionArray[i] = new TruncatedNormal(meanSecondDistribution, standardDeviationFirstDistribution, secondMin, firstMax + epsilon, sampleSizeSecondDistribution);
                         }
                         else if (minIsDecreasing && maxIsDecreasing)
                         {
-                            monotonicDistributionArray[i] = new Normal(meanSecondDistribution, standardDeviationFirstDistribution, firstMin + epsilon, firstMax + epsilon, sampleSizeSecondDistribution);
+                            monotonicDistributionArray[i] = new TruncatedNormal(meanSecondDistribution, standardDeviationFirstDistribution, firstMin + epsilon, firstMax + epsilon, sampleSizeSecondDistribution);
                         }
                     }
                     else

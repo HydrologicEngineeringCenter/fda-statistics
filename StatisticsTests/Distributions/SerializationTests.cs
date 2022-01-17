@@ -25,7 +25,7 @@ namespace StatisticsTests.Distributions
         [InlineData(2.33, 1d, 1d, 4d, 1)]
         public void SerializationRoundTrip_TruncatedNormal(double mean, double sd, double min, double max, int n)
         {
-            IDistribution d = new Normal(mean, sd, min, max, n);
+            IDistribution d = new TruncatedNormal(mean, sd, min, max, n);
             XElement ele = d.ToXML();
             IDistribution d2 = ContinuousDistribution.FromXML(ele);
             Assert.True(d.Equals(d2));
