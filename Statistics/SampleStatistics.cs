@@ -56,13 +56,13 @@ namespace Statistics
         {
             InitalizeStats(data);
             Range = Utilities.IRangeFactory.Factory(_min, _max);
-            //State = Validate(new Validation.SummaryStatisticsValidator(), out IEnumerable<IMessage> msgs);
-            //Messages = msgs;
         }
         internal void InitalizeStats(IEnumerable<double> observations)
         {
             foreach (double observation in observations)
             {
+                if (Double.IsInfinity(observation)) continue;
+                if (Double.IsNaN(observation)) continue;
                 if (_n == 0)
                 {
                     _max = observation;
@@ -100,6 +100,8 @@ namespace Statistics
             bool firstpass = true;
             foreach (double observation in observations)
             {
+                if (Double.IsInfinity(observation)) continue;
+                if (Double.IsNaN(observation)) continue;
                 if (midpoint == val)
                 {
                     if (noRounding)
