@@ -5,10 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Utilities;
 
+
 namespace Statistics.Distributions
 {
-    public class LogPearson3: ContinuousDistribution
+    public class TruncatedLogPearson3 : ContinuousDistribution
     {
+
+        internal IRange<double> _ProbabilityRange;
+        private bool _Constructed;
 
         #region Properties
         public override IDistributionEnum Type => IDistributionEnum.LogPearsonIII;
@@ -18,27 +22,56 @@ namespace Statistics.Distributions
         public double StandardDeviation { get; set; }
         [Stored(Name = "Skew", type = typeof(double))]
         public double Skewness { get; set; }
+        [Stored(Name = "Min", type = typeof(double))]
+        public double Min
+        {
+            get; set;
+        }
+        [Stored(Name = "Max", type = typeof(double))]
+        public double Max
+        {
+            get; set;
+        }
         #endregion
 
         #region Constructor
-        public LogPearson3()
+        public TruncatedLogPearson3()
         {
             //for reflection;
             Mean = 0.1;
             StandardDeviation = .01;
             Skewness = .01;
             SampleSize = 1;
+            Min = double.NegativeInfinity;
+            Max = double.PositiveInfinity;
+            _ProbabilityRange = IRangeFactory.Factory(0D, 1D);
             addRules();
-            
+            BuildFromProperties();
+            _Constructed = true;
+
         }
-        public LogPearson3(double mean, double standardDeviation, double skew, int sampleSize = int.MaxValue)
+        public TruncatedLogPearson3(double mean, double standardDeviation, double skew, double min, double max, int sampleSize = int.MaxValue)
         {
             Mean = mean;
             StandardDeviation = standardDeviation;
             Skewness = skew;
             SampleSize = sampleSize;
+            Min = min;
+            Max = max;
+            Truncated = true;
             addRules();
-            
+            BuildFromProperties();
+        }
+
+        public void BuildFromProperties()
+        {
+            Validate();
+            if (!HasErrors)
+            {
+                SetProbabilityRangeAndMinAndMax(Min, Max);
+            }
+
+            _Constructed = true;
         }
         private void addRules()
         {
@@ -89,14 +122,60 @@ namespace Statistics.Distributions
 
         #region Functions
 
+        private void SetProbabilityRangeAndMinAndMax(double min, double max)
+        {//TODO: need to set the probability range before we get here if LP3 is not constructed 
+            double pmin = 0;
+            double epsilon = 1 / 1000000000d;
+            double pmax = 1 - pmin;
+            if (min.IsFinite() || max.IsFinite())//not entirely sure how inclusive or works with one sided truncation and the while loop below.
+            {
+                pmin = CDF(min);
+                pmax = CDF(max);
+            }
+            else
+            {
+                pmin = .0000001;
+                pmax = 1 - pmin;
+                min = InverseCDF(pmin);
+                max = InverseCDF(pmax);
+            }
+            while (!(min.IsFinite() && max.IsFinite()))
+            {
+                pmin += epsilon;
+                pmax -= epsilon;
+                if (!min.IsFinite()) min = InverseCDF(pmin);
+                if (!max.IsFinite()) max = InverseCDF(pmax);
+                if (pmin > 0.25)
+                    throw new InvalidConstructorArgumentsException($"The log Pearson III object is not constructable because 50% or more of its distribution returns {double.NegativeInfinity} and {double.PositiveInfinity}.");
+            }
+            //apparently we have done everything we need at this point.
+            Max = max;
+            Min = min;
+            _ProbabilityRange = IRangeFactory.Factory(pmin, pmax);
+            //IsConstructed = true;
+        }
         #region IDistribution Functions
         public override double PDF(double x)
         {
-            PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
-            return d.PDF(Math.Log10(x))/x/Math.Log(10);        
+            if (x < Min || x > Max) return double.Epsilon;
+            else
+            {
+                PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
+                return d.PDF(Math.Log10(x)) / x / Math.Log(10);
+
+            }
         }
         public override double CDF(double x)
         {
+
+            if (_Constructed)
+            {
+                if (x == Min) return _ProbabilityRange.Min;
+                if (x == Max) return _ProbabilityRange.Max;
+            }
+
+            if (x < Min) return 0;
+            if (x > Max) return 1;
             if (x > 0)
             {
                 PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
@@ -106,10 +185,25 @@ namespace Statistics.Distributions
         }
         public override double InverseCDF(double p)
         {
+            //check if constructed
+            //if not, skip probability min and max pieces
 
-            if (p <= 0) return 0;
-            if (p >= 1) return Double.PositiveInfinity;
-
+            if (Truncated && _Constructed)
+            {
+                p = _ProbabilityRange.Min + (p) * (_ProbabilityRange.Max - _ProbabilityRange.Min);
+            }
+            if (!p.IsFinite())
+            {
+                throw new ArgumentException($"The value of specified probability parameter: {p} is invalid because it is not on the valid probability range: [0, 1].");
+            }
+            else // Range has been set check p against [_ProbabilityRange.Min, _ProbabilityRange.Max]
+            {
+                if (_Constructed) // object is constructed
+                {
+                    if (p <= _ProbabilityRange.Min) return Min;
+                    if (p >= _ProbabilityRange.Max) return Max;
+                }
+            }
             PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
             return Math.Pow(10, d.InverseCDF(p));
         }
@@ -130,11 +224,12 @@ namespace Statistics.Distributions
 
         public override IDistribution Fit(double[] sample)
         {
-            for(int i = 0; i<sample.Count(); i++) {
+            for (int i = 0; i < sample.Count(); i++)
+            {
                 sample[i] = Math.Log10(sample[i]);
             }
             ISampleStatistics stats = new SampleStatistics(sample);
-            return new LogPearson3(stats.Mean, stats.StandardDeviation, stats.Skewness, stats.SampleSize);
+            return new TruncatedLogPearson3(stats.Mean, stats.StandardDeviation, stats.Skewness, this.Min, this.Max, stats.SampleSize);
         }
         #endregion
     }

@@ -142,7 +142,7 @@ namespace Statistics
             if (lpIII.IsNull()) throw new ArgumentNullException(nameof(lpIII));
             if (lpIII.Type != IDistributionEnum.LogPearsonIII) throw new ArgumentException($"The {nameof(FactoryTruncatedLogPearsonIII)} factory requires a {nameof(IDistributionEnum.LogPearsonIII)} {nameof(lpIII)} parameter, instead a {nameof(lpIII.Type)} was provided.");
             Statistics.Distributions.LogPearson3 ldist = (Statistics.Distributions.LogPearson3)lpIII;
-            return new Statistics.Distributions.LogPearson3(ldist.Mean,ldist.StandardDeviation,ldist.Skewness, min, max, lpIII.SampleSize);
+            return new Statistics.Distributions.TruncatedLogPearson3(ldist.Mean,ldist.StandardDeviation,ldist.Skewness, min, max, lpIII.SampleSize);
         }
         /// <summary>
         /// Constructs a <see cref="IDistribution"/> bound on the range specified by the <paramref name="min"/> and <paramref name="max"/> values."/>
