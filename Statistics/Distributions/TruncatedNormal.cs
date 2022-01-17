@@ -168,7 +168,7 @@ namespace Statistics.Distributions
         public override IDistribution Fit(double[] sample)
         {
             ISampleStatistics stats = new SampleStatistics(sample);
-            return new Normal(stats.Mean, stats.StandardDeviation, stats.SampleSize);
+            return new TruncatedNormal(stats.Mean, stats.StandardDeviation, this.Min, this.Max, stats.SampleSize);
         }
 
         /**

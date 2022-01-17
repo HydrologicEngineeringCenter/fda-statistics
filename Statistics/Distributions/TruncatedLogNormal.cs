@@ -7,37 +7,53 @@ using Utilities;
 
 namespace Statistics.Distributions
 {
-    public class LogNormal : ContinuousDistribution
-    {      
+    internal class TruncatedLogNormal : ContinuousDistribution
+    {
         #region Fields and Properties
         private double _mean;
         private double _standardDeviation;
         private double _min;
         private double _max;
+        internal IRange<double> _ProbabilityRange;
 
         #region IDistribution Properties
         public override IDistributionEnum Type => IDistributionEnum.Normal;
         [Stored(Name = "Mean", type = typeof(double))]
-         public double Mean { get{return _mean;} set{_mean = value;} }
+        public double Mean { get { return _mean; } set { _mean = value; } }
         [Stored(Name = "Standard_Deviation", type = typeof(double))]
-        public double StandardDeviation { get{return _standardDeviation;} set{_standardDeviation = value;} }
+        public double StandardDeviation { get { return _standardDeviation; } set { _standardDeviation = value; } }
+        [Stored(Name = "Min", type = typeof(double))]
+        public double Min { get { return _min; } set { _min = value; } }
+        [Stored(Name = "Max", type = typeof(double))]
+        public double Max { get { return _max; } set { _max = value; } }
         #endregion
+
+
         #endregion
 
         #region Constructor
-        public LogNormal()
+        public TruncatedLogNormal()
         {
             //for reflection;
             Mean = 0;
             StandardDeviation = 1.0;
+            _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
+            Min = InverseCDF(0.0000000000001);
+            Max = InverseCDF(1 - 0.0000000000001);
+
             addRules();
         }
-        public LogNormal(double mean, double sd, int sampleSize = int.MaxValue)
+        public TruncatedLogNormal(double mean, double sd, double minValue, double maxValue, int sampleSize = int.MaxValue)
         {
             Mean = mean;
             StandardDeviation = sd;
             SampleSize = sampleSize;
+            Min = minValue;
+            Max = maxValue;
+            Truncated = true;
+            _ProbabilityRange = IRangeFactory.Factory(0.0, 1.0);
             addRules();
+
         }
         private void addRules()
         {
@@ -64,20 +80,26 @@ namespace Statistics.Distributions
 
         #region Functions
         #region IDistribution
-        public override double PDF(double x){
+        public override double PDF(double x)
+        {
             Normal sn = new Normal();
             return sn.PDF(Math.Log(x));
         }
-        public override double CDF(double x){
+        public override double CDF(double x)
+        {
             Normal sn = new Normal();
             return sn.CDF(Math.Log(x));
         }
         public override double InverseCDF(double p)
         {
-            if (p <= 0) return 0;
-            if (p >= 1) return double.PositiveInfinity;
+            if (Truncated)
+            {
+                p = _ProbabilityRange.Min + (p) * (_ProbabilityRange.Max - _ProbabilityRange.Min);
+            }
+            if (p <= _ProbabilityRange.Min) return Min;
+            if (p >= _ProbabilityRange.Max) return Max;
             Normal sn = new Normal();
-            return Math.Exp(Mean+sn.InverseCDF(p)*StandardDeviation);
+            return Math.Exp(Mean + sn.InverseCDF(p) * StandardDeviation);
         }
         public override string Print(bool round = false) => round ? Print(Mean, StandardDeviation, SampleSize) : $"LogNormal(mean: {Mean}, sd: {StandardDeviation}, sample size: {SampleSize})";
         public override string Requirements(bool printNotes) => RequiredParameterization(printNotes);
@@ -101,8 +123,9 @@ namespace Statistics.Distributions
                 sample[i] = Math.Log10(sample[i]);
             }
             ISampleStatistics stats = new SampleStatistics(sample);
-            return new LogNormal(stats.Mean, stats.StandardDeviation, stats.SampleSize);
-        }   
+            return new TruncatedLogNormal(stats.Mean, stats.StandardDeviation, this.Min, this.Max, stats.SampleSize);
+        }
         #endregion
     }
 }
+
