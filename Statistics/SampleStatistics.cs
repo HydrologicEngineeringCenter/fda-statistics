@@ -52,17 +52,14 @@ namespace Statistics
         {
             get { return (int)_n; }
         }
-        public IMessageLevels State { get; }
-        public IEnumerable<IMessage> Messages { get; }
-
-        internal SampleStatistics(IData data)
+        internal SampleStatistics(double[] data)
         {
-            InitalizeStats(data.Elements);
+            InitalizeStats(data);
             Range = Utilities.IRangeFactory.Factory(_min, _max);
             //State = Validate(new Validation.SummaryStatisticsValidator(), out IEnumerable<IMessage> msgs);
             //Messages = msgs;
         }
-        internal void InitalizeStats(IOrderedEnumerable<double> observations)
+        internal void InitalizeStats(IEnumerable<double> observations)
         {
             foreach (double observation in observations)
             {

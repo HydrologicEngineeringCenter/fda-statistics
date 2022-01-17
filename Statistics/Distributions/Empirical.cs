@@ -495,10 +495,7 @@ namespace Statistics.Distributions
         {
             return $"Empirical(Observation Values: [{double.MinValue.Print()}, {double.MaxValue.Print()}], Cumulative Probabilities [0,1])";
         }
-        public IMessageLevels Validate(IValidator<Empirical> validator, out IEnumerable<IMessage> messages)
-        {
-            return validator.IsValid(this, out messages);
-        }
+
         public XElement WriteToXML()
         {
             XElement masterElem = new XElement("Empirical Distribution");
@@ -539,7 +536,22 @@ namespace Statistics.Distributions
             }
             return new Empirical(cumulativeProbabilities, observationValues);
         }
-        #endregion
+        public override IDistribution Fit(double[] sample)
+        {
+            int count = sample.Length;
+            double[] probs = new double[count];
+            double min = Double.MaxValue;
+            double max = Double.MinValue;
+            Array.Sort(sample);//check if ascending or decending
+            for (int i = 0; i < sample.Count(); i++)
+            {
+                if (sample[i] > max) max = sample[i];
+                if (sample[i] < min) min = sample[i];
+                probs[i] = (double)i / (double)count;
+            }
+            return new Empirical(probs, sample, min, max, false);
+        }
+            #endregion
     }
 
 }

@@ -144,14 +144,14 @@ namespace Statistics.Distributions
         }
         private static string Parameterization() => $"LogNormal(mean: [{double.MinValue.Print()}, {double.MaxValue.Print()}], sd: [0, {double.MaxValue.Print()}], sample size: > 0)";
         private static string RequirementNotes() => $"The parameters should reflect the log-scale random number values.";
-        
-        public static IDistribution Fit(IEnumerable<double> sample, bool islogSample = false)
+
+        public override IDistribution Fit(double[] sample)
         {
-            List<double> logSample = new List<double>();
-            if (!islogSample) foreach (double x in sample) logSample.Add(Math.Log10(x));  
-            IData data = sample.IsNullOrEmpty() ? throw new ArgumentNullException(nameof(sample)) : islogSample ? IDataFactory.Factory(sample): IDataFactory.Factory(logSample);
-            if (!(data.State < IMessageLevels.Error) || data.Elements.Count() < 3) throw new ArgumentException($"The {nameof(sample)} is invalid because it contains an insufficient number of finite, numeric values (3 are required but only {data.Elements.Count()} were provided).");
-            ISampleStatistics stats = ISampleStatisticsFactory.Factory(data);
+            for (int i = 0; i < sample.Count(); i++)
+            {
+                sample[i] = Math.Log10(sample[i]);
+            }
+            ISampleStatistics stats = new SampleStatistics(sample);
             return new LogNormal(stats.Mean, stats.StandardDeviation, stats.SampleSize);
         }   
         #endregion

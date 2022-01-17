@@ -23,6 +23,7 @@ namespace Statistics
         public abstract double PDF(double x);
         public abstract string Print(bool round = false);
         public abstract string Requirements(bool printNotes);
+        public abstract IDistribution Fit(double[] data);
         /// <summary>
         /// Generates a parametric bootstrap sample of the distribution.
         /// </summary>
@@ -53,9 +54,9 @@ namespace Statistics
                 }
             }
             if (packetOfRandomNumbers.Length < SampleSize) throw new ArgumentException($"The parametric bootstrap sample cannot be constructed using the {Print(true)} distribution. It requires at least {SampleSize} random value but only {packetOfRandomNumbers.Length} were provided.");
-            double[] X = new double[SampleSize];
-            for (int i = 0; i < SampleSize; i++) X[i] = this.InverseCDF(packetOfRandomNumbers[i]);
-            return IDistributionFactory.Fit(X, Type);
+            double[] samples = new double[SampleSize];
+            for (int i = 0; i < SampleSize; i++) samples[i] = this.InverseCDF(packetOfRandomNumbers[i]);
+            return this.Fit(samples);
         }
         public XElement ToXML()
         {

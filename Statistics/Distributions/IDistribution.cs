@@ -64,6 +64,7 @@ namespace Statistics
         bool Equals(IDistribution distribution);
         XElement ToXML();
         IDistribution Sample(double[] randomPacket);
+        IDistribution Fit(double[] data);
         #endregion
 
     }
