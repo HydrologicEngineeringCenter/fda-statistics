@@ -190,9 +190,9 @@ namespace StatisticsTests.Histograms
             histogram.ForceDeQueue();
             double actual = histogram.CDF(value);
             double err = Math.Abs((expected - actual) / expected);
-            double errTol = 0.01;
+
             Assert.True(histogram.ConvergedIteration >= maxiter);
-            Assert.True(err < errTol);
+            Assert.Equal(expected, actual, 2);
         }
         [Theory]
         [InlineData(10000, .1, .80, 1.96, .975)]
@@ -217,7 +217,7 @@ namespace StatisticsTests.Histograms
             double err = Math.Abs((expected - actual) / expected);
             double errTol = 0.1;
             Assert.True(histogram.ConvergedIteration >= maxiter);
-            Assert.True(err < errTol);
+            Assert.Equal(expected, actual, 2);
         }
 
         /*
