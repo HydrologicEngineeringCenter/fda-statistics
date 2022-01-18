@@ -6,6 +6,7 @@ using Statistics;
 using Statistics.Histograms;
 using Xunit;
 using Utilities;
+using System.Threading.Tasks;
 
 namespace StatisticsTests.Histograms
 {
@@ -180,7 +181,7 @@ namespace StatisticsTests.Histograms
             {
                 histogram.AddObservationToHistogram(stdNormal.InverseCDF(rand.NextDouble()));
                 iter++;
-                if (iter % 1000 == 0)
+                if (iter % 10000 == 0)
                 {
                     histogram.ForceDeQueue();
                     histogram.TestForConvergence(quantile, 1 - quantile);
@@ -190,9 +191,35 @@ namespace StatisticsTests.Histograms
             double actual = histogram.CDF(value);
             double err = Math.Abs((expected - actual) / expected);
             double errTol = 0.01;
-            Assert.True(histogram.ConvergedIteration < maxiter);
+            Assert.True(histogram.ConvergedIteration >= maxiter);
             Assert.True(err < errTol);
         }
+        [Theory]
+        [InlineData(10000, .1, .80, 1.96, .975)]
+        public void Parallel_Histogram_Convergence(Int64 maxiter, double binWidth, double quantile, double value, double expected)
+        {
+            IDistribution stdNormal = new Statistics.Distributions.Normal(0, 1);
+            var rand = new Random(1234);
+            double z = stdNormal.InverseCDF(.5 + .5 * .85);
+            var convergencecriteria = new ConvergenceCriteria(maxIterations: maxiter, tolerance: 1, zAlpha: z);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(0, binWidth, convergencecriteria);
+            while (!histogram.IsConverged)
+            {
+                Parallel.For(0, 10000, index =>
+                 {
+                    histogram.AddObservationToHistogram(stdNormal.InverseCDF(rand.NextDouble()));
+                 });
+                histogram.ForceDeQueue();
+                histogram.TestForConvergence(quantile, 1 - quantile);
+            }
+            histogram.ForceDeQueue();
+            double actual = histogram.CDF(value);
+            double err = Math.Abs((expected - actual) / expected);
+            double errTol = 0.1;
+            Assert.True(histogram.ConvergedIteration >= maxiter);
+            Assert.True(err < errTol);
+        }
+
         /*
         [Theory]
         [InlineData(1000000, .1, 2d, 1d, 2d, 2d)]

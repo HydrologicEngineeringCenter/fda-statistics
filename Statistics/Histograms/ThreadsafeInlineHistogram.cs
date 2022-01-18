@@ -24,7 +24,7 @@ namespace Statistics.Histograms
         private long _ConvergedIterations = Int64.MinValue;
         private bool _ConvergedOnMax = false;
         private ConvergenceCriteria _ConvergenceCriteria;
-        private int _maxQueueCount = 100;
+        private int _maxQueueCount = 1000;
         private object _lock = new object();
         private object _bwListLock = new object();
         private static int _enqueue;
@@ -260,7 +260,10 @@ namespace Statistics.Histograms
         {
                 lock (_bwListLock)
                 {
+                if (!_bw.IsBusy)
+                {
                     DeQueue();
+                }
                 }
         }
         private void DeQueue()
