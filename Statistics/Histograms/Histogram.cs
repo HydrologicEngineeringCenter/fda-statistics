@@ -115,10 +115,7 @@ namespace Statistics.Histograms
             _BinWidth = binWidth;
             if (data == null)
             {
-                Min = 0;
-                Max = Min + _BinWidth;
-                Int64 numberOfBins = 1;
-                _BinCounts = new Int32[numberOfBins];
+                throw new ArgumentNullException("The histogram cannot be constructed without data. Use a different constructor.");
             }
             else if(data.Length==1){
                 Min = data.Min();
