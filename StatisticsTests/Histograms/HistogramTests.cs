@@ -211,7 +211,8 @@ namespace StatisticsTests.Histograms
         [InlineData(.1,1)]
         public void IsHistogramConstructableWithNullData(double binWidth, double expected)
         {
-            Histogram histogram = new Histogram(null, binWidth);
+            double observationValue = 0.5;
+            Histogram histogram = new Histogram(observationValue, binWidth);
             histogram.AddObservationToHistogram(.05);
             double actual = histogram.BinCounts[0];
             Assert.Equal(expected, actual);
