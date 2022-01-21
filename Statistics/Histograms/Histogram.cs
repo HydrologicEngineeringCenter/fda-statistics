@@ -113,23 +113,21 @@ namespace Statistics.Histograms
         public Histogram(double[] data, double binWidth)
         {
             _BinWidth = binWidth;
-            if (data == null)
-            {
-                throw new ArgumentNullException("The histogram cannot be constructed without data. Use a different constructor.");
-            }
-            else if(data.Length==1){
-                Min = data.Min();
-                Int64 numberOfBins = 1;
-                Max = Min + binWidth;
-                _BinCounts = new Int32[numberOfBins];
-                AddObservationsToHistogram(data);
-            }else
-            {
-                Min = data.Min();
-                Int64 numberOfBins = Convert.ToInt64(Math.Ceiling((data.Max() - Min) / binWidth));
-                Max = Min + (numberOfBins * binWidth);
-                _BinCounts = new Int32[numberOfBins];
-                AddObservationsToHistogram(data);
+            if (data != null) {
+                if (data.Length == 1) {
+                    Min = data.Min();
+                    Int64 numberOfBins = 1;
+                    Max = Min + binWidth;
+                    _BinCounts = new Int32[numberOfBins];
+                    AddObservationsToHistogram(data);
+                } else
+                {
+                    Min = data.Min();
+                    Int64 numberOfBins = Convert.ToInt64(Math.Ceiling((data.Max() - Min) / binWidth));
+                    Max = Min + (numberOfBins * binWidth);
+                    _BinCounts = new Int32[numberOfBins];
+                    AddObservationsToHistogram(data);
+                }
             }
             _ConvergenceCriteria = new ConvergenceCriteria();
         }
