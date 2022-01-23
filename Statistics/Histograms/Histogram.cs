@@ -376,7 +376,15 @@ namespace Statistics.Histograms
                         cobs += obs;
 
                     }
-                    double fraction = (cobs - numobs) / obs;
+                    double fraction = 0.0;
+                    if (obs == 0)
+                    {
+                        fraction = .5;
+                    }
+                    else
+                    {
+                        fraction = (cobs - numobs) / obs;
+                    }
                     double binOffSet = Convert.ToDouble(index + 1);
                     return Min + _BinWidth * binOffSet - _BinWidth * fraction;
                 } else
@@ -390,7 +398,15 @@ namespace Statistics.Histograms
                         obs = _BinCounts[index];
                         cobs -= obs;
                     }
-                    double fraction = (numobs - cobs) / obs;
+                    double fraction = 0.0;
+                    if (obs == 0)
+                    {
+                        fraction = .5;
+                    }
+                    else
+                    {
+                        fraction = (numobs - cobs) / obs;
+                    }
                     double binOffSet = Convert.ToDouble(_BinCounts.Length - index);
                     return Max - _BinWidth * binOffSet + _BinWidth * fraction;
                 }
