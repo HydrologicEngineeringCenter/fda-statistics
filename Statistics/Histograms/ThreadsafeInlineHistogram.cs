@@ -38,7 +38,7 @@ namespace Statistics.Histograms
         {
             get
             {
-                ForceDeQueue();
+                ForceDeQueue();//would need to test for convergence if anything is dequeued...
                 return _Converged;
             }
         }
@@ -46,8 +46,16 @@ namespace Statistics.Histograms
         {
             get
             {
-                ForceDeQueue();
+                ForceDeQueue();//would need to test for convergence if anything is dequeued...
                 return _ConvergedIterations;
+            }
+        }
+        public bool ConvergedOnMax
+        {
+            get
+            {
+                ForceDeQueue();//would need to test for convergence if anything is dequeued...
+                return _ConvergedOnMax;
             }
         }
         public double BinWidth
@@ -205,48 +213,77 @@ namespace Statistics.Histograms
         public double Skewness()
         {
             ForceDeQueue();
+            if (_N == 0)
+            {
+                return double.NaN;
+            }
+            if (_N <=2)
+            {
+                return 0;
+            }
+            if (_Min == (_Max - _BinWidth))
+            {
+                return 0.0;
+            }
             double deviation = 0, deviation2 = 0, deviation3 = 0;
 
             for (int i = 0; i < _BinCounts.Length; i++)
             {
                 double midpoint = Min + (i * _BinWidth) + (0.5 * _BinWidth);
 
-                deviation += midpoint - Mean;
+                deviation += midpoint - _SampleMean;
                 deviation2 += deviation * deviation;
                 deviation3 += deviation2 * deviation;
 
             }
-            double skewness = SampleSize > 2 ? deviation3 / SampleSize / Math.Pow(Variance, 3 / 2) : 0;
-            return skewness;
+            double variance = _SampleVariance * (double)((double)(_N - 1) / (double)_N);
+            return deviation3 / _N / Math.Pow(variance, 3 / 2);
         }
         #region Functions
         public double HistogramMean()
         {
             ForceDeQueue();
-            double sum = 0;
-            double min = Min;
-            for (int i = 0; i < BinCounts.Length; i++)
+            if (_N == 0)
             {
-                sum += (min + (i * BinWidth) + (0.5 * BinWidth)) * BinCounts[i];
+                return double.NaN;
             }
-            double mean = SampleSize > 0 ? sum / SampleSize : double.NaN;
-            return mean;
+            if (_Min == (_Max - _BinWidth))
+            {
+                return _Min + (.5 * _BinWidth);
+            }
+            double sum = 0;
+            for (int i = 0; i < _BinCounts.Length; i++)
+            {
+                sum += (_Min + (i * _BinWidth) + (0.5 * _BinWidth)) * _BinCounts[i];
+            }
+            return sum / _N;
         }
         public double HistogramVariance()
         {
             ForceDeQueue();
+            if (_N == 0)
+            {
+                return double.NaN;
+            }
+            if (_N <=1)
+            {
+                return 0;
+            }
+            if (_Min == (_Max - _BinWidth))
+            {
+                return 0.0;
+            }
             double deviation = 0, deviation2 = 0;
 
-            for (int i = 0; i < BinCounts.Length; i++)
+            for (int i = 0; i < _BinCounts.Length; i++)
             {
-                double midpoint = Min + (i * BinWidth) + (0.5 * BinWidth);
+                double midpoint = _Min + (i * _BinWidth) + (0.5 * _BinWidth);
 
-                deviation = midpoint - Mean;
+                deviation = midpoint - _SampleMean;
                 deviation2 += deviation * deviation;
 
             }
-            double variance = SampleSize > 1 ? deviation2 / (SampleSize - 1) : 0;
-            return variance;
+            return deviation2 / (_N - 1);
         }
         public double HistogramStandardDeviation()
         {
@@ -391,6 +428,21 @@ namespace Statistics.Histograms
         public double PDF(double x)
         {
             //ForceDeQueue();
+            if (_N == 0)
+            {
+                return double.NaN;
+            }
+            if (_Min == (_Max - _BinWidth))
+            {
+                if (x > _Min)
+                {
+                    if (x <= _Max)
+                    {
+                        return 1.0;
+                    }
+                }
+                return 0.0;
+            }
             double nAtX = Convert.ToDouble(FindBinCount(x, false));
             double n = Convert.ToDouble(SampleSize);
             return nAtX / n;
@@ -398,6 +450,25 @@ namespace Statistics.Histograms
         public double CDF(double x)
         {
             //ForceDeQueue();
+            if (_N == 0)
+            {
+                return double.NaN;
+            }
+            if (_Min == (_Max - _BinWidth))
+            {
+                if (x > _Min)
+                {
+                    if (x <= _Max)
+                    {
+                        return (_Max - x) / (_Max - _Min);
+                    }
+                    else
+                    {
+                        return 1.0;
+                    }
+                }
+                return 0.0;
+            }
             double nAtX = Convert.ToDouble(FindBinCount(x));
             double n = Convert.ToDouble(SampleSize);
             return nAtX / n;
@@ -409,6 +480,14 @@ namespace Statistics.Histograms
             if (p >= 1) return _SampleMax;
             else
             {
+                if (_N == 0)
+                {
+                    return double.NaN;
+                }
+                if (_Min == (_Max - _BinWidth))
+                {
+                    return _Min + (_BinWidth * p);
+                }
                 Int64 numobs = Convert.ToInt64(SampleSize * p);
                 if (p <= 0.5)
                 {

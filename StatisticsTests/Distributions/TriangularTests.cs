@@ -35,6 +35,17 @@ namespace StatisticsTests.Distributions
             Assert.True(dist.HasErrors);
         }
         [Theory]
+        [InlineData(0d, 0d, 0d, 1)]
+        [InlineData(0d, 0d, 3d, 1)]
+        [InlineData(-1d, 3d, 3d, 1)]
+        public void MinorValidation(double min, double mostlikely, double max, int n)
+        {
+            Statistics.Distributions.Triangular dist = new Statistics.Distributions.Triangular(min, mostlikely, max, n);
+            dist.Validate();
+            Assert.True(dist.HasErrors);
+            Assert.True(dist.ErrorLevel == Base.Enumerations.ErrorLevel.Minor);
+        }
+        [Theory]
         [InlineData(0d, 1d, 2d, 1)]
         [InlineData(-1d, 2d, 3d, 1)]
         public void GoodValidation(double min,double mostlikely, double max, int n)

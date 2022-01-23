@@ -44,16 +44,16 @@ namespace Statistics.Distributions
         {
             AddSinglePropertyRule(nameof(Min),
                 new Rule(() => {
+                    return Min <= Max;
+                },
+                "Min must be smaller or equal to Max.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(Min),
+                new Rule(() => {
                     return Min < Max;
                 },
-                "Min must be smaller than Max.",
-                ErrorLevel.Fatal));
-            AddSinglePropertyRule(nameof(Max),
-                new Rule(() => {
-                    return Min != Max;
-                },
-                "Max cannot equal Min.",
-                ErrorLevel.Fatal));
+                "Min shouldnt equal Max.",
+                ErrorLevel.Minor));
             AddSinglePropertyRule(nameof(SampleSize),
                 new Rule(() => {
                     return SampleSize > 0;
@@ -64,13 +64,20 @@ namespace Statistics.Distributions
         #endregion
 
         #region Functions
-        public IMessageLevels Validate(IValidator<Uniform> validator, out IEnumerable<IMessage> msgs)
-        {
-            return validator.IsValid(this, out msgs);
-        }
         
         #region IDistribution Functions
         public override double PDF(double x){
+            if (Max == Min)
+            {
+                if (x == Min)
+                {
+                    return 1.0;
+                }
+                else
+                {
+                    return 0.0;
+                }
+            }
             if(x<Min){
                 return 0;
             }else if(x<= Max){
@@ -80,7 +87,18 @@ namespace Statistics.Distributions
             }
         }
         public override double CDF(double x){
-            if(x<Min){
+            if (Max == Min)
+            {
+                if (x >= Min)
+                {
+                    return 1.0;
+                }
+                else
+                {
+                    return 0.0;
+                }
+            }
+            if (x<Min){
                 return 0;
             }else if(x<= Max){
                 return (x-Min)/(Max-Min);

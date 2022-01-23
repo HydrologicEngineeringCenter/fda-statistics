@@ -44,10 +44,16 @@ namespace Statistics.Distributions
         {
             AddSinglePropertyRule(nameof(StandardDeviation),
                 new Rule(() => {
+                    return StandardDeviation >= 0;
+                },
+                "Standard Deviation must be greater than or equal to 0.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(StandardDeviation),
+                new Rule(() => {
                     return StandardDeviation > 0;
                 },
-                "Standard Deviation must be greater than 0.",
-                ErrorLevel.Fatal));
+                "Standard Deviation shouldnt be 0.",
+                ErrorLevel.Minor));
             AddSinglePropertyRule(nameof(SampleSize),
                 new Rule(() => {
                     return SampleSize > 0;
@@ -60,9 +66,30 @@ namespace Statistics.Distributions
         #region Functions
         #region IDistribution Functions
         public override double PDF(double x){
+            if (StandardDeviation == 0)
+            {
+                if (x == Mean)
+                {
+                    return 1.0;
+                }
+                else
+                {
+                    return 0.0;
+                }
+            }
             return Math.Exp(-(x-Mean)*(x-Mean)/(2.0*StandardDeviation*StandardDeviation))/(Math.Sqrt(2.0*Math.PI)*StandardDeviation);
         }
         public override double CDF(double x){
+            if(StandardDeviation == 0)
+            {
+                if( x >= Mean) {
+                    return 1.0;
+                }
+                else
+                {
+                    return 0.0;
+                }
+            }
             if (x == Double.PositiveInfinity){
 			    return 1.0;
             }
@@ -80,6 +107,7 @@ namespace Statistics.Distributions
         {
             if (p <= 0) return Double.NegativeInfinity;
             if (p >= 1) return Double.PositiveInfinity;
+            if (StandardDeviation == 0) return Mean;
             return invCDFNewton(p, Mean, 1e-10,100);
         }
 
