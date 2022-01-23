@@ -12,8 +12,7 @@ namespace Statistics.Distributions
         #region Fields and Properties
         private double _mean;
         private double _standardDeviation;
-        private double _min;
-        private double _max;
+
 
         #region IDistribution Properties
         public override IDistributionEnum Type => IDistributionEnum.Normal;
@@ -43,10 +42,16 @@ namespace Statistics.Distributions
         {
             AddSinglePropertyRule(nameof(StandardDeviation),
                 new Rule(() => {
+                    return StandardDeviation >= 0;
+                },
+                "Standard Deviation must be greater than or equal to 0.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(StandardDeviation),
+                new Rule(() => {
                     return StandardDeviation > 0;
                 },
-                "Standard Deviation must be greater than 0.",
-                ErrorLevel.Fatal));
+                "Standard Deviation shouldnt equal 0.",
+                ErrorLevel.Minor));
             AddSinglePropertyRule(nameof(Mean),
                 new Rule(() => {
                     return Mean > 0;
