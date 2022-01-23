@@ -81,7 +81,7 @@ namespace Statistics.Distributions
                     return MostLikely < Max;
                 },
                 "MostLikely shouldnt equal to Max.",
-                ErrorLevel.Fatal));
+                ErrorLevel.Minor));
             AddSinglePropertyRule(nameof(SampleSize),
                 new Rule(() => {
                     return SampleSize > 0;
