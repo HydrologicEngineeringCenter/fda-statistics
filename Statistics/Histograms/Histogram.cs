@@ -143,7 +143,14 @@ namespace Statistics.Histograms
         public double Skewness()
         {
             double deviation = 0, deviation2 = 0, deviation3 = 0;
-
+            if (_N == 0)
+            {
+                return double.NaN;
+            }
+            if (_Min == (_Max-_BinWidth))
+            {
+                return 0.0;
+            }
             for (int i = 0; i < _BinCounts.Length; i++)
             {
                 double midpoint = Min + (i * _BinWidth) + (0.5 * _BinWidth);
@@ -163,9 +170,9 @@ namespace Statistics.Histograms
             {
                 return double.NaN;
             }
-            if (_Min == _Max)
+            if (_Min == (_Max - _BinWidth))
             {
-                return _Min;
+                return _Max + (.5*_BinWidth);
             }
             double sum = 0;
             for (int i = 0; i < BinCounts.Length; i++)
@@ -184,7 +191,7 @@ namespace Statistics.Histograms
             {
                 return 0.0;
             }
-            if (_Min == _Max)
+            if (_Min == (_Max - _BinWidth))
             {
                 return 0.0;
             }
