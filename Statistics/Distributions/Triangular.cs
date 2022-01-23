@@ -48,27 +48,39 @@ namespace Statistics.Distributions
         {
             AddSinglePropertyRule(nameof(Min),
                 new Rule(() => {
+                    return Min <= Max;
+                },
+                "Min must not exceed Max.",
+                ErrorLevel.Fatal));
+            AddSinglePropertyRule(nameof(Min),
+                new Rule(() => {
                     return Min < Max;
                 },
-                "Min must be smaller than Max.",
+                "Min shouldnt equal Max.",
+                ErrorLevel.Minor));
+            AddSinglePropertyRule(nameof(Min),
+                new Rule(() => {
+                    return Min <= MostLikely;
+                },
+                "Min must be smaller than or equal to MostLikely.",
                 ErrorLevel.Fatal));
             AddSinglePropertyRule(nameof(Min),
                 new Rule(() => {
                     return Min < MostLikely;
                 },
-                "Min must be smaller than MostLikely.",
-                ErrorLevel.Fatal));
+                "Min shouldnt equal MostLikely.",
+                ErrorLevel.Minor));
             AddSinglePropertyRule(nameof(Max),
                 new Rule(() => {
-                    return Min != Max;
+                    return MostLikely <= Max;
                 },
-                "Max cannot equal Min.",
+                "MostLikely must be smaller than or equal to Max.",
                 ErrorLevel.Fatal));
             AddSinglePropertyRule(nameof(Max),
                 new Rule(() => {
                     return MostLikely < Max;
                 },
-                "MostLikely must be smaller than Max.",
+                "MostLikely shouldnt equal to Max.",
                 ErrorLevel.Fatal));
             AddSinglePropertyRule(nameof(SampleSize),
                 new Rule(() => {
@@ -96,6 +108,14 @@ namespace Statistics.Distributions
         
         #region IDistribution Functions
         public override double PDF(double x){
+            if (Max == Min)
+            {
+                if (x == MostLikely)//this is actually kinda odd.
+                {
+                    return 1.0;
+                }
+                return 0.0;
+            }
             if(x<Min){
                 return 0;
             }else if(x<=MostLikely){
@@ -107,7 +127,15 @@ namespace Statistics.Distributions
             }
         }
         public override double CDF(double x){
-            if(x<Min){
+            if (Max == Min)
+            {
+                if (x >= MostLikely)//this is actually kinda odd.
+                {
+                    return 1.0;
+                }
+                return 0.0;
+            }
+            if (x<Min){
                 return 0;
             }else if (x<= MostLikely){
                 return Math.Pow(x-Min,2)/((Max-Min)*(MostLikely-Min));
@@ -118,6 +146,10 @@ namespace Statistics.Distributions
             }
         }
         public override double InverseCDF(double p){
+            if (Max == Min)
+            {
+                return MostLikely;//this is actually kinda odd.
+            }
             double a = MostLikely - Min;
             double b = Max - MostLikely;
             if (p <= 0){
