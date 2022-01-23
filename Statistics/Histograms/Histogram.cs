@@ -159,28 +159,45 @@ namespace Statistics.Histograms
         #region Functions
         public double HistogramMean()
         {           
+            if (_N == 0)
+            {
+                return double.NaN;
+            }
+            if (_Min == _Max)
+            {
+                return _Min;
+            }
             double sum = 0;
-            double min = Min;
-                for (int i = 0; i < BinCounts.Length; i++)
-                {
-                    sum += (min + (i * BinWidth) + (0.5 * BinWidth)) * BinCounts[i];
-                }
-            double mean = SampleSize > 0 ? sum / SampleSize : double.NaN;
-            return mean;
+            for (int i = 0; i < BinCounts.Length; i++)
+            {
+                sum += (_Min + (i * _BinWidth) + (0.5 * _BinWidth)) * _BinCounts[i];
+            }
+            return sum / _N;
         }
         public double HistogramVariance()
         {
+            if (_N == 0)
+            {
+                return double.NaN;
+            }
+            if (_N == 1)
+            {
+                return 0.0;
+            }
+            if (_Min == _Max)
+            {
+                return 0.0;
+            }
             double deviation = 0, deviation2 = 0;
-
             for (int i = 0; i < BinCounts.Length; i++)
             {
-                double midpoint = Min + (i * BinWidth) + (0.5 * BinWidth);
+                double midpoint = _Min + (i * _BinWidth) + (0.5 * _BinWidth);
 
-                deviation = midpoint - Mean;
+                deviation = midpoint - _SampleMean;
                 deviation2 += deviation * deviation;
 
             }
-            double variance = SampleSize > 1 ? deviation2 / (SampleSize - 1) : 0;
+            double variance = deviation2 / (_N - 1);
             return variance;
         }
         public double HistogramStandardDeviation(){
@@ -274,12 +291,46 @@ namespace Statistics.Histograms
         }
         public double PDF(double x)
         {
+            if (_N == 0)
+            {
+                return double.NaN;
+            }
+            if (_Min == (_Max-_BinWidth))
+            {
+                if (x > _Min)
+                {
+                    if (x <= _Max)
+                    {
+                        return 1.0;
+                    }
+                }
+                return 0.0;
+            }
             double nAtX = Convert.ToDouble(FindBinCount(x, false));
             double n = Convert.ToDouble(SampleSize);
             return nAtX/n;
         }
         public double CDF(double x)
         {
+            if (_N == 0)
+            {
+                return double.NaN;
+            }
+            if (_Min == (_Max - _BinWidth))
+            {
+                if (x > _Min)
+                {
+                    if (x <= _Max)
+                    {
+                        return (_Max - x) / (_Max - _Min);
+                    }
+                    else
+                    {
+                        return 1.0;
+                    }
+                }
+                return 0.0;
+            }
             double nAtX = Convert.ToDouble(FindBinCount(x));
             double n = Convert.ToDouble(SampleSize);
             return nAtX / n;
@@ -289,6 +340,14 @@ namespace Statistics.Histograms
             if (!p.IsOnRange(0, 1)) throw new ArgumentOutOfRangeException($"The provided probability value: {p} is not on the a valid range: [0, 1]");
             else
             {
+                if (_N == 0)
+                {
+                    return double.NaN;
+                }
+                if (_Min == (_Max - _BinWidth))
+                {
+                    return _Min + (_BinWidth * p);
+                }
                 if (p==0)
                 {
                     return Min;
@@ -331,16 +390,6 @@ namespace Statistics.Histograms
                 
             }
         }
-        /*
-        public double Sample(Random r = null) => InverseCDF(r == null ? new Random().NextDouble() : r.NextDouble());
-        public double[] Sample(int sampleSize, Random r = null)
-        {
-            double[] sample = new double[sampleSize];
-            for (int i = 0; i < sampleSize; i++) sample[i] = Sample(r);
-            return sample;
-        }
-        */
-
         public XElement WriteToXML()
         {
             XElement masterElem = new XElement("Histogram");
