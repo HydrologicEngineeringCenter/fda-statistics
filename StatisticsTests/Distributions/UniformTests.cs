@@ -6,7 +6,6 @@ using Xunit;
 
 namespace StatisticsTests.Distributions
 {
-    [ExcludeFromCodeCoverage]
     public class UniformTests
     {
         [Theory]
@@ -26,6 +25,15 @@ namespace StatisticsTests.Distributions
             Statistics.Distributions.Uniform dist = new Statistics.Distributions.Uniform(min, max, n);
             dist.Validate();
             Assert.True(dist.HasErrors);
+        }
+        [Theory]
+        [InlineData(0d, 0d, 1)]
+        public void MinorValidation(double min, double max, int n)
+        {
+            Statistics.Distributions.Uniform dist = new Statistics.Distributions.Uniform(min, max, n);
+            dist.Validate();
+            Assert.True(dist.HasErrors);
+            Assert.True(dist.ErrorLevel==Base.Enumerations.ErrorLevel.Minor);
         }
         [Theory]
         [InlineData(0d, 1d, 1)]
