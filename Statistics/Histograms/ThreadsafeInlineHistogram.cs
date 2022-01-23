@@ -169,9 +169,9 @@ namespace Statistics.Histograms
             _BinWidth = binWidth;
             if (data == null)
             {
-                Min = 0;
-                Max = Min + _BinWidth;
-                Int64 numberOfBins = 1;
+                //Min = 0;
+                //Max = Min + _BinWidth;
+                Int64 numberOfBins = 0;
                 _BinCounts = new Int32[numberOfBins];
             }
             else if (data.Length == 1)
@@ -444,7 +444,7 @@ namespace Statistics.Histograms
                 return 0.0;
             }
             double nAtX = Convert.ToDouble(FindBinCount(x, false));
-            double n = Convert.ToDouble(SampleSize);
+            double n = Convert.ToDouble(_N);
             return nAtX / n;
         }
         public double CDF(double x)
@@ -470,14 +470,14 @@ namespace Statistics.Histograms
                 return 0.0;
             }
             double nAtX = Convert.ToDouble(FindBinCount(x));
-            double n = Convert.ToDouble(SampleSize);
+            double n = Convert.ToDouble(_N);
             return nAtX / n;
         }
         public double InverseCDF(double p)
         {
             //ForceDeQueue();
-            if (p <= 0) return _SampleMin;
-            if (p >= 1) return _SampleMax;
+            if (p <= 0) return _Min;
+            if (p >= 1) return _Max;
             else
             {
                 if (_N == 0)
@@ -488,7 +488,7 @@ namespace Statistics.Histograms
                 {
                     return _Min + (_BinWidth * p);
                 }
-                Int64 numobs = Convert.ToInt64(SampleSize * p);
+                Int64 numobs = Convert.ToInt64(_N * p);
                 if (p <= 0.5)
                 {
                     Int64 index = 0;
@@ -501,24 +501,40 @@ namespace Statistics.Histograms
                         cobs += obs;
 
                     }
-                    double fraction = (cobs - numobs) / obs;
+                    double fraction = 0.0;
+                    if (obs == 0){
+                        fraction = .5;
+                    }
+                    else
+                    {
+                        fraction = (cobs - numobs) / obs;
+                    }
+                    
                     double binOffSet = Convert.ToDouble(index + 1);
-                    return Min + _BinWidth * binOffSet - _BinWidth * fraction;
+                    return _Min + _BinWidth * binOffSet - _BinWidth * fraction;
                 }
                 else
                 {
                     Int64 index = _BinCounts.Length - 1;
                     double obs = _BinCounts[index];
-                    double cobs = SampleSize - obs;
+                    double cobs = _N - obs;
                     while (cobs > numobs)
                     {
                         index--;
                         obs = _BinCounts[index];
                         cobs -= obs;
                     }
-                    double fraction = (numobs - cobs) / obs;
+                    double fraction = 0.0;
+                    if (obs == 0)
+                    {
+                        fraction = .5;
+                    }
+                    else
+                    {
+                        fraction = (numobs - cobs) / obs;
+                    }
                     double binOffSet = Convert.ToDouble(_BinCounts.Length - index);
-                    return Max - _BinWidth * binOffSet + _BinWidth * fraction;
+                    return _Max - _BinWidth * binOffSet + _BinWidth * fraction;
                 }
 
             }
