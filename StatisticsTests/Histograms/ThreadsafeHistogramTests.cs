@@ -207,7 +207,7 @@ namespace StatisticsTests.Histograms
             Assert.Equal(expected, actual, 2);
         }
         [Theory]
-        [InlineData(.1, 1)]
+        [InlineData(.1, 0)]
         public void IsHistogramConstructableWithNullData(double binWidth, double expected)
         {
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(null, binWidth);
