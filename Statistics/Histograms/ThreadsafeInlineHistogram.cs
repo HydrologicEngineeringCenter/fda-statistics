@@ -24,7 +24,7 @@ namespace Statistics.Histograms
         private long _ConvergedIterations = Int64.MinValue;
         private bool _ConvergedOnMax = false;
         private ConvergenceCriteria _ConvergenceCriteria;
-        private int _maxQueueCount = 100;
+        private int _maxQueueCount = 10000;
         private object _lock = new object();
         private object _bwListLock = new object();
         private static int _enqueue;
@@ -377,7 +377,11 @@ namespace Statistics.Histograms
                 }
                 else
                 {
-                    Int64 newObsIndex = Convert.ToInt64(Math.Floor((observation - _Min) / _BinWidth));
+                    Int64 newObsIndex = 0;
+                    if (observation != _Min)
+                    {
+                        newObsIndex = Convert.ToInt64(Math.Floor((observation - Min) / _BinWidth));
+                    }
                     if (observation == _Max)
                     {
                         quantityAdditionalBins = 1;

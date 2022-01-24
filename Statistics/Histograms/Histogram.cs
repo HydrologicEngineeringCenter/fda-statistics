@@ -255,7 +255,11 @@ namespace Statistics.Histograms
                 Max = newMax;
             } else
             {
-                Int64 newObsIndex = Convert.ToInt64(Math.Floor((observation - Min) / _BinWidth));
+                Int64 newObsIndex = 0;
+                if (observation != _Min)
+                {
+                    newObsIndex = Convert.ToInt64(Math.Floor((observation - Min) / _BinWidth));
+                }
                 if (observation == Max)
                 {
                     quantityAdditionalBins = 1;
