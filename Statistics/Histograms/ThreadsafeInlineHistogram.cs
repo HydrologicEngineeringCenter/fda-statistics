@@ -173,15 +173,15 @@ namespace Statistics.Histograms
                 {
                     Min = data.Min();
                     Int64 numberOfBins = 1;
-                    Max = Min + binWidth;
+                    Max = _Min + binWidth;
                     _BinCounts = new Int32[numberOfBins];
                     AddObservationsToHistogram(data);
                 }
                 else
                 {
                     Min = data.Min();
-                    Int64 numberOfBins = Convert.ToInt64(Math.Ceiling((data.Max() - Min) / binWidth));
-                    Max = Min + (numberOfBins * binWidth);
+                    Int64 numberOfBins = Convert.ToInt64(Math.Ceiling((data.Max() - _Min) / binWidth));
+                    Max = _Min + (numberOfBins * binWidth);
                     _BinCounts = new Int32[numberOfBins];
                     AddObservationsToHistogram(data);
                 }
@@ -380,7 +380,7 @@ namespace Statistics.Histograms
                     Int64 newObsIndex = 0;
                     if (observation != _Min)
                     {
-                        newObsIndex = Convert.ToInt64(Math.Floor((observation - Min) / _BinWidth));
+                        newObsIndex = Convert.ToInt64(Math.Floor((observation - _Min) / _BinWidth));
                     }
                     if (observation == _Max)
                     {

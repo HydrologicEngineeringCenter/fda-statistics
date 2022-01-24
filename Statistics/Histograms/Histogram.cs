@@ -243,7 +243,7 @@ namespace Statistics.Histograms
                 Min = newMin;
             } else if (observation > Max)
             {
-                quantityAdditionalBins = Convert.ToInt64(Math.Ceiling((observation - Max+_BinWidth) / _BinWidth));
+                quantityAdditionalBins = Convert.ToInt64(Math.Ceiling((observation - _Max+_BinWidth) / _BinWidth));
                 Int32[] newBinCounts = new Int32[quantityAdditionalBins + _BinCounts.Length];
                 for (Int64 i = 0; i < _BinCounts.Length; i++)
                 {
@@ -258,7 +258,7 @@ namespace Statistics.Histograms
                 Int64 newObsIndex = 0;
                 if (observation != _Min)
                 {
-                    newObsIndex = Convert.ToInt64(Math.Floor((observation - Min) / _BinWidth));
+                    newObsIndex = Convert.ToInt64(Math.Floor((observation - _Min) / _BinWidth));
                 }
                 if (observation == Max)
                 {
