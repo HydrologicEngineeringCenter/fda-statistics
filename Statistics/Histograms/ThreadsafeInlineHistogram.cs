@@ -24,6 +24,7 @@ namespace Statistics.Histograms
         private long _ConvergedIterations = Int64.MinValue;
         private bool _ConvergedOnMax = false;
         private ConvergenceCriteria _ConvergenceCriteria;
+        private bool _minHasNotBeenSet = false;
         private int _maxQueueCount = 10000;
         private object _lock = new object();
         private object _bwListLock = new object();
@@ -186,6 +187,10 @@ namespace Statistics.Histograms
                     AddObservationsToHistogram(data);
                 }
             }
+            else
+            {
+                _minHasNotBeenSet = true;
+            }
             _ConvergenceCriteria = new ConvergenceCriteria();
             _bw = new System.ComponentModel.BackgroundWorker();
             _bw.DoWork += _bw_DoWork;
@@ -336,6 +341,10 @@ namespace Statistics.Histograms
                     _SampleMean = observation;
                     _SampleVariance = 0;
                     _N = 1;
+                    if (_minHasNotBeenSet)
+                    {
+                        Min = observation;
+                    }
                 }
                 else
                 {
