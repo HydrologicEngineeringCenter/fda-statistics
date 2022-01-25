@@ -262,6 +262,7 @@ namespace Statistics.Histograms
         public void AddObservationToHistogram(double observation)
         {
             _observations.Enqueue(observation);
+            //can i update max and min here if _N = 0 to avoid doin that using linq?
             Interlocked.Increment(ref _enqueue);
             SafelyDeQueue();
         }
@@ -335,8 +336,8 @@ namespace Statistics.Histograms
             double observation;
             while (_observations.TryDequeue(out observation))
             {
-                if (double.IsNaN(observation)) continue;
-                if (double.IsInfinity(observation)) continue;
+                //if (double.IsNaN(observation)) continue;
+                //if (double.IsInfinity(observation)) continue;
                 if (_N == 0)
                 {
                     _SampleMax = observation;

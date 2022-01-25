@@ -150,7 +150,7 @@ namespace Statistics.Distributions
         for(int i=0;i<maxIter;i++){
         	
         	double dfdx = PDF(x);
-        	if (Double.MinValue > Math.Abs(dfdx))
+        	if (Double.MinValue > Math.Abs(dfdx))//consider a unequivically better choice than minvalue (e-8)
         	{
         		//this is a minimum or maximum. Can't get any closer
         		return x;
