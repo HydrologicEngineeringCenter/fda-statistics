@@ -152,6 +152,15 @@ namespace Statistics.Histograms
             _bw = new System.ComponentModel.BackgroundWorker();
             _bw.DoWork += _bw_DoWork;
         }
+        public ThreadsafeInlineHistogram(double binWidth)
+        {
+            _observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
+            _BinWidth = binWidth;
+            _minHasNotBeenSet = true;
+            _ConvergenceCriteria = new ConvergenceCriteria();
+            _bw = new System.ComponentModel.BackgroundWorker();
+            _bw.DoWork += _bw_DoWork;
+        }
         public ThreadsafeInlineHistogram(double min, double binWidth, ConvergenceCriteria _c)
         {
             _observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
@@ -164,37 +173,37 @@ namespace Statistics.Histograms
             _bw = new System.ComponentModel.BackgroundWorker();
             _bw.DoWork += _bw_DoWork;
         }
-        public ThreadsafeInlineHistogram(double[] data, double binWidth)
-        {
-            _observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
-            _BinWidth = binWidth;
-            if (data != null)
-            {
-                if (data.Length == 1)
-                {
-                    Min = data.Min();
-                    Int64 numberOfBins = 1;
-                    Max = _Min + binWidth;
-                    _BinCounts = new Int32[numberOfBins];
-                    AddObservationsToHistogram(data);
-                }
-                else
-                {
-                    Min = data.Min();
-                    Int64 numberOfBins = Convert.ToInt64(Math.Ceiling((data.Max() - _Min) / binWidth));
-                    Max = _Min + (numberOfBins * binWidth);
-                    _BinCounts = new Int32[numberOfBins];
-                    AddObservationsToHistogram(data);
-                }
-            }
-            else
-            {
-                _minHasNotBeenSet = true;
-            }
-            _ConvergenceCriteria = new ConvergenceCriteria();
-            _bw = new System.ComponentModel.BackgroundWorker();
-            _bw.DoWork += _bw_DoWork;
-        }
+        //public ThreadsafeInlineHistogram(double[] data, double binWidth)
+        //{
+        //    _observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
+        //    _BinWidth = binWidth;
+        //    if (data != null)
+        //    {
+        //        if (data.Length == 1)
+        //        {
+        //            Min = data.Min();
+        //            Int64 numberOfBins = 1;
+        //            Max = _Min + binWidth;
+        //            _BinCounts = new Int32[numberOfBins];
+        //            AddObservationsToHistogram(data);
+        //        }
+        //        else
+        //        {
+        //            Min = data.Min();
+        //            Int64 numberOfBins = Convert.ToInt64(Math.Ceiling((data.Max() - _Min) / binWidth));
+        //            Max = _Min + (numberOfBins * binWidth);
+        //            _BinCounts = new Int32[numberOfBins];
+        //            AddObservationsToHistogram(data);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        _minHasNotBeenSet = true;
+        //    }
+        //    _ConvergenceCriteria = new ConvergenceCriteria();
+        //    _bw = new System.ComponentModel.BackgroundWorker();
+        //    _bw.DoWork += _bw_DoWork;
+        //}
         private ThreadsafeInlineHistogram(double min, double max, double binWidth, Int32[] binCounts)
         {
             _observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
@@ -344,6 +353,8 @@ namespace Statistics.Histograms
                     if (_minHasNotBeenSet)
                     {
                         Min = observation;
+                        Max = observation + _BinWidth;
+                        _BinCounts = new int[] { 0 };
                     }
                 }
                 else

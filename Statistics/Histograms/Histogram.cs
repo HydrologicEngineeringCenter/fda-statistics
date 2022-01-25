@@ -102,6 +102,12 @@ namespace Statistics.Histograms
             _BinCounts = new Int32[numberOfBins];
             _ConvergenceCriteria = new ConvergenceCriteria();
         }
+        public Histogram(double binWidth)
+        {
+            _BinWidth = binWidth;
+            _minHasNotBeenSet = true;
+            _ConvergenceCriteria = new ConvergenceCriteria();
+        }
         public Histogram(double min, double binWidth, ConvergenceCriteria _c)
         {
             _BinWidth = binWidth;
@@ -111,31 +117,31 @@ namespace Statistics.Histograms
             _BinCounts = new Int32[numberOfBins];
             _ConvergenceCriteria = _c;
         }
-        public Histogram(double[] data, double binWidth)
-        {
-            _BinWidth = binWidth;
-            if (data != null) {
-                if (data.Length == 1) {
-                    Min = data.Min();
-                    Int64 numberOfBins = 1;
-                    Max = Min + binWidth;
-                    _BinCounts = new Int32[numberOfBins];
-                    AddObservationsToHistogram(data);
-                } else
-                {
-                    Min = data.Min();
-                    Int64 numberOfBins = Convert.ToInt64(Math.Ceiling((data.Max() - Min) / binWidth));
-                    Max = Min + (numberOfBins * binWidth);
-                    _BinCounts = new Int32[numberOfBins];
-                    AddObservationsToHistogram(data);
-                }
-            }
-            else
-            {
-                _minHasNotBeenSet = true;
-            }
-            _ConvergenceCriteria = new ConvergenceCriteria();
-        }
+        //public Histogram(double[] data, double binWidth)
+        //{
+        //    _BinWidth = binWidth;
+        //    if (data != null) {
+        //        if (data.Length == 1) {
+        //            Min = data.Min();
+        //            Int64 numberOfBins = 1;
+        //            Max = Min + binWidth;
+        //            _BinCounts = new Int32[numberOfBins];
+        //            AddObservationsToHistogram(data);
+        //        } else
+        //        {
+        //            Min = data.Min();
+        //            Int64 numberOfBins = Convert.ToInt64(Math.Ceiling((data.Max() - Min) / binWidth));
+        //            Max = Min + (numberOfBins * binWidth);
+        //            _BinCounts = new Int32[numberOfBins];
+        //            AddObservationsToHistogram(data);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        _minHasNotBeenSet = true;
+        //    }
+        //    _ConvergenceCriteria = new ConvergenceCriteria();
+        //}
         private Histogram(double min, double max, double binWidth, Int32[] binCounts)
         {
             Min = min;
@@ -225,6 +231,8 @@ namespace Statistics.Histograms
                 if (_minHasNotBeenSet)
                 {
                     Min = observation;
+                    Max = observation + _BinWidth;
+                    _BinCounts = new int[] { 0};
                 }
                 _N = 1;
             }else{

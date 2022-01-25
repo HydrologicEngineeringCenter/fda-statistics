@@ -49,7 +49,8 @@ namespace Statistics
             double min = sample.Min();
             double max = sample.Max();
             double binWidth = (min - max) / nBins;
-            Statistics.Histograms.Histogram histogram = new Statistics.Histograms.Histogram(sample.ToArray(), binWidth);
+            Statistics.Histograms.Histogram histogram = new Statistics.Histograms.Histogram(binWidth);
+            histogram.AddObservationsToHistogram(sample.ToArray());
             return histogram;
         }
         /// <summary>

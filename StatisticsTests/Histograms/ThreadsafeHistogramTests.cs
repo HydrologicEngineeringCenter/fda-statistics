@@ -17,7 +17,8 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_Minimum(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(data, binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.Min;
             Assert.Equal(expected, actual);
@@ -27,7 +28,8 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_AddedData_Minimum(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(data, binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            histogram.AddObservationsToHistogram(data);
             histogram.AddObservationToHistogram(0);
             histogram.ForceDeQueue();
             double actual = histogram.Min;
@@ -38,7 +40,8 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_Maximum(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(data, binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.Max;
             Assert.Equal(expected, actual);
@@ -48,7 +51,8 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_AddedData_Maximum(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(data, binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            histogram.AddObservationsToHistogram(data);
             histogram.AddObservationToHistogram(6);
             histogram.ForceDeQueue();
             double actual = histogram.Max;
@@ -59,7 +63,8 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_Mean(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(data, binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.HistogramMean();
             Assert.Equal(expected, actual);
@@ -69,7 +74,8 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_HistogramStandardDeviation(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(data, binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.HistogramStandardDeviation();
             Assert.Equal(expected, actual, 3);//this gives much more meaningful error reporting
@@ -79,7 +85,8 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_StandardDeviation(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(data, binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.StandardDeviation;
             Assert.Equal(expected, actual, 5);//this gives much more meaningful error reporting
@@ -89,7 +96,8 @@ namespace StatisticsTests.Histograms
         public void Histogram_InvCDF(double binWidth, double prob, double expected)
         {
             double[] data = new double[14] { 0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(data, binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.InverseCDF(prob);
             double err = Math.Abs((expected - actual) / expected);
@@ -102,7 +110,8 @@ namespace StatisticsTests.Histograms
         public void Histogram_CDF(double binWidth, double val, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(data, binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.CDF(val);
             double err = Math.Abs((expected - actual) / expected);
@@ -115,7 +124,8 @@ namespace StatisticsTests.Histograms
         public void Histogram_PDF(double binWidth, double val, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(data, binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.PDF(val);
             double err = Math.Abs((expected - actual) / expected);
@@ -128,7 +138,8 @@ namespace StatisticsTests.Histograms
         public void Fit_ExpandsHistogram_WithDataOutOfRange(double binWidth)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(data, binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            histogram.AddObservationsToHistogram(data);
             double[] newData = new double[2] { 7, 9 };
             histogram.AddObservationsToHistogram(newData);
             histogram.ForceDeQueue();
@@ -207,10 +218,10 @@ namespace StatisticsTests.Histograms
             Assert.Equal(expected, actual, 2);
         }
         [Theory]
-        [InlineData(.1, 0)]
+        [InlineData(.1, 1)]
         public void IsHistogramConstructableWithNullData(double binWidth, double expected)
         {
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(null, binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
             histogram.AddObservationToHistogram(.05);
             histogram.ForceDeQueue();
             double actual = histogram.BinCounts[0];
