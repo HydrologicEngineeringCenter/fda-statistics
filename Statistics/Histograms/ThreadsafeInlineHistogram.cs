@@ -25,6 +25,7 @@ namespace Statistics.Histograms
         private bool _ConvergedOnMax = false;
         private ConvergenceCriteria _ConvergenceCriteria;
         private int _maxQueueCount = 1000;
+        private int _postQueueCount = 100;
         private object _lock = new object();
         private object _bwListLock = new object();
         private static int _enqueue;
@@ -146,13 +147,15 @@ namespace Statistics.Histograms
             _bw = new System.ComponentModel.BackgroundWorker();
             _bw.DoWork += _bw_DoWork;
         }
-        public ThreadsafeInlineHistogram(double binWidth, ConvergenceCriteria c)
+        public ThreadsafeInlineHistogram(double binWidth, ConvergenceCriteria c, int startqueueSize = 1000, int postqueueSize = 100)
         {
             _observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
             _BinWidth = binWidth;
             _ConvergenceCriteria = c;
             _bw = new System.ComponentModel.BackgroundWorker();
             _bw.DoWork += _bw_DoWork;
+            _maxQueueCount = startqueueSize;
+            _postQueueCount = postqueueSize;
         }
         private ThreadsafeInlineHistogram(double min, double max, double binWidth, Int32[] binCounts)
         {
@@ -326,6 +329,7 @@ namespace Statistics.Histograms
 
                 _BinCounts = new int[] { 0 };
                 _Max = _Min + _BinWidth;
+                _maxQueueCount = _postQueueCount;
                 
             }
             double observation;
