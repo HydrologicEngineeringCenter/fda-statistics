@@ -192,7 +192,8 @@ namespace StatisticsTests.Histograms
             double actual = histogram.CDF(value);
             double err = Math.Abs((expected - actual) / expected);
             Assert.True(histogram.ConvergedIteration >= maxiter);
-            Assert.Equal(expected, actual, 2);
+            double tolerance = .01;
+            Assert.True(err<tolerance);
         }
         [Theory]
         [InlineData(10000000, .80, 1.96, .975)]
