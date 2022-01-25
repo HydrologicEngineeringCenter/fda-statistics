@@ -24,8 +24,7 @@ namespace Statistics.Histograms
         private long _ConvergedIterations = Int64.MinValue;
         private bool _ConvergedOnMax = false;
         private ConvergenceCriteria _ConvergenceCriteria;
-        private bool _minHasNotBeenSet = false;
-        private int _maxQueueCount = 10000;
+        private int _maxQueueCount = 1000;
         private object _lock = new object();
         private object _bwListLock = new object();
         private static int _enqueue;
@@ -140,70 +139,21 @@ namespace Statistics.Histograms
         }
         #endregion
         #region Constructor
-        public ThreadsafeInlineHistogram(double min, double binWidth)
+        public ThreadsafeInlineHistogram(ConvergenceCriteria c)
         {
             _observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
-            _BinWidth = binWidth;
-            Min = min;
-            Max = Min + _BinWidth;
-            Int64 numberOfBins = 1;
-            _BinCounts = new Int32[numberOfBins];
-            _ConvergenceCriteria = new ConvergenceCriteria();
+            _ConvergenceCriteria = c;
             _bw = new System.ComponentModel.BackgroundWorker();
             _bw.DoWork += _bw_DoWork;
         }
-        public ThreadsafeInlineHistogram(double binWidth)
+        public ThreadsafeInlineHistogram(double binWidth, ConvergenceCriteria c)
         {
             _observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
             _BinWidth = binWidth;
-            _minHasNotBeenSet = true;
-            _ConvergenceCriteria = new ConvergenceCriteria();
+            _ConvergenceCriteria = c;
             _bw = new System.ComponentModel.BackgroundWorker();
             _bw.DoWork += _bw_DoWork;
         }
-        public ThreadsafeInlineHistogram(double min, double binWidth, ConvergenceCriteria _c)
-        {
-            _observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
-            _BinWidth = binWidth;
-            Min = min;
-            Max = Min + _BinWidth;
-            Int64 numberOfBins = 1;
-            _BinCounts = new Int32[numberOfBins];
-            _ConvergenceCriteria = _c;
-            _bw = new System.ComponentModel.BackgroundWorker();
-            _bw.DoWork += _bw_DoWork;
-        }
-        //public ThreadsafeInlineHistogram(double[] data, double binWidth)
-        //{
-        //    _observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
-        //    _BinWidth = binWidth;
-        //    if (data != null)
-        //    {
-        //        if (data.Length == 1)
-        //        {
-        //            Min = data.Min();
-        //            Int64 numberOfBins = 1;
-        //            Max = _Min + binWidth;
-        //            _BinCounts = new Int32[numberOfBins];
-        //            AddObservationsToHistogram(data);
-        //        }
-        //        else
-        //        {
-        //            Min = data.Min();
-        //            Int64 numberOfBins = Convert.ToInt64(Math.Ceiling((data.Max() - _Min) / binWidth));
-        //            Max = _Min + (numberOfBins * binWidth);
-        //            _BinCounts = new Int32[numberOfBins];
-        //            AddObservationsToHistogram(data);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        _minHasNotBeenSet = true;
-        //    }
-        //    _ConvergenceCriteria = new ConvergenceCriteria();
-        //    _bw = new System.ComponentModel.BackgroundWorker();
-        //    _bw.DoWork += _bw_DoWork;
-        //}
         private ThreadsafeInlineHistogram(double min, double max, double binWidth, Int32[] binCounts)
         {
             _observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
@@ -211,6 +161,12 @@ namespace Statistics.Histograms
             Max = max;
             _BinWidth = binWidth;
             _BinCounts = binCounts;
+            //need to sum up the bincounts to get to _N.
+            foreach(int count in _BinCounts)
+            {
+                _N += count;
+            }
+            //sample mean, max, variance, and min dont work in this context...
             _ConvergenceCriteria = new ConvergenceCriteria();
             _bw = new System.ComponentModel.BackgroundWorker();
             _bw.DoWork += _bw_DoWork;
@@ -308,8 +264,16 @@ namespace Statistics.Histograms
         }
         private void SafelyDeQueue()
         {
-            if (_observations.Count > _maxQueueCount && !_bw.IsBusy)
+            //if (_enqueue - _dequeue > (_maxQueueCount * 2))
+            //{
+            //    throw new Exception("what the hey!");
+            //}
+            if (_observations.Count > _maxQueueCount)
             {
+                //while (_bw.IsBusy)
+                //{
+                //    Thread.Sleep(1);
+                //}
                 lock (_bwListLock)
                 {
                     if (!_bw.IsBusy) _bw.RunWorkerAsync();
@@ -340,9 +304,35 @@ namespace Statistics.Histograms
         {
             //do NOT reference any properties of this class in this method!
             //it will trigger unsafe operations across threads.
+
+            //apply sturges rule if _n = 0.
+            if (_N == 0)
+            {
+                Min = _observations.Min();
+                double max = _observations.Max();
+                int size = _observations.Count();
+                double range = max - _Min;
+                if(_BinWidth == 0)
+                {
+                    if (range == 0)
+                    {
+                        _BinWidth = .01;
+                    }
+                    else
+                    {
+                        _BinWidth = range/(1.0 + 3.322 * Math.Log(size));
+                    }
+                }
+
+                _BinCounts = new int[] { 0 };
+                _Max = _Min + _BinWidth;
+                
+            }
             double observation;
             while (_observations.TryDequeue(out observation))
             {
+                if (double.IsNaN(observation)) continue;
+                if (double.IsInfinity(observation)) continue;
                 if (_N == 0)
                 {
                     _SampleMax = observation;
@@ -350,12 +340,6 @@ namespace Statistics.Histograms
                     _SampleMean = observation;
                     _SampleVariance = 0;
                     _N = 1;
-                    if (_minHasNotBeenSet)
-                    {
-                        Min = observation;
-                        Max = observation + _BinWidth;
-                        _BinCounts = new int[] { 0 };
-                    }
                 }
                 else
                 {
@@ -422,6 +406,7 @@ namespace Statistics.Histograms
         }
         public void AddObservationsToHistogram(double[] data)
         {
+            //
             foreach (double x in data)
             {
                 AddObservationToHistogram(x);

@@ -17,7 +17,7 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_Minimum(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
             histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.Min;
@@ -28,7 +28,7 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_AddedData_Minimum(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
             histogram.AddObservationsToHistogram(data);
             histogram.AddObservationToHistogram(0);
             histogram.ForceDeQueue();
@@ -40,7 +40,7 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_Maximum(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
             histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.Max;
@@ -51,7 +51,7 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_AddedData_Maximum(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
             histogram.AddObservationsToHistogram(data);
             histogram.AddObservationToHistogram(6);
             histogram.ForceDeQueue();
@@ -63,7 +63,7 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_Mean(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
             histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.HistogramMean();
@@ -74,7 +74,7 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_HistogramStandardDeviation(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
             histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.HistogramStandardDeviation();
@@ -85,7 +85,7 @@ namespace StatisticsTests.Histograms
         public void HistogramStatistics_StandardDeviation(double binWidth, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
             histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.StandardDeviation;
@@ -96,7 +96,7 @@ namespace StatisticsTests.Histograms
         public void Histogram_InvCDF(double binWidth, double prob, double expected)
         {
             double[] data = new double[14] { 0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
             histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.InverseCDF(prob);
@@ -110,7 +110,7 @@ namespace StatisticsTests.Histograms
         public void Histogram_CDF(double binWidth, double val, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
             histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.CDF(val);
@@ -124,7 +124,7 @@ namespace StatisticsTests.Histograms
         public void Histogram_PDF(double binWidth, double val, double expected)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
             histogram.AddObservationsToHistogram(data);
             histogram.ForceDeQueue();
             double actual = histogram.PDF(val);
@@ -138,14 +138,14 @@ namespace StatisticsTests.Histograms
         public void Fit_ExpandsHistogram_WithDataOutOfRange(double binWidth)
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
             histogram.AddObservationsToHistogram(data);
             double[] newData = new double[2] { 7, 9 };
             histogram.AddObservationsToHistogram(newData);
             histogram.ForceDeQueue();
-            double expected = 10;
+            double expected = 10;//computed by test.
             double actual = histogram.Max;
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, actual,5);
         }
         [Theory]
         [InlineData(10000, .1, .80, 1.96, .975)]
@@ -155,7 +155,7 @@ namespace StatisticsTests.Histograms
             var rand = new Random(1234);
             double z = stdNormal.InverseCDF(.5 + .5 * .85);
             var convergencecriteria = new ConvergenceCriteria(maxIterations: maxiter, tolerance: 1, zAlpha: z);
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(0, binWidth, convergencecriteria);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, convergencecriteria);
             int iter = 0;
             while (!histogram.IsConverged)
             {
@@ -180,7 +180,7 @@ namespace StatisticsTests.Histograms
             var rand = new Random(1234);
             double z = stdNormal.InverseCDF(.5 + .5 * .85);
             var convergencecriteria = new ConvergenceCriteria(maxIterations: maxiter, tolerance: 1, zAlpha: z);
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(0, binWidth, convergencecriteria);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, convergencecriteria);
             while (!histogram.IsConverged)
             {
                 Parallel.For(0, 10000, index =>
@@ -195,14 +195,14 @@ namespace StatisticsTests.Histograms
             Assert.Equal(expected, actual, 2);
         }
         [Theory]
-        [InlineData(10000000, .1, .80, 1.96, .975)]
-        public void Parallel_Histogram_Convergence_automatic(Int64 maxiter, double binWidth, double quantile, double value, double expected)
+        [InlineData(10000000, .80, 1.96, .975)]
+        public void Parallel_Histogram_Convergence_automatic(Int64 maxiter, double quantile, double value, double expected)
         {
             IDistribution stdNormal = new Statistics.Distributions.Normal(0, 1);
             var rand = new Random(1234);
             double z = stdNormal.InverseCDF(.5 + .5 * .85);
-            var convergencecriteria = new ConvergenceCriteria(maxIterations: maxiter, tolerance: 1, zAlpha: z);
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(0, binWidth, convergencecriteria);
+            var convergencecriteria = new ConvergenceCriteria(maxIterations: maxiter, tolerance: .7, zAlpha: z);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(convergencecriteria);
             Int64 iterations = convergencecriteria.MinIterations;
             while (!histogram.IsConverged)
             {
@@ -221,7 +221,7 @@ namespace StatisticsTests.Histograms
         [InlineData(.1, 1)]
         public void IsHistogramConstructableWithNullData(double binWidth, double expected)
         {
-            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth);
+            ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
             histogram.AddObservationToHistogram(.05);
             histogram.ForceDeQueue();
             double actual = histogram.BinCounts[0];
