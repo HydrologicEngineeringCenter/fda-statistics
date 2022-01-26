@@ -32,27 +32,7 @@ namespace Statistics
         /// <returns> A new <see cref="IDistribution"/> constructed from a bootstrap sample from the underlying distribution. </returns>
         public IDistribution Sample(double[] packetOfRandomNumbers)
         {
-            if (this.IsNull()) throw new ArgumentNullException($"The sample distribution cannot be constructed because the input distribution is null.");
-            if (!(this.State < Utilities.IMessageLevels.Error)) throw new ArgumentException($"The specified distribution cannot be sampled because it is being held in an invalid state with the following messages: {Messages.PrintTabbedListOfMessages()}");
-            if (packetOfRandomNumbers.IsNull())
-            {
-                throw new ArgumentException($"The sample distribution cannot be sampled because the provided packet of random numbers is null");
-            }
-            if (packetOfRandomNumbers.Length==0)
-            {
-                throw new ArgumentException($"The sample distribution cannot be sampled because the provided packet of random numbers is empty");
-            }
-            foreach (var r in packetOfRandomNumbers)
-            {
-                if (r>1.0)
-                {
-                    throw new ArgumentException($"The sample distribution cannot be sampled because the provided packet of random numbers contains members outside the valid range of: [0, 1].");
-                }
-                if (r < 0.0)
-                {
-                    throw new ArgumentException($"The sample distribution cannot be sampled because the provided packet of random numbers contains members outside the valid range of: [0, 1].");
-                }
-            }
+
             if (packetOfRandomNumbers.Length < SampleSize) throw new ArgumentException($"The parametric bootstrap sample cannot be constructed using the {Print(true)} distribution. It requires at least {SampleSize} random value but only {packetOfRandomNumbers.Length} were provided.");
             double[] samples = new double[SampleSize];
             for (int i = 0; i < SampleSize; i++) samples[i] = this.InverseCDF(packetOfRandomNumbers[i]);

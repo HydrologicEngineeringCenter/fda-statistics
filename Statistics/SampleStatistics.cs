@@ -61,8 +61,6 @@ namespace Statistics
         {
             foreach (double observation in observations)
             {
-                if (Double.IsInfinity(observation)) continue;
-                if (Double.IsNaN(observation)) continue;
                 if (_n == 0)
                 {
                     _max = observation;
@@ -100,8 +98,6 @@ namespace Statistics
             bool firstpass = true;
             foreach (double observation in observations)
             {
-                if (Double.IsInfinity(observation)) continue;
-                if (Double.IsNaN(observation)) continue;
                 if (midpoint == val)
                 {
                     if (noRounding)

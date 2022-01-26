@@ -107,8 +107,14 @@ namespace Statistics.Distributions
         public override double InverseCDF(double p)
         {
 
-            if (p <= 0) return 0;
-            if (p >= 1) return Double.PositiveInfinity;
+            if (p <= 0)
+            {
+                p = 0.000000000001;
+            }
+            if (p >= 1)
+            {
+                p = 0.999999999999;
+            };
 
             PearsonIII d = new PearsonIII(Mean, StandardDeviation, Skewness, SampleSize);
             return Math.Pow(10, d.InverseCDF(p));

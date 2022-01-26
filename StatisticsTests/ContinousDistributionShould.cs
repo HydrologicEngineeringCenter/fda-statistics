@@ -22,7 +22,7 @@ namespace StatisticsTests
             double[] probs = NextNonRandomSequence(lp3.SampleSize);
             IDistribution bootstrap = lp3.Sample(probs);
             double value = bootstrap.InverseCDF(.5);
-            Assert.Equal(7.2640082317200774, value);
+            Assert.Equal(7.02429641377399, value, 6);
         }
         private double[] NextRandomSequence(int size, int seed)
         {
@@ -39,7 +39,7 @@ namespace StatisticsTests
             double[] randyPacket = new double[size];//needs to be initialized with a set of random nubmers between 0 and 1;
             for (int i = 0; i < size; i++)
             {
-                randyPacket[i] = (double)i / (double)size;
+                randyPacket[i] = (((double)i)+.5) / (double)size;
             }
             return randyPacket;
         }
