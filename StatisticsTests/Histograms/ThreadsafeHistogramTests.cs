@@ -18,7 +18,13 @@ namespace StatisticsTests.Histograms
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
-            histogram.AddObservationsToHistogram(data);
+            histogram.SetIterationSize(5);
+            int i = 0;
+            foreach(double observation in data)
+            {
+                histogram.AddObservationToHistogram(observation, i);
+                i++;
+            }
             histogram.ForceDeQueue();
             double actual = histogram.Min;
             Assert.Equal(expected, actual);
@@ -29,8 +35,16 @@ namespace StatisticsTests.Histograms
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
-            histogram.AddObservationsToHistogram(data);
-            histogram.AddObservationToHistogram(0);
+            histogram.SetIterationSize(5);
+            int i = 0;
+            foreach (double observation in data)
+            {
+                histogram.AddObservationToHistogram(observation, i);
+                i++;
+            }
+            histogram.ForceDeQueue();
+            histogram.SetIterationSize(1);
+            histogram.AddObservationToHistogram(0,0);
             histogram.ForceDeQueue();
             double actual = histogram.Min;
             Assert.Equal(expected, actual);
@@ -41,7 +55,13 @@ namespace StatisticsTests.Histograms
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
-            histogram.AddObservationsToHistogram(data);
+            histogram.SetIterationSize(5);
+            int i = 0;
+            foreach (double observation in data)
+            {
+                histogram.AddObservationToHistogram(observation, i);
+                i++;
+            }
             histogram.ForceDeQueue();
             double actual = histogram.Max;
             Assert.Equal(expected, actual);
@@ -52,8 +72,16 @@ namespace StatisticsTests.Histograms
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
-            histogram.AddObservationsToHistogram(data);
-            histogram.AddObservationToHistogram(6);
+            histogram.SetIterationSize(5);
+            int i = 0;
+            foreach (double observation in data)
+            {
+                histogram.AddObservationToHistogram(observation, i);
+                i++;
+            }
+            histogram.ForceDeQueue();
+            histogram.SetIterationSize(1);
+            histogram.AddObservationToHistogram(6,0);
             histogram.ForceDeQueue();
             double actual = histogram.Max;
             Assert.Equal(expected, actual);
@@ -64,7 +92,13 @@ namespace StatisticsTests.Histograms
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
-            histogram.AddObservationsToHistogram(data);
+            histogram.SetIterationSize(5);
+            int i = 0;
+            foreach (double observation in data)
+            {
+                histogram.AddObservationToHistogram(observation, i);
+                i++;
+            }
             histogram.ForceDeQueue();
             double actual = histogram.HistogramMean();
             Assert.Equal(expected, actual);
@@ -75,7 +109,13 @@ namespace StatisticsTests.Histograms
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
-            histogram.AddObservationsToHistogram(data);
+            histogram.SetIterationSize(5);
+            int i = 0;
+            foreach (double observation in data)
+            {
+                histogram.AddObservationToHistogram(observation, i);
+                i++;
+            }
             histogram.ForceDeQueue();
             double actual = histogram.HistogramStandardDeviation();
             Assert.Equal(expected, actual, 3);//this gives much more meaningful error reporting
@@ -86,7 +126,13 @@ namespace StatisticsTests.Histograms
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
-            histogram.AddObservationsToHistogram(data);
+            histogram.SetIterationSize(5);
+            int i = 0;
+            foreach (double observation in data)
+            {
+                histogram.AddObservationToHistogram(observation, i);
+                i++;
+            }
             histogram.ForceDeQueue();
             double actual = histogram.StandardDeviation;
             Assert.Equal(expected, actual, 5);//this gives much more meaningful error reporting
@@ -97,7 +143,13 @@ namespace StatisticsTests.Histograms
         {
             double[] data = new double[14] { 0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4 };
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
-            histogram.AddObservationsToHistogram(data);
+            histogram.SetIterationSize(14);
+            int i = 0;
+            foreach (double observation in data)
+            {
+                histogram.AddObservationToHistogram(observation, i);
+                i++;
+            }
             histogram.ForceDeQueue();
             double actual = histogram.InverseCDF(prob);
             double err = Math.Abs((expected - actual) / expected);
@@ -111,7 +163,13 @@ namespace StatisticsTests.Histograms
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
-            histogram.AddObservationsToHistogram(data);
+            histogram.SetIterationSize(5);
+            int i = 0;
+            foreach (double observation in data)
+            {
+                histogram.AddObservationToHistogram(observation, i);
+                i++;
+            }
             histogram.ForceDeQueue();
             double actual = histogram.CDF(val);
             double err = Math.Abs((expected - actual) / expected);
@@ -125,7 +183,13 @@ namespace StatisticsTests.Histograms
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
-            histogram.AddObservationsToHistogram(data);
+            histogram.SetIterationSize(5);
+            int i = 0;
+            foreach (double observation in data)
+            {
+                histogram.AddObservationToHistogram(observation, i);
+                i++;
+            }
             histogram.ForceDeQueue();
             double actual = histogram.PDF(val);
             double err = Math.Abs((expected - actual) / expected);
@@ -139,9 +203,22 @@ namespace StatisticsTests.Histograms
         {
             double[] data = new double[5] { 1, 2, 3, 4, 5 };
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
-            histogram.AddObservationsToHistogram(data);
+            histogram.SetIterationSize(5);
+            int i = 0;
+            foreach (double observation in data)
+            {
+                histogram.AddObservationToHistogram(observation, i);
+                i++;
+            }
+            histogram.ForceDeQueue();
             double[] newData = new double[2] { 7, 9 };
-            histogram.AddObservationsToHistogram(newData);
+            histogram.SetIterationSize(2);
+            int j = 0;
+            foreach (double observation in newData)
+            {
+                histogram.AddObservationToHistogram(observation, j);
+                j++;
+            }
             histogram.ForceDeQueue();
             double expected = 10;//computed by test.
             double actual = histogram.Max;
@@ -157,9 +234,10 @@ namespace StatisticsTests.Histograms
             var convergencecriteria = new ConvergenceCriteria(maxIterations: maxiter, tolerance: 1, zAlpha: z);
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, convergencecriteria);
             int iter = 0;
+            histogram.SetIterationSize(maxiter+1);
             while (!histogram.IsConverged)
             {
-                histogram.AddObservationToHistogram(stdNormal.InverseCDF(rand.NextDouble()));
+                histogram.AddObservationToHistogram(stdNormal.InverseCDF(rand.NextDouble()), iter);
                 iter++;
                 if (iter % 10000 == 0)
                 {
@@ -183,9 +261,10 @@ namespace StatisticsTests.Histograms
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, convergencecriteria);
             while (!histogram.IsConverged)
             {
+                histogram.SetIterationSize(10000);
                 Parallel.For(0, 10000, index =>
                  {
-                    histogram.AddObservationToHistogram(stdNormal.InverseCDF(rand.NextDouble()));
+                    histogram.AddObservationToHistogram(stdNormal.InverseCDF(rand.NextDouble()), index);
                  });
                 histogram.TestForConvergence(quantile, 1 - quantile);
             }
@@ -207,9 +286,10 @@ namespace StatisticsTests.Histograms
             Int64 iterations = convergencecriteria.MinIterations;
             while (!histogram.IsConverged)
             {
+                histogram.SetIterationSize(iterations);
                 Parallel.For(0, iterations, index =>
                 {
-                    histogram.AddObservationToHistogram(stdNormal.InverseCDF(rand.NextDouble()));
+                    histogram.AddObservationToHistogram(stdNormal.InverseCDF(rand.NextDouble()), index);
                 });
                 histogram.TestForConvergence(quantile, 1 - quantile);
                 iterations = histogram.EstimateIterationsRemaining(quantile, 1 - quantile);
@@ -223,7 +303,8 @@ namespace StatisticsTests.Histograms
         public void IsHistogramConstructableWithNullData(double binWidth, double expected)
         {
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, new ConvergenceCriteria());
-            histogram.AddObservationToHistogram(.05);
+            histogram.SetIterationSize(1);
+            histogram.AddObservationToHistogram(.05,0);
             histogram.ForceDeQueue();
             double actual = histogram.BinCounts[0];
             Assert.Equal(expected, actual);

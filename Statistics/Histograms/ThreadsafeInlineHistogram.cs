@@ -24,14 +24,8 @@ namespace Statistics.Histograms
         private long _ConvergedIterations = Int64.MinValue;
         private bool _ConvergedOnMax = false;
         private ConvergenceCriteria _ConvergenceCriteria;
-        private int _maxQueueCount = 1000;
-        private int _postQueueCount = 100;
-        private object _lock = new object();
-        private object _bwListLock = new object();
-        private static int _enqueue;
-        private static int _dequeue;
-        private System.ComponentModel.BackgroundWorker _bw;
-        private System.Collections.Concurrent.ConcurrentQueue<double> _observations;
+        private Int64 _maxQueueCount = 1000;
+        private double[] _observations;
         #endregion
         #region Properties
 
@@ -39,7 +33,7 @@ namespace Statistics.Histograms
         {
             get
             {
-                ForceDeQueue();//would need to test for convergence if anything is dequeued...
+                //ForceDeQueue();//would need to test for convergence if anything is dequeued...
                 return _Converged;
             }
         }
@@ -142,24 +136,19 @@ namespace Statistics.Histograms
         #region Constructor
         public ThreadsafeInlineHistogram(ConvergenceCriteria c)
         {
-            _observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
+            //_observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
             _ConvergenceCriteria = c;
-            _bw = new System.ComponentModel.BackgroundWorker();
-            _bw.DoWork += _bw_DoWork;
         }
-        public ThreadsafeInlineHistogram(double binWidth, ConvergenceCriteria c, int startqueueSize = 1000, int postqueueSize = 100)
+        public ThreadsafeInlineHistogram(double binWidth, ConvergenceCriteria c)
         {
-            _observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
+            //_observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
             _BinWidth = binWidth;
             _ConvergenceCriteria = c;
-            _bw = new System.ComponentModel.BackgroundWorker();
-            _bw.DoWork += _bw_DoWork;
-            _maxQueueCount = startqueueSize;
-            _postQueueCount = postqueueSize;
+
         }
         private ThreadsafeInlineHistogram(double min, double max, double binWidth, Int32[] binCounts)
         {
-            _observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
+            //_observations = new System.Collections.Concurrent.ConcurrentQueue<double>();
             Min = min;
             Max = max;
             _BinWidth = binWidth;
@@ -171,14 +160,9 @@ namespace Statistics.Histograms
             }
             //sample mean, max, variance, and min dont work in this context...
             _ConvergenceCriteria = new ConvergenceCriteria();
-            _bw = new System.ComponentModel.BackgroundWorker();
-            _bw.DoWork += _bw_DoWork;
         }
         #endregion
-        private void _bw_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
-        {
-            DeQueue();
-        }
+
         public double Skewness()
         {
             ForceDeQueue();
@@ -259,52 +243,17 @@ namespace Statistics.Histograms
             //force dequeue is triggered in histogram variance.
             return Math.Sqrt(HistogramVariance());
         }
-        public void AddObservationToHistogram(double observation)
+        public void SetIterationSize(Int64 iterationSize)
         {
-            _observations.Enqueue(observation);
-            //can i update max and min here if _N = 0 to avoid doin that using linq?
-            Interlocked.Increment(ref _enqueue);
-            SafelyDeQueue();
+            _observations = new double[iterationSize];
+            _maxQueueCount = iterationSize;
         }
-        private void SafelyDeQueue()
+        public void AddObservationToHistogram(double observation, Int64 index)
         {
-            //if (_enqueue - _dequeue > (_maxQueueCount * 2))
-            //{
-            //    throw new Exception("what the hey!");
-            //}
-            if (_observations.Count > _maxQueueCount)
-            {
-                //while (_bw.IsBusy)
-                //{
-                //    Thread.Sleep(1);
-                //}
-                lock (_bwListLock)
-                {
-                    if (!_bw.IsBusy) _bw.RunWorkerAsync();
-                }
-            }
+            _observations[index] = observation;
         }
+
         public void ForceDeQueue()
-        {
-            if (_observations.Count > 0)
-            {
-                lock (_bwListLock)
-                {
-                    if (!_bw.IsBusy)
-                    {
-                        DeQueue();
-                    }
-                    else
-                    {
-                        while (_bw.IsBusy)
-                        {
-                            Thread.Sleep(1);
-                        }
-                    }
-                }
-            }
-        }
-        private void DeQueue()
         {
             //do NOT reference any properties of this class in this method!
             //it will trigger unsafe operations across threads.
@@ -330,11 +279,10 @@ namespace Statistics.Histograms
 
                 _BinCounts = new int[] { 0 };
                 _Max = _Min + _BinWidth;
-                _maxQueueCount = _postQueueCount;
                 
             }
-            double observation;
-            while (_observations.TryDequeue(out observation))
+
+            foreach (double observation in _observations)
             {
                 //if (double.IsNaN(observation)) continue;
                 //if (double.IsInfinity(observation)) continue;
@@ -405,18 +353,10 @@ namespace Statistics.Histograms
                     }
                     _BinCounts[newObsIndex] += 1;
                 }
-                Interlocked.Increment(ref _dequeue);
             }
+            _observations = new double[0];
+        }
 
-        }
-        public void AddObservationsToHistogram(double[] data)
-        {
-            //
-            foreach (double x in data)
-            {
-                AddObservationToHistogram(x);
-            }
-        }
         private double FindBinCount(double x, bool cumulative = true)
         {
             Int64 obsIndex = Convert.ToInt64(Math.Floor((x - _Min) / _BinWidth));
