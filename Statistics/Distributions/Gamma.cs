@@ -31,7 +31,7 @@ namespace Statistics.Distributions
             if (x <= 0)
             {
                 return 0;
-            } else if(x >= double.PositiveInfinity)
+            } else if(x >= double.MaxValue)
             {
                 return 1;
             }
@@ -45,27 +45,26 @@ namespace Statistics.Distributions
         {
             if (p <= 0.0)
             {
-                return 0.0;
+                p = 0.0000000000001;
             }
             else if (p >= 1.0)
             {
-                return double.PositiveInfinity;
+                p = .99999999999999;
             }
-            else
+
+            double xMin = 0.0;
+            double xMax = 1.0;
+            for (int j = 0; j < 100; j++)
             {
-                double xMin = 0.0;
-                double xMax = 1.0;
-                for (int j = 0; j < 100; j++)
+                double pMax = CDF(xMax);
+                if (pMax > p)
                 {
-                    double pMax = CDF(xMax);
-                    if (pMax > p)
-                    {
-                        return invCDFNewtonBiSearch(p, xMin, xMax, 1E-12, 100);
-                    }
-                    xMax *= 2.0;
+                    return invCDFNewtonBiSearch(p, xMin, xMax, 1E-12, 100);
                 }
-                return double.NaN;
+                xMax *= 2.0;
             }
+            return double.NaN;
+
             
         }
 
