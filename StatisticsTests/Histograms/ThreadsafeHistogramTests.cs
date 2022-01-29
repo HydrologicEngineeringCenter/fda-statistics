@@ -248,7 +248,7 @@ namespace StatisticsTests.Histograms
             double err = Math.Abs((expected - actual) / expected);
 
             Assert.True(histogram.ConvergedIteration >= maxiter);
-            Assert.True(err<.01);
+            Assert.True(err<.03);
         }
         [Theory]
         [InlineData(10000, .1, .80, 1.96, .975)]
