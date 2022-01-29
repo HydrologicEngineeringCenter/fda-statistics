@@ -636,13 +636,21 @@ namespace Statistics.Histograms
             double uz2 = 2 * _ConvergenceCriteria.ZAlpha;
             double uxp = InverseCDF(up);
             double ufxp = PDF(uxp);
-            Int64 upperestimate = Math.Abs((Int64)Math.Ceiling(val * (Math.Pow((uz2 / (uxp * _ConvergenceCriteria.Tolerance * ufxp)), 2.0))));
+            Int64 upperestimate = _ConvergenceCriteria.MaxIterations;
+            if (ufxp > 0.0 & uxp !=0 )
+            {
+                upperestimate = Math.Abs((Int64)Math.Ceiling(val * (Math.Pow((uz2 / (uxp * _ConvergenceCriteria.Tolerance * ufxp)), 2.0))));
+            }
             double lp = lowerq;
             double lval = lp * (1 - lp);
             double lz2 = 2 * _ConvergenceCriteria.ZAlpha;
             double lxp = InverseCDF(lp);
             double lfxp = PDF(lxp);
-            Int64 lowerestimate = Math.Abs((Int64)Math.Ceiling(val * (Math.Pow((lz2 / (lxp * _ConvergenceCriteria.Tolerance * lfxp)), 2.0))));
+            Int64 lowerestimate = _ConvergenceCriteria.MaxIterations;
+            if (lfxp > 0.0 & uxp != 0)
+            {
+                lowerestimate = Math.Abs((Int64)Math.Ceiling(val * (Math.Pow((lz2 / (lxp * _ConvergenceCriteria.Tolerance * lfxp)), 2.0))));
+            }
             Int64 biggestGuess = Math.Max(upperestimate, lowerestimate);
             Int64 remainingIters = _ConvergenceCriteria.MaxIterations - _N;
             return Math.Min(remainingIters, biggestGuess);
