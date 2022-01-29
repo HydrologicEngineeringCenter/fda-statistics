@@ -435,7 +435,7 @@ namespace Statistics.Histograms
             }
             else
             {
-                if(obsIndex<0||obsIndex>_BinCounts.Length) return 0;
+                if(obsIndex<0||obsIndex>=_BinCounts.Length) return 0;
                 return _BinCounts[obsIndex];
             }
 
