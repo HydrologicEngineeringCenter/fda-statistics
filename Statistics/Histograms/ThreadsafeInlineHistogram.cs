@@ -435,6 +435,7 @@ namespace Statistics.Histograms
             }
             else
             {
+                if(obsIndex<0||obsIndex>_BinCounts.Length) return 0;
                 return _BinCounts[obsIndex];
             }
 
@@ -459,6 +460,7 @@ namespace Statistics.Histograms
             }
             double nAtX = Convert.ToDouble(FindBinCount(x, false));
             double n = Convert.ToDouble(_N);
+            n = n * _BinWidth;
             return nAtX / n;
         }
         public double CDF(double x)
@@ -603,13 +605,13 @@ namespace Statistics.Histograms
                 return true;
             }
             double qval = InverseCDF(lowerq);
-            double qslope = PDF(lowerq);
+            double qslope = PDF(qval);
             double variance = (lowerq * (1 - lowerq)) / (((double)_N) * qslope * qslope);
             bool lower = false;
             double lower_comparison = Math.Abs(_ConvergenceCriteria.ZAlpha * Math.Sqrt(variance) / qval);
             if (lower_comparison <= (_ConvergenceCriteria.Tolerance * .5)) { lower = true; }
             qval = InverseCDF(upperq);
-            qslope = PDF(upperq);
+            qslope = PDF(qval);
             variance = (upperq * (1 - upperq)) / (((double)_N) * qslope * qslope);
             bool upper = false;
             double upper_comparison = Math.Abs(_ConvergenceCriteria.ZAlpha * Math.Sqrt(variance) / qval);

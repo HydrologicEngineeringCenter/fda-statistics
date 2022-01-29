@@ -231,7 +231,7 @@ namespace StatisticsTests.Histograms
             IDistribution stdNormal = new Statistics.Distributions.Normal(0, 1);
             var rand = new Random(1234);
             double z = stdNormal.InverseCDF(.5 + .5 * .85);
-            var convergencecriteria = new ConvergenceCriteria(maxIterations: maxiter, tolerance: 1, zAlpha: z);
+            var convergencecriteria = new ConvergenceCriteria(maxIterations: maxiter, tolerance: .1, zAlpha: z);
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, convergencecriteria);
             int iter = 0;
             histogram.SetIterationSize(maxiter+1);
@@ -248,7 +248,7 @@ namespace StatisticsTests.Histograms
             double err = Math.Abs((expected - actual) / expected);
 
             Assert.True(histogram.ConvergedIteration >= maxiter);
-            Assert.Equal(expected, actual, 2);
+            Assert.True(err<.01);
         }
         [Theory]
         [InlineData(10000, .1, .80, 1.96, .975)]
@@ -281,16 +281,20 @@ namespace StatisticsTests.Histograms
             IDistribution stdNormal = new Statistics.Distributions.Normal(0, 1);
             var rand = new Random(1234);
             double z = stdNormal.InverseCDF(.5 + .5 * .85);
-            var convergencecriteria = new ConvergenceCriteria(maxIterations: maxiter, tolerance: .7, zAlpha: z);
+            var convergencecriteria = new ConvergenceCriteria(maxIterations: maxiter, tolerance: .1, zAlpha: z);
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(convergencecriteria);
             Int64 iterations = convergencecriteria.MinIterations;
+            object whilelock = new object();
             while (!histogram.IsConverged)
             {
                 histogram.SetIterationSize(iterations);
-                Parallel.For(0, iterations, index =>
+                lock (whilelock)
                 {
-                    histogram.AddObservationToHistogram(stdNormal.InverseCDF(rand.NextDouble()), index);
-                });
+                    Parallel.For(0, iterations, index =>
+                    {
+                        histogram.AddObservationToHistogram(stdNormal.InverseCDF(rand.NextDouble()), index);
+                    });
+                }
                 histogram.TestForConvergence(quantile, 1 - quantile);
                 iterations = histogram.EstimateIterationsRemaining(quantile, 1 - quantile);
             }
