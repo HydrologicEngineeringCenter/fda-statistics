@@ -105,10 +105,34 @@ namespace Statistics.Distributions
         }
         public override double InverseCDF(double p)
         {
-            if (p <= 0) return Double.NegativeInfinity;
-            if (p >= 1) return Double.PositiveInfinity;
-            if (StandardDeviation == 0) return Mean;
-            return invCDFNewton(p, Mean, 1e-10,100);
+            //if (p <= 0) return Double.NegativeInfinity;
+            //if (p >= 1) return Double.PositiveInfinity;
+            //if (StandardDeviation == 0) return Mean;
+            //return invCDFNewton(p, Mean, 1e-10,100);
+            int i;
+            double x;
+            double c0 = 2.515517;
+            double c1 = .802853;
+            double c2 = .010328;
+            double d1 = 1.432788;
+            double d2 = .189269;
+            double d3 = .001308;
+            double q;
+            q = p;
+            if (q == .5) { return Mean; }
+            if (q <= 0) { q = .000000000000001; }
+            if (q >= 1) { q = .999999999999999; }
+            if (q < .5) { i = -1; }
+            else
+            {
+                i = 1;
+                q = 1 - q;
+            }
+            double t = Math.Sqrt(Math.Log(1 / Math.Pow(q, 2)));
+            x = t - (c0 + c1 * t + c2 * (Math.Pow(t, 2))) / (1 + d1 * t + d2 * Math.Pow(t, 2) + d3 * Math.Pow(t, 3));
+            x = i * x;
+            return (x * StandardDeviation) + Mean;
+
         }
 
         public override string Print(bool round = false) => round ? Print(Mean, StandardDeviation, SampleSize): $"Normal(mean: {Mean}, sd: {StandardDeviation}, sample size: {SampleSize})";

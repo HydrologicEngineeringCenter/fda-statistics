@@ -41,7 +41,7 @@ namespace StatisticsTests.Distributions
         public void StandardNormal_InverseCDF(double mean, double sd, int n, double p, double z)
         {
             var testObj = new Statistics.Distributions.Normal(mean, sd, n);
-            Assert.Equal(z,testObj.InverseCDF(p),4);
+            Assert.Equal(z,testObj.InverseCDF(p),3);
         }
 
         [Theory]
