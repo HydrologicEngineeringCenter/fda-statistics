@@ -13,7 +13,7 @@ namespace StatisticsTests
             double[] probs = NextRandomSequence(lp3.SampleSize, 1234);
             IDistribution bootstrap = lp3.Sample(probs);
             double value = bootstrap.InverseCDF(.5);
-            Assert.Equal(7.0732439574305959, value);
+            Assert.Equal(7.09400322893831, value,6);
         }
         [Fact]
         public void ComputeMeanBootstrap_LP3()
@@ -22,7 +22,7 @@ namespace StatisticsTests
             double[] probs = NextNonRandomSequence(lp3.SampleSize);
             IDistribution bootstrap = lp3.Sample(probs);
             double value = bootstrap.InverseCDF(.5);
-            Assert.Equal(7.02429641377399, value, 6);
+            Assert.Equal(7.04222444264507, value, 6);
         }
         private double[] NextRandomSequence(int size, int seed)
         {
