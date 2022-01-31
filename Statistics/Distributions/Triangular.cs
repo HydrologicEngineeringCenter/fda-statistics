@@ -2,8 +2,6 @@
 using Base.Enumerations;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Utilities;
 
 namespace Statistics.Distributions
 {
@@ -92,11 +90,8 @@ namespace Statistics.Distributions
         #endregion
 
         #region Functions
-        public IMessageLevels Validate(IValidator<Triangular> validator, out IEnumerable<IMessage> msgs)
-        {
-            return validator.IsValid(this, out msgs);
-        }
-        internal static string Print(double mode, IRange<double> range) => $"Triangular(mode: {mode.Print()}, range: [{range.Min.Print()}, {range.Max.Print()}])";
+
+        internal static string Print(double mode, double Min, double Max) => $"Triangular(mode: {mode}, range: [{Min}, {Max}])";
         internal static string RequiredParameterization(bool printNotes)
         {
             string s = $"The Triangular distribution requires the following parameterization: {Parameterization()}.";

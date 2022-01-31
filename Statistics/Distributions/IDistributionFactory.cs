@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Xml.Linq;
-using Statistics.Histograms;
-using Utilities;
+
 
 namespace Statistics
 {
@@ -138,7 +135,7 @@ namespace Statistics
         /// <returns> A <see cref="Statistics.Distributions.LogPearson3"/> object bound on the range: [<paramref name="min"/>, <paramref name="max"/>] returned as an implementation of the  <see cref="IDistribution"/> interface. </returns>
         public static IDistribution FactoryTruncatedLogPearsonIII(IDistribution lpIII, double min = 0, double max = double.PositiveInfinity)
         {
-            if (lpIII.IsNull()) throw new ArgumentNullException(nameof(lpIII));
+            if (lpIII==null) throw new ArgumentNullException(nameof(lpIII));
             if (lpIII.Type != IDistributionEnum.LogPearsonIII) throw new ArgumentException($"The {nameof(FactoryTruncatedLogPearsonIII)} factory requires a {nameof(IDistributionEnum.LogPearsonIII)} {nameof(lpIII)} parameter, instead a {nameof(lpIII.Type)} was provided.");
             Statistics.Distributions.LogPearson3 ldist = (Statistics.Distributions.LogPearson3)lpIII;
             return new Statistics.Distributions.TruncatedLogPearson3(ldist.Mean,ldist.StandardDeviation,ldist.Skewness, min, max, lpIII.SampleSize);
@@ -152,7 +149,7 @@ namespace Statistics
         /// <returns> A <see cref="IDistribution"/> bound on the range: [<paramref name="min"/>, <paramref name="max"/>] returned as an implementation of the  <see cref="IDistribution"/> interface. </returns>
         public static IDistribution FactoryTruncatedDistribution(IDistribution distribution, double min = double.NegativeInfinity, double max = double.PositiveInfinity)
         {
-            if (distribution.IsNull()) throw new ArgumentNullException(nameof(distribution));
+            if (distribution == null) throw new ArgumentNullException(nameof(distribution));
             switch (distribution.Type) 
             {
                 case IDistributionEnum.Normal:

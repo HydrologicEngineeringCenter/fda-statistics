@@ -1,10 +1,8 @@
 ﻿using Statistics.Distributions;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Remoting;
 using System.Xml.Linq;
-using Utilities;
 
 namespace Statistics
 {
@@ -15,8 +13,6 @@ namespace Statistics
         public int SampleSize { get; protected set; }
         [Stored(Name = "Truncated", type = typeof(bool))]
         public bool Truncated { get; protected set; }
-        public IMessageLevels State { get; protected set; }
-        public IEnumerable<IMessage> Messages { get; protected set; }
         public abstract double CDF(double x);
         public abstract bool Equals(IDistribution distribution);
         public abstract double InverseCDF(double p);

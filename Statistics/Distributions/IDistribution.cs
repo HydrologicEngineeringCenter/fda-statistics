@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
 namespace Statistics
 {
     /// <summary>
     /// Provides and interface for double precision numbers stored as statistical distributions rather than static values.
     /// </summary>
-    public interface IDistribution: Utilities.IMessagePublisher
+    public interface IDistribution
     {
         #region Properties
         /// <summary>

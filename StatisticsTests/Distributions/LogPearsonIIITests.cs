@@ -49,14 +49,15 @@ namespace StatisticsTests.Distributions
         [Theory]
         [InlineData(1d, 1d, 1d, 100)]
         [InlineData(2d, 2d, 2d, 100)]
-        [InlineData(3d, 3d, 3d, 100)]
-        [InlineData(4d, 4d, 4d, 100)]
-        [InlineData(5d, 5d, 5d, 100)]
-        [InlineData(6d, 6d, 6d, 100)]
+        [InlineData(3d, 2.99d, 2.99d, 100)]
+        [InlineData(4d, 2.99d, 2.99d, 100)]
+        [InlineData(5d, 2.99d, -2.99d, 100)]
+        [InlineData(6d, 2.99d, -2.99d, 100)]
         public void GoodData_Returns_NoErrorState(double mean, double sd, double skew, int n)
         {
             var testObj = new Statistics.Distributions.LogPearson3(mean, sd, skew, n);
-            Assert.True(testObj.State < IMessageLevels.Error);
+            testObj.Validate();
+            Assert.True(testObj.ErrorLevel < Base.Enumerations.ErrorLevel.Major);
         }
 
         [Theory]

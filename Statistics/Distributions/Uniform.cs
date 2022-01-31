@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Utilities;
-using System.Linq;
-using Base.Implementations;
+﻿using Base.Implementations;
 using Base.Enumerations;
 
 namespace Statistics.Distributions
@@ -129,7 +125,7 @@ namespace Statistics.Distributions
         }
         #endregion
 
-        internal static string Print(IRange<double> range) => $"Uniform(range: {range.Print(true)})";
+        internal static string Print(double Min, double Max) => $"Uniform(range: {Min} to {Max})";
         internal static string RequiredParameterization(bool printNotes = false) => $"The Uniform distribution requires the following parameterization: {Parameterization()}.";
         internal static string Parameterization() => $"Uniform()";
 

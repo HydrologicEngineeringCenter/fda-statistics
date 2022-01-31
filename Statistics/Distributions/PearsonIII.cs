@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Utilities;
 
 namespace Statistics.Distributions
 {
@@ -47,7 +44,7 @@ namespace Statistics.Distributions
                 if (Skewness > 0)
                 {
                     shift = Mean - 2d * StandardDeviation / Skewness;
-                    if (!alpha.IsOnRange(0, double.PositiveInfinity, false, false) || !beta.IsOnRange(0, double.PositiveInfinity)) throw new InvalidOperationException(PrintExceptionMessage(alpha, beta));
+                    //if (!alpha.IsOnRange(0, double.PositiveInfinity, false, false) || !beta.IsOnRange(0, double.PositiveInfinity)) throw new InvalidOperationException(PrintExceptionMessage(alpha, beta));
                     ShiftedGamma gamma = new ShiftedGamma(alpha, beta, shift);
                     return gamma.CDF(x);
                 }
@@ -56,7 +53,7 @@ namespace Statistics.Distributions
                 {
                     beta = -beta;
                     shift = -Mean + 2d * StandardDeviation / Skewness;
-                    if (!alpha.IsOnRange(0, double.PositiveInfinity, false, false) || !beta.IsOnRange(0, double.PositiveInfinity)) throw new InvalidOperationException(PrintExceptionMessage(alpha, beta));
+                    //if (!alpha.IsOnRange(0, double.PositiveInfinity, false, false) || !beta.IsOnRange(0, double.PositiveInfinity)) throw new InvalidOperationException(PrintExceptionMessage(alpha, beta));
                     ShiftedGamma gamma = new ShiftedGamma(alpha, beta, shift);
                     return 1 - gamma.CDF(-x);
                 }               
@@ -78,7 +75,7 @@ namespace Statistics.Distributions
                 if (Skewness > 0)
                 {
                     shift = Mean - 2d * StandardDeviation / Skewness;
-                    if (!alpha.IsOnRange(0, double.PositiveInfinity, false, false) || !beta.IsOnRange(0, double.PositiveInfinity)) throw new InvalidOperationException(PrintExceptionMessage(alpha, beta));
+                    //if (!alpha.IsOnRange(0, double.PositiveInfinity, false, false) || !beta.IsOnRange(0, double.PositiveInfinity)) throw new InvalidOperationException(PrintExceptionMessage(alpha, beta));
                     ShiftedGamma gamma = new ShiftedGamma(alpha, beta, shift);
                     return gamma.PDF(x);
                 }
@@ -87,7 +84,7 @@ namespace Statistics.Distributions
                 {
                     beta = -beta;
                     shift = -Mean + 2d * StandardDeviation / Skewness;
-                    if (!alpha.IsOnRange(0, double.PositiveInfinity, false, false) || !beta.IsOnRange(0, double.PositiveInfinity)) throw new InvalidOperationException(PrintExceptionMessage(alpha, beta));
+                    //if (!alpha.IsOnRange(0, double.PositiveInfinity, false, false) || !beta.IsOnRange(0, double.PositiveInfinity)) throw new InvalidOperationException(PrintExceptionMessage(alpha, beta));
                     ShiftedGamma gamma = new ShiftedGamma(alpha, beta, shift);
                     return -gamma.PDF(x);
                 }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Utilities;
 using Base.Implementations;
 using Base.Enumerations;
 
@@ -152,9 +149,9 @@ namespace Statistics.Distributions
         }
         #endregion
 
-        internal static string Print(double mean, double sd, int n) => $"Normal(mean: {mean.Print()}, sd: {sd.Print()}, sample size: {n.Print()})";
+        internal static string Print(double mean, double sd, int n) => $"Normal(mean: {mean}, sd: {sd}, sample size: {n})";
         public static string RequiredParameterization(bool printNotes = false) => $"The Normal distribution requires the following parameterization: {Parameterization()}.";
-        internal static string Parameterization() => $"Normal(mean: [{double.MinValue.Print()}, {double.MaxValue.Print()}], sd: [{double.MinValue.Print()}, {double.MaxValue.Print()}], sample size: > 0)";
+        internal static string Parameterization() => $"Normal(mean: [{double.MinValue}, {double.MaxValue}], sd: [{double.MinValue}, {double.MaxValue}], sample size: > 0)";
         public override IDistribution Fit(double[] sample)
         {
             ISampleStatistics stats = new SampleStatistics(sample);

@@ -1,7 +1,5 @@
 ﻿using Base.Implementations;
 using Base.Enumerations;
-using System.Collections.Generic;
-using Utilities;
 
 namespace Statistics.Distributions
 {
@@ -9,7 +7,6 @@ namespace Statistics.Distributions
     {
         #region IDistribution Properties
         public override IDistributionEnum Type => IDistributionEnum.Deterministic;
-        public IRange<double> Range { get; set; }
         #endregion
         [Stored(Name = "Value", type = typeof(double))]
         public double Value { get; set; }
@@ -25,12 +22,12 @@ namespace Statistics.Distributions
         }
         private void addRules()
         {
-            AddSinglePropertyRule(nameof(Value),
-                new Rule(() => {
-                    return !Value.IsNull();
-                },
-                "On Deterministic Distributions Value cannot be Null.",
-                ErrorLevel.Fatal));
+            //AddSinglePropertyRule(nameof(Value),
+            //    new Rule(() => {
+            //        return Value!=null;
+            //    },
+            //    "On Deterministic Distributions Value cannot be Null.",
+            //    ErrorLevel.Fatal));
         }
         #endregion
 

@@ -1,9 +1,7 @@
 ﻿using Base.Implementations;
 using Base.Enumerations;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using Utilities;
 
 namespace Statistics.Distributions
 {
@@ -89,14 +87,14 @@ namespace Statistics.Distributions
         public override bool Equals(IDistribution distribution) => string.Compare(Print(), distribution.Print()) == 0;
         #endregion
 
-        internal static string Print(double mean, double sd, int n) => $"LogNormal(mean: {mean.Print()}, sd: {sd.Print()}, sample size: {n.Print()})";
+        internal static string Print(double mean, double sd, int n) => $"LogNormal(mean: {mean}, sd: {sd}, sample size: {n})";
         public static string RequiredParameterization(bool printNotes)
         {
             string msg = $"The Log Normal distribution requires the following parameterization: {Parameterization()}.";
             if (printNotes) msg += $" {RequirementNotes()}";
             return msg;
         }
-        private static string Parameterization() => $"LogNormal(mean: [{double.MinValue.Print()}, {double.MaxValue.Print()}], sd: [0, {double.MaxValue.Print()}], sample size: > 0)";
+        private static string Parameterization() => $"LogNormal(mean: [{double.MinValue}, {double.MaxValue}], sd: [0, {double.MaxValue}], sample size: > 0)";
         private static string RequirementNotes() => $"The parameters should reflect the log-scale random number values.";
 
         public override IDistribution Fit(double[] sample)
