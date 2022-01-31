@@ -20,9 +20,9 @@ namespace Statistics.Distributions
         #region IDistribution Properties
         public override IDistributionEnum Type => IDistributionEnum.Normal;
         [Stored(Name = "Mean", type = typeof(double))]
-         public double Mean { get{return _mean;} set{_mean = value;} }
+        public double Mean { get { return _mean; } set { _mean = value; } }
         [Stored(Name = "Standard_Deviation", type = typeof(double))]
-        public double StandardDeviation { get{return _standardDeviation;} set{_standardDeviation = value;} }
+        public double StandardDeviation { get { return _standardDeviation; } set { _standardDeviation = value; } }
         #endregion
 
         #endregion
@@ -46,19 +46,22 @@ namespace Statistics.Distributions
         private void addRules()
         {
             AddSinglePropertyRule(nameof(StandardDeviation),
-                new Rule(() => {
+                new Rule(() =>
+                {
                     return StandardDeviation >= 0;
                 },
                 "Standard Deviation must be greater than or equal to 0.",
                 ErrorLevel.Fatal));
             AddSinglePropertyRule(nameof(StandardDeviation),
-                new Rule(() => {
+                new Rule(() =>
+                {
                     return StandardDeviation > 0;
                 },
                 "Standard Deviation shouldnt be 0.",
                 ErrorLevel.Minor));
             AddSinglePropertyRule(nameof(SampleSize),
-                new Rule(() => {
+                new Rule(() =>
+                {
                     return SampleSize > 0;
                 },
                 "SampleSize must be greater than 0.",
@@ -68,7 +71,8 @@ namespace Statistics.Distributions
 
         #region Functions
         #region IDistribution Functions
-        public override double PDF(double x){
+        public override double PDF(double x)
+        {
             if (StandardDeviation == 0)
             {
                 if (x == Mean)
@@ -80,12 +84,14 @@ namespace Statistics.Distributions
                     return 0.0;
                 }
             }
-            return Math.Exp(-(x-Mean)*(x-Mean)/(2.0*StandardDeviation*StandardDeviation))/(Math.Sqrt(2.0*Math.PI)*StandardDeviation);
+            return Math.Exp(-(x - Mean) * (x - Mean) / (2.0 * StandardDeviation * StandardDeviation)) / (Math.Sqrt(2.0 * Math.PI) * StandardDeviation);
         }
-        public override double CDF(double x){
-            if(StandardDeviation == 0)
+        public override double CDF(double x)
+        {
+            if (StandardDeviation == 0)
             {
-                if( x >= Mean) {
+                if (x >= Mean)
+                {
                     return 1.0;
                 }
                 else
@@ -93,17 +99,21 @@ namespace Statistics.Distributions
                     return 0.0;
                 }
             }
-            if (x == Double.PositiveInfinity){
-			    return 1.0;
+            if (x == Double.PositiveInfinity)
+            {
+                return 1.0;
             }
-            else if (x == Double.NegativeInfinity){
+            else if (x == Double.NegativeInfinity)
+            {
                 return 0.0;
             }
-            else if(x>=Mean){
-                return 0.5*(1.0+SpecialFunctions.regIncompleteGamma(0.5, (x-Mean)*(x-Mean)/(2.0*StandardDeviation*StandardDeviation)));
+            else if (x >= Mean)
+            {
+                return 0.5 * (1.0 + SpecialFunctions.regIncompleteGamma(0.5, (x - Mean) * (x - Mean) / (2.0 * StandardDeviation * StandardDeviation)));
             }
-            else{
-                return 0.5*(1.0-SpecialFunctions.regIncompleteGamma(0.5, (x-Mean)*(x-Mean)/(2.0*StandardDeviation*StandardDeviation)));
+            else
+            {
+                return 0.5 * (1.0 - SpecialFunctions.regIncompleteGamma(0.5, (x - Mean) * (x - Mean) / (2.0 * StandardDeviation * StandardDeviation)));
             }
         }
         public override double InverseCDF(double p)
@@ -125,8 +135,8 @@ namespace Statistics.Distributions
                 i = 1;
                 q = 1 - q;
             }
-            
-            double t = Math.Sqrt(Math.Log(1 /(q*q)));
+
+            double t = Math.Sqrt(Math.Log(1 / (q * q)));
             double tsquared = t * t;
             double tcubed = tsquared * t;
             x = t - (c0 + c1 * t + c2 * (tsquared)) / (1 + d1 * t + d2 * tsquared + d3 * tcubed);
@@ -134,19 +144,57 @@ namespace Statistics.Distributions
             return (x * StandardDeviation) + Mean;
 
         }
+        public static double StandardNormalInverseCDF(double p)
+        {
+            //if (p <= 0) return Double.NegativeInfinity;
+            //if (p >= 1) return Double.PositiveInfinity;
+            //if (StandardDeviation == 0) return Mean;
+            //return invCDFNewton(p, Mean, 1e-10,100);
+            int i;
+            double x;
+            double q;
+            double c0 = 2.515517;
+            double c1 = .802853;
+            double c2 = .010328;
+            double d1 = 1.432788;
+            double d2 = .189269;
+            double d3 = .001308;
+            q = p;
+            if (q == .5) { return 0.0; }
+            if (q <= 0) { q = .000000000000001; }
+            if (q >= 1) { q = .999999999999999; }
+            if (q < .5) { i = -1; }
+            else
+            {
+                i = 1;
+                q = 1 - q;
+            }
 
-        public override string Print(bool round = false) => round ? Print(Mean, StandardDeviation, SampleSize): $"Normal(mean: {Mean}, sd: {StandardDeviation}, sample size: {SampleSize})";
+            double t = Math.Sqrt(Math.Log(1 / (q * q)));
+            double tsquared = t * t;
+            double tcubed = tsquared * t;
+            x = t - (c0 + c1 * t + c2 * (tsquared)) / (1 + d1 * t + d2 * tsquared + d3 * tcubed);
+            x = i * x;
+            return (x * 1.0);
+
+        }
+        public override string Print(bool round = false) => round ? Print(Mean, StandardDeviation, SampleSize) : $"Normal(mean: {Mean}, sd: {StandardDeviation}, sample size: {SampleSize})";
         public override string Requirements(bool printNotes) => RequiredParameterization(printNotes);
-        public override bool Equals(IDistribution distribution){
-            if (Type==distribution.Type){
+        public override bool Equals(IDistribution distribution)
+        {
+            if (Type == distribution.Type)
+            {
                 Normal dist = (Normal)distribution;
-                if(SampleSize == dist.SampleSize){
-                    if(Mean==dist.Mean){
-                        if(StandardDeviation==dist.StandardDeviation){
+                if (SampleSize == dist.SampleSize)
+                {
+                    if (Mean == dist.Mean)
+                    {
+                        if (StandardDeviation == dist.StandardDeviation)
+                        {
                             return true;
                         }
-                    } 
-                }              
+                    }
+                }
             }
             return false;
         }
@@ -161,33 +209,36 @@ namespace Statistics.Distributions
             return new Normal(stats.Mean, stats.StandardDeviation, stats.SampleSize);
         }
 
-        	/**
-	 * @param p = probability between 0 and 1
-	 * @return a value corresponding to the inverse of 
-	 *         cumulative probability distribution
-	 *         found using the Newton method
-	 *         This method is not guarantee to converge
-	 */
-	private double invCDFNewton(double p, double valGuess, double tolP, int maxIter){
-        double x=valGuess;
-        double testY = CDF(x)-p;
-        for(int i=0;i<maxIter;i++){
-        	
-        	double dfdx = PDF(x);
-        	if (Double.MinValue > Math.Abs(dfdx))//consider a unequivically better choice than minvalue (e-8)
-        	{
-        		//this is a minimum or maximum. Can't get any closer
-        		return x;
-        	}
-        	
-            x = x - testY / dfdx;
-			testY = CDF(x)-p;
-            if(Math.Abs(testY) <= tolP){
-                return x;
-            } 
+        /**
+ * @param p = probability between 0 and 1
+ * @return a value corresponding to the inverse of 
+ *         cumulative probability distribution
+ *         found using the Newton method
+ *         This method is not guarantee to converge
+ */
+        private double invCDFNewton(double p, double valGuess, double tolP, int maxIter)
+        {
+            double x = valGuess;
+            double testY = CDF(x) - p;
+            for (int i = 0; i < maxIter; i++)
+            {
+
+                double dfdx = PDF(x);
+                if (Double.MinValue > Math.Abs(dfdx))//consider a unequivically better choice than minvalue (e-8)
+                {
+                    //this is a minimum or maximum. Can't get any closer
+                    return x;
+                }
+
+                x = x - testY / dfdx;
+                testY = CDF(x) - p;
+                if (Math.Abs(testY) <= tolP)
+                {
+                    return x;
+                }
+            }
+            return Double.NaN;
         }
-        return Double.NaN;
-	}
         #endregion
-}
+    }
 }

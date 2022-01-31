@@ -141,13 +141,13 @@ namespace Statistics.Distributions
             if (Skewness == 0)
             {
                 Normal zeroSkewNorm = new Normal(Mean, StandardDeviation);
-                double logflow = zeroSkewNorm.InverseCDF(p);
+                double logflow = (Normal.StandardNormalInverseCDF(p)*StandardDeviation) + Mean;
                 return Math.Pow(10, logflow);
             }
             else
             {
-                Normal sn = new Normal();
-                double z = sn.InverseCDF(p);
+                //Normal sn = new Normal();
+                double z = Normal.StandardNormalInverseCDF(p);
                 double whfactor = (z - _skewDividedBySix) * Skewness / 6.0 + 1;
                 double k = (_twoDividedBySkew) * ((whfactor*whfactor*whfactor) - 1); //pemdas says you cant substitute for the divide in that other instance... so dont do it!
                 double logflow = Mean + (k * StandardDeviation);
