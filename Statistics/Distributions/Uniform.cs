@@ -5,7 +5,6 @@ namespace Statistics.Distributions
 {
     public class Uniform: ContinuousDistribution
     {
-        //TODO: Validation
         #region Fields and Properties
         private double _min;
         private double _max;

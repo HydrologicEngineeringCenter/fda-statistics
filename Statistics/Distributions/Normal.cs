@@ -7,9 +7,15 @@ namespace Statistics.Distributions
     public class Normal : ContinuousDistribution
     {
         //TODO: Sample
-        #region Fields and Propertiesj
+        #region Fields and Properties
         private double _mean;
         private double _standardDeviation;
+        private double c0 = 2.515517;
+        private double c1 = .802853;
+        private double c2 = .010328;
+        private double d1 = 1.432788;
+        private double d2 = .189269;
+        private double d3 = .001308;
 
         #region IDistribution Properties
         public override IDistributionEnum Type => IDistributionEnum.Normal;
@@ -108,12 +114,6 @@ namespace Statistics.Distributions
             //return invCDFNewton(p, Mean, 1e-10,100);
             int i;
             double x;
-            double c0 = 2.515517;
-            double c1 = .802853;
-            double c2 = .010328;
-            double d1 = 1.432788;
-            double d2 = .189269;
-            double d3 = .001308;
             double q;
             q = p;
             if (q == .5) { return Mean; }
