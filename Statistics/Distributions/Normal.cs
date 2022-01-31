@@ -125,8 +125,11 @@ namespace Statistics.Distributions
                 i = 1;
                 q = 1 - q;
             }
-            double t = Math.Sqrt(Math.Log(1 / Math.Pow(q, 2)));
-            x = t - (c0 + c1 * t + c2 * (Math.Pow(t, 2))) / (1 + d1 * t + d2 * Math.Pow(t, 2) + d3 * Math.Pow(t, 3));
+            
+            double t = Math.Sqrt(Math.Log(1 /(q*q)));
+            double tsquared = t * t;
+            double tcubed = tsquared * t;
+            x = t - (c0 + c1 * t + c2 * (tsquared)) / (1 + d1 * t + d2 * tsquared + d3 * tcubed);
             x = i * x;
             return (x * StandardDeviation) + Mean;
 

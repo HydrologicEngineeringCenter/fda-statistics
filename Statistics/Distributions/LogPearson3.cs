@@ -148,7 +148,8 @@ namespace Statistics.Distributions
             {
                 Normal sn = new Normal();
                 double z = sn.InverseCDF(p);
-                double k = (_twoDividedBySkew) * (Math.Pow((z - _skewDividedBySix) * Skewness / 6.0 + 1, 3) - 1); //pemdas says you cant substitute for the divide in that other instance... so dont do it!
+                double whfactor = (z - _skewDividedBySix) * Skewness / 6.0 + 1;
+                double k = (_twoDividedBySkew) * ((whfactor*whfactor*whfactor) - 1); //pemdas says you cant substitute for the divide in that other instance... so dont do it!
                 double logflow = Mean + (k * StandardDeviation);
                 return Math.Pow(10, logflow);
             }
