@@ -51,21 +51,29 @@ namespace StatisticsTests.GraphicalRelationships
 
         }
 
-        [Fact]
-        public void ReturnDistributionsForInputProbabilities()
+        [Theory]
+        [InlineData( new double[] {.002,.01,.02,.1,.5,.99},new double[] {146000,86000,66900,34900,2000,500},5,true,true  )] //Based on Elkhorn River at Highway 91 Dodge County FIS 2008
+        [InlineData(new double[] { .99, .95, .90, .85, .8, .75, .7, .65, .6, .55, .5, .45, .4, .35, .3, .25, .2, .15, .1, .05, .02, .01, .005, .0025 }, 
+            new double[] { 6.6, 7.4, 8.55, 9.95, 11.5, 12.7, 13.85, 14.7, 15.8, 16.7, 17.5, 18.25, 19, 19.7, 20.3, 21.1, 21.95, 23, 24.2, 25.7, 27.4, 28.4, 29.1, 29.4 },
+            20,true,true)]
+        public void ReturnDistributionsForInputProbabilities(double[] probs, double[] flows, int erl, bool usingFlows, bool flowsNotLogged)
         {
-            Graphical graphical = new Graphical(exceedanceProbabilities, quantileValues, equivalentRecordLength);
+            Graphical graphical = new Graphical(probs, flows, erl, usingFlows: true, flowsAreNotLogged: true);
             graphical.ComputeGraphicalConfidenceLimits();
             double[] outputProbs = graphical.ExceedanceProbabilities;
-            foreach (double value in exceedanceProbabilities)
+            foreach (double value in probs)
             {
                 Assert.Contains(value, outputProbs);
             }
         }
-        [Fact]
-        public void ReturnDistributionsForInputMeanValues()
+        [Theory]
+        [InlineData(new double[] { .002, .01, .02, .1, .5, .99 }, new double[] { 146000, 86000, 66900, 34900, 2000, 500 }, 10, true, true)] //Based on Elkhorn River at Highway 91 Dodge County FIS 2008
+        [InlineData(new double[] { .99, .95, .90, .85, .8, .75, .7, .65, .6, .55, .5, .45, .4, .35, .3, .25, .2, .15, .1, .05, .02, .01, .005, .0025 },
+            new double[] { 6.6, 7.4, 8.55, 9.95, 11.5, 12.7, 13.85, 14.7, 15.8, 16.7, 17.5, 18.25, 19, 19.7, 20.3, 21.1, 21.95, 23, 24.2, 25.7, 27.4, 28.4, 29.1, 29.4 },
+            20, true, true)]
+        public void ReturnDistributionsWithInputMeanValues(double[] probs, double[] flows, int erl, bool usingFlows, bool flowsNotLogged)
         {
-            Graphical graphical = new Graphical(exceedanceProbabilities, quantileValues, equivalentRecordLength);
+            Graphical graphical = new Graphical(probs, flows, erl,usingFlows: usingFlows, flowsAreNotLogged: flowsNotLogged);
             graphical.ComputeGraphicalConfidenceLimits();
             Normal[] dists = graphical.FlowOrStageDistributions;
             double[] means = new double[dists.Length];
@@ -73,8 +81,7 @@ namespace StatisticsTests.GraphicalRelationships
             {
                 means[i] = dists[i].Mean;
             }
-
-            foreach (double value in quantileValues)
+            foreach (double value in flows)
             {
                 Assert.Contains(value, means);
             }
