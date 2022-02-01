@@ -6,6 +6,7 @@ using System.Linq;
 using Utilities;
 using Xunit;
 using Statistics.GraphicalRelationships;
+using Statistics.Distributions;
 
 namespace StatisticsTests.GraphicalRelationships
 {
@@ -48,6 +49,35 @@ namespace StatisticsTests.GraphicalRelationships
             Assert.Equal(standardDeviations[j], computedStandardDeviations[j], 1);
             Assert.Equal(standardDeviations[k], computedStandardDeviations[k], 1);
 
+        }
+
+        [Fact]
+        public void ReturnDistributionsForInputProbabilities()
+        {
+            Graphical graphical = new Graphical(exceedanceProbabilities, quantileValues, equivalentRecordLength);
+            graphical.ComputeGraphicalConfidenceLimits();
+            double[] outputProbs = graphical.ExceedanceProbabilities;
+            foreach (double value in exceedanceProbabilities)
+            {
+                Assert.Contains(value, outputProbs);
+            }
+        }
+        [Fact]
+        public void ReturnDistributionsForInputMeanValues()
+        {
+            Graphical graphical = new Graphical(exceedanceProbabilities, quantileValues, equivalentRecordLength);
+            graphical.ComputeGraphicalConfidenceLimits();
+            Normal[] dists = graphical.FlowOrStageDistributions;
+            double[] means = new double[dists.Length];
+            for(int i = 0; i < dists.Length; i++)
+            {
+                means[i] = dists[i].Mean;
+            }
+
+            foreach (double value in quantileValues)
+            {
+                Assert.Contains(value, means);
+            }
         }
     }
 }
