@@ -123,7 +123,8 @@ namespace Statistics.Distributions
             }
             if (p <= _ProbabilityRange.Min) return Min;
             if (p >= _ProbabilityRange.Max) return Max;
-            return invCDFNewton(p, Mean, 1e-10, 100);
+            return Mean + Normal.StandardNormalInverseCDF(p)*StandardDeviation;
+            //return invCDFNewton(p, Mean, 1e-10, 100);
         }
 
 

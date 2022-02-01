@@ -45,13 +45,13 @@ namespace StatisticsTests.Distributions
         }
 
         [Theory]
-        [InlineData(0d, 1, -2d,2d, 0, .99865, 1.97668)]
-        [InlineData(0d, 1, -2d, 2d, 0, .97725, 1.701069)]
-        [InlineData(0d, 1, -2d, 2d, 0, .84134, .93773)]
+        [InlineData(0d, 1, -2d,2d, 0, .99865, 1.97711642477487)]
+        [InlineData(0d, 1, -2d, 2d, 0, .97725, 1.70144538422304)]
+        [InlineData(0d, 1, -2d, 2d, 0, .84134, 0.937648811119616)]
         [InlineData(0d, 1, -2d, 2d, 0, .5, 0d)]
-        [InlineData(0d, 1, -2d, 2d, 0, .15866, -.93773)]
-        [InlineData(0d, 1, -2d, 2d, 0, .02275, -1.701069)]
-        [InlineData(0d, 1, -2d, 2d, 0, .00135, -1.97668)]
+        [InlineData(0d, 1, -2d, 2d, 0, .15866, -0.937648811119617)]
+        [InlineData(0d, 1, -2d, 2d, 0, .02275, -1.70144538422304)]
+        [InlineData(0d, 1, -2d, 2d, 0, .00135, -1.97711642477487)]
         public void Truncated_StandardNormal_InverseCDF(double mean, double sd, double min, double max, int n, double p, double z)
         {
             var testObj = new Statistics.Distributions.TruncatedNormal(mean, sd, min, max, n);

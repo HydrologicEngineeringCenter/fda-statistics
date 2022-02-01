@@ -80,7 +80,7 @@ namespace Statistics.Distributions
             if (p <= 0) return 0;
             if (p >= 1) return double.PositiveInfinity;
             Normal sn = new Normal();
-            return Math.Exp(Mean+sn.InverseCDF(p)*StandardDeviation);
+            return Math.Exp(Mean+Normal.StandardNormalInverseCDF(p)*StandardDeviation);
         }
         public override string Print(bool round = false) => round ? Print(Mean, StandardDeviation, SampleSize) : $"LogNormal(mean: {Mean}, sd: {StandardDeviation}, sample size: {SampleSize})";
         public override string Requirements(bool printNotes) => RequiredParameterization(printNotes);

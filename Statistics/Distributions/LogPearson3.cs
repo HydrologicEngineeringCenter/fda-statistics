@@ -140,7 +140,7 @@ namespace Statistics.Distributions
             //return Math.Pow(10, d.InverseCDF(p));
             if (Skewness == 0)
             {
-                Normal zeroSkewNorm = new Normal(Mean, StandardDeviation);
+                //Normal zeroSkewNorm = new Normal(Mean, StandardDeviation);
                 double logflow = (Normal.StandardNormalInverseCDF(p)*StandardDeviation) + Mean;
                 return Math.Pow(10, logflow);
             }
