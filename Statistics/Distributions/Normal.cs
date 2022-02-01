@@ -10,12 +10,7 @@ namespace Statistics.Distributions
         #region Fields and Properties
         private double _mean;
         private double _standardDeviation;
-        private double c0 = 2.515517;
-        private double c1 = .802853;
-        private double c2 = .010328;
-        private double d1 = 1.432788;
-        private double d2 = .189269;
-        private double d3 = .001308;
+
 
         #region IDistribution Properties
         public override IDistributionEnum Type => IDistributionEnum.Normal;
@@ -125,6 +120,12 @@ namespace Statistics.Distributions
             int i;
             double x;
             double q;
+            double c0 = 2.515517;
+            double c1 = .802853;
+            double c2 = .010328;
+            double d1 = 1.432788;
+            double d2 = .189269;
+            double d3 = .001308;
             q = p;
             if (q == .5) { return Mean; }
             if (q <= 0) { q = .000000000000001; }
