@@ -112,14 +112,15 @@ namespace StatisticsTests.GraphicalRelationships
             double[] means = new double[dists.Length];
             double[] conf95 = new double[dists.Length];
             double[] conf05 = new double[dists.Length];
-            for (int i = 0; i < dists.Length; i++)
+            for (int j = 0; j < dists.Length; j++)
             {
-                means[i] = dists[i].Mean;
-                conf95[i] = dists[i].InverseCDF(.95);
-                conf05[i] = dists[i].InverseCDF(.05);
+                means[j] = dists[j].Mean;
+                conf95[j] = dists[j].InverseCDF(.95);
+                conf05[j] = dists[j].InverseCDF(.05);
             }
+            int i;
             bool pass = true;
-            for (int i = 1; i < dists.Length; i++)
+            for (i = 1; i < dists.Length; i++)
             {
                 if (means[i] < means[i - 1])
                 {

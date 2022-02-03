@@ -1,84 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Statistics.Distributions;
+﻿using Statistics.Distributions;
+using System;
 
 namespace Statistics.GraphicalRelationships
 {
     static class MakeMeMonotonic
     {
-
+        static double[] probsForChecking = new double[] { .45, .2, .1, .05, .02, .01, .005, .002 };
+        static Normal standardNormal = new Normal(0,1);
         public static Normal[] IAmNormalMakeMeMonotonic(Normal[] distributionArray)
         {
+
             Normal[] monotonicDistributionArray = new Normal[distributionArray.Length];
-            double lowerBoundNonExceedanceProbability = 0.0001;
-            double upperBoundNonExceedanceProbability = 1 - lowerBoundNonExceedanceProbability;
-            double lowerBoundFirstDistribution;
-            double lowerBoundSecondDistribution;
-            double upperBoundFirstDistribution;
-            double upperBoundSecondDistribution;
-            bool lowerBoundIsDecreasing;
-            bool upperBoundIsDecreasing;
-
             monotonicDistributionArray[0] = distributionArray[0];
-            for (int i = 1; i < distributionArray.Length; i++)
+
+            for (int j = 0; j < probsForChecking.Length; j++)
             {
-                lowerBoundFirstDistribution = distributionArray[i - 1].InverseCDF(lowerBoundNonExceedanceProbability);
-                lowerBoundSecondDistribution = distributionArray[i].InverseCDF(lowerBoundNonExceedanceProbability);
-                upperBoundFirstDistribution = distributionArray[i - 1].InverseCDF(upperBoundNonExceedanceProbability);
-                upperBoundSecondDistribution = distributionArray[i].InverseCDF(upperBoundNonExceedanceProbability);
-
-                lowerBoundIsDecreasing = lowerBoundSecondDistribution < lowerBoundFirstDistribution;
-                upperBoundIsDecreasing = upperBoundSecondDistribution < upperBoundFirstDistribution;
-
-                if (lowerBoundIsDecreasing || upperBoundIsDecreasing)
+                double q = probsForChecking[j];
+                double qComplement = 1 - q; 
+                for (int i = 1; i < distributionArray.Length; i++)
                 {
-                    double meanSecondDistribution = (distributionArray[i]).Mean;
-                    int sampleSizeSecondDistribution = (distributionArray[i]).SampleSize;
-                    double standardDeviationFirstDistribution = (distributionArray[i - 1]).StandardDeviation;
+                    double lowerBoundPreviousDistribution = distributionArray[i - 1].InverseCDF(q);
+                    double lowerBoundCurrentDistribution = distributionArray[i].InverseCDF(q);
+                    double lowerBoundDifference = lowerBoundCurrentDistribution - lowerBoundPreviousDistribution;
 
-                    if (distributionArray[i].Truncated)
+                    double upperBoundPreviousDistribution = distributionArray[i - 1].InverseCDF(qComplement);
+                    double upperBoundCurrentDistribution = distributionArray[i].InverseCDF(qComplement);
+                    double upperBoundDifference = upperBoundCurrentDistribution - upperBoundPreviousDistribution;
+
+                    if ((upperBoundDifference < 0) || (lowerBoundDifference < 0))
                     {
-                        double firstMin = ((TruncatedNormal)(distributionArray[i - 1])).Min;
-                        double secondMin = ((TruncatedNormal)(distributionArray[i])).Min;
-                        double firstMax = ((TruncatedNormal)(distributionArray[i - 1])).Max;
-                        double secondMax = ((TruncatedNormal)(distributionArray[i])).Max;
-                        bool minIsDecreasing = secondMin < firstMin;
-                        bool maxIsDecreasing = secondMax < firstMax;
-                        double epsilon = .0001;
-
-                        if (minIsDecreasing && !maxIsDecreasing)
-                        {
-                            monotonicDistributionArray[i] = new TruncatedNormal(meanSecondDistribution, standardDeviationFirstDistribution, firstMin + epsilon, secondMax, sampleSizeSecondDistribution);
-                        }
-                        else if (!minIsDecreasing && maxIsDecreasing)
-                        {
-                            monotonicDistributionArray[i] = new TruncatedNormal(meanSecondDistribution, standardDeviationFirstDistribution, secondMin, firstMax + epsilon, sampleSizeSecondDistribution);
-                        }
-                        else if (minIsDecreasing && maxIsDecreasing)
-                        {
-                            monotonicDistributionArray[i] = new TruncatedNormal(meanSecondDistribution, standardDeviationFirstDistribution, firstMin + epsilon, firstMax + epsilon, sampleSizeSecondDistribution);
-                        }
+                        monotonicDistributionArray[i] = new Normal(distributionArray[i].Mean, distributionArray[i - 1].StandardDeviation, distributionArray[i].SampleSize);
                     }
                     else
                     {
-
-                        monotonicDistributionArray[i] = new Normal(meanSecondDistribution, standardDeviationFirstDistribution, sampleSizeSecondDistribution);
+                        monotonicDistributionArray[i] = distributionArray[i];
                     }
-                }
-                else
-                {
-                    monotonicDistributionArray[i] = distributionArray[i];
                 }
             }
             return monotonicDistributionArray;
         }
-
-      
-
- 
 
     }
 }
