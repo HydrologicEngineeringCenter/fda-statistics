@@ -161,7 +161,7 @@ namespace Statistics.GraphicalRelationships
             _ExpandedFlowOrStageValues = interpolatedQuantiles.ComputeQuantiles(finalProbabilities.ToArray());
             _FinalProbabilities = finalProbabilities.ToArray();
             _FlowOrStageStandardErrorsComputed = ComputeStandardDeviations(useConstantStandardError, lowerExceedanceProbabilityHoldStandardErrorConstant, higherExceedanceProbabilityHoldStandardErrorConstant);
-            _FlowOrStageDistributions = MakeMeMonotonic.IAmNormalMakeMeMonotonic(ConstructNormalDistributions());
+            _FlowOrStageDistributions = ConstructNormalDistributions();
         }
       
         private bool IsMonotonicallyIncreasing(double[] arrayOfData)
