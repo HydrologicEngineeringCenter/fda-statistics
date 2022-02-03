@@ -56,11 +56,11 @@ namespace Statistics.GraphicalRelationships
         {
             get
             {
-                return _RequiredExceedanceProbabilities;
+                return _FinalProbabilities;
             }
             set
             {
-                _RequiredExceedanceProbabilities = value;
+                _FinalProbabilities = value;
             }
         }
         [Stored(Name = "FlowOrStageDistributions", type = typeof(IDistribution[]))]
