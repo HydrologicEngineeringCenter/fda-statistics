@@ -52,7 +52,7 @@ namespace Statistics
         {
             get { return (int)_n; }
         }
-        internal SampleStatistics(double[] data)
+        public SampleStatistics(double[] data)
         {
             InitalizeStats(data);
             Range = Utilities.IRangeFactory.Factory(_min, _max);
