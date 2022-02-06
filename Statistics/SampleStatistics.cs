@@ -74,15 +74,16 @@ namespace Statistics
                     if (observation > _max) _max = observation;
                     if (observation < _min) _min = observation;
                     _n += 1;
-                    double tmpMean = _mean + ((observation - _mean) / (double)_n);
-                    _sampleVariance = ((((double)(_n - 2) / (double)(_n - 1)) * _sampleVariance) + (Math.Pow(observation - _mean, 2)) / (double)_n);
+                    double obsminusmean = observation - _mean;
+                    double tmpMean = _mean + ((obsminusmean) / (double)_n);
+                    _sampleVariance = ((((double)(_n - 2) / (double)(_n - 1)) * _sampleVariance) + ((obsminusmean)*(obsminusmean)) / (double)_n);
                     _mean = tmpMean;
                 }
             }
 
             double s = System.Math.Pow(_sampleVariance * (double)((double)(_n - 1) / (double)_n), 0.5);
             double SkewSums = 0;
-            double ksums = 0;
+            //double ksums = 0;
             double midpoint = ((double)_n - 1) / 2;
             bool noRounding = false;
             if (System.Math.Floor(midpoint) == midpoint)
@@ -120,14 +121,15 @@ namespace Statistics
                     }
 
                 }
-                SkewSums = SkewSums + (System.Math.Pow((observation - _mean), 3.0));
-                ksums = ksums + System.Math.Pow(((observation - _mean) / s), 4.0);
+                double obsminusmean = observation - _mean;
+                SkewSums = SkewSums + (obsminusmean*obsminusmean*obsminusmean);
+                //ksums = ksums + System.Math.Pow(((observation - _mean) / s), 4.0);
                 val++;
             }
             double nd = (double)_n;
-            ksums = ksums * (nd * (nd + 1.0)) / ((nd - 1.0) * (nd - 2.0) * (nd - 3.0));
-            _skew = ((nd) * SkewSums) / ((nd - 1.0) * (nd - 2.0) * (System.Math.Pow(s, 3.0)));
-            _kurtosis = (ksums) - ((3.0 * (System.Math.Pow((nd - 1.0), 2.0))) / ((nd - 2.0) * (nd - 3.0)));
+           // ksums = ksums * (nd * (nd + 1.0)) / ((nd - 1.0) * (nd - 2.0) * (nd - 3.0));
+            _skew = ((nd) * SkewSums) / ((nd - 1.0) * (nd - 2.0) * (s*s*s));
+            //_kurtosis = (ksums) - ((3.0 * (System.Math.Pow((nd - 1.0), 2.0))) / ((nd - 2.0) * (nd - 3.0)));
         }
         public IMessageLevels Validate(Utilities.IValidator<ISampleStatistics> validator, out IEnumerable<IMessage> msgs)
         {
