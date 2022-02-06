@@ -6,7 +6,7 @@ using Utilities;
 
 namespace Statistics
 {
-    internal class SampleStatistics : ISampleStatistics
+    public class SampleStatistics : ISampleStatistics
     {
         private double _mean;
         private double _sampleVariance;
