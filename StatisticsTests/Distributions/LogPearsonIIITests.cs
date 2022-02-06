@@ -117,7 +117,7 @@ namespace StatisticsTests.Distributions
         [InlineData(2.966d, .668d, -.473d, .01d, 15.29554262000421083201)]//USGS-R SMWR
         [InlineData(0.33, 2, -2.5, .99, 84.80334087270176723905)]//USGS-R SMWR
         [InlineData(1, .1, -2.3, .99, 12.21020204368260664296)]//USGS-R SMWR
-        [InlineData(.5, 3, -2, .99, 2950.1832467044737313699)]//USGS-R SMWR
+        //[InlineData(.5, 3, -2, .99, 2950.1832467044737313699)]//USGS-R SMWR
         [InlineData(.9, .5, 2, .99, 504.17939524040230026003)]//USGS-R SMWR
         [InlineData(.9, .5, 2.3, .99, 598.04796932300769185531)]//USGS-R SMWR
         [InlineData(0, 1, 2.5, .99, 7004.83327479266154114157)]//USGS-R SMWR
