@@ -257,7 +257,7 @@ namespace StatisticsTests.Histograms
             IDistribution stdNormal = new Statistics.Distributions.Normal(0, 1);
             var rand = new Random(1234);
             double z = stdNormal.InverseCDF(.5 + .5 * .85);
-            var convergencecriteria = new ConvergenceCriteria(maxIterations: maxiter, tolerance: 1, zAlpha: z);
+            var convergencecriteria = new ConvergenceCriteria(maxIterations: maxiter, tolerance: .01, zAlpha: z);
             ThreadsafeInlineHistogram histogram = new ThreadsafeInlineHistogram(binWidth, convergencecriteria);
             while (!histogram.IsConverged)
             {
