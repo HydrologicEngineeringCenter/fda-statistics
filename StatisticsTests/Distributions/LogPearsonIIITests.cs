@@ -11,6 +11,7 @@ namespace StatisticsTests.Distributions
 {
     /// <summary>
     /// This class tests the LogPearsonIII Distribution in the Statistics Library <see cref="Statistics.Distributions.LogPearson3"/>.
+    /// Most testing values produced using the USGS SMWR R package. Example script here: https://drive.google.com/file/d/1CUAJ0UckcreU9Nis8edNvyadkHDymTZs/view?usp=sharing
     /// </summary>
     [ExcludeFromCodeCoverage]
     public class LogPearsonIIITests
