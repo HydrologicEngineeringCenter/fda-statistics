@@ -43,7 +43,7 @@ namespace StatisticsTests.Distributions
             Statistics.Distributions.Triangular dist = new Statistics.Distributions.Triangular(min, mostlikely, max, n);
             dist.Validate();
             Assert.True(dist.HasErrors);
-            Assert.True(dist.ErrorLevel == Base.Enumerations.ErrorLevel.Minor);
+            Assert.True(dist.ErrorLevel == HEC.MVVMFramework.Base.Enumerations.ErrorLevel.Minor);
         }
         [Theory]
         [InlineData(0d, 1d, 2d, 1)]

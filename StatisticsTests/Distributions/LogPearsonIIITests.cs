@@ -57,7 +57,7 @@ namespace StatisticsTests.Distributions
         {
             var testObj = new Statistics.Distributions.LogPearson3(mean, sd, skew, n);
             testObj.Validate();
-            Assert.True(testObj.ErrorLevel < Base.Enumerations.ErrorLevel.Major);
+            Assert.True(testObj.ErrorLevel < HEC.MVVMFramework.Base.Enumerations.ErrorLevel.Major);
         }
 
         [Theory]

@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace Statistics
 {
-    public abstract class ContinuousDistribution : Base.Implementations.Validation, IDistribution
+    public abstract class ContinuousDistribution : HEC.MVVMFramework.Base.Implementations.Validation, IDistribution
     {   
         public abstract IDistributionEnum Type { get; }
         [Stored(Name = "SampleSize", type = typeof(Int32))]
