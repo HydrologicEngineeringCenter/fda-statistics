@@ -33,7 +33,7 @@ namespace StatisticsTests.Distributions
             Statistics.Distributions.Uniform dist = new Statistics.Distributions.Uniform(min, max, n);
             dist.Validate();
             Assert.True(dist.HasErrors);
-            Assert.True(dist.ErrorLevel==Base.Enumerations.ErrorLevel.Minor);
+            Assert.True(dist.ErrorLevel==HEC.MVVMFramework.Base.Enumerations.ErrorLevel.Minor);
         }
         [Theory]
         [InlineData(0d, 1d, 1)]
